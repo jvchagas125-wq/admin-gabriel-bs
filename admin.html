@@ -93,7 +93,7 @@
       <div class="login-title">Painel Admin</div>
       <div class="login-sub">Gabriel Barber Studio - so para administradores</div>
       <div class="login-err" id="login-err">Usuario ou senha incorretos.</div>
-      <div class="field"><label>Usuario</label><input type="text" id="inp-user" placeholder="admin" autocomplete="username"></div>
+      <div class="field"><label>Email</label><input type="email" id="inp-user" placeholder="admin@email.com" autocomplete="username"></div>
       <div class="field"><label>Senha</label><input type="password" id="inp-pass" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" autocomplete="current-password"></div>
       <button class="login-btn" onclick="doLogin()">Entrar no Painel</button>
       <p class="login-notice">Acesso restrito - nao compartilhe suas credenciais</p>
@@ -167,11 +167,7 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getFirestore, collection, deleteDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-  const ADMINS = [
-    { user: "gabriel", pass: "barber2025" },
-    { user: "admin",   pass: "gbs@admin"  }
-  ];
+  import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyBuqPBQocq7gFFnbtD8VoMB6kTu1I3R_9w",
@@ -184,6 +180,7 @@
 
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
+  const auth = getAuth(app);
   const COL = "appointments";
 
   let currentAdmin = null;
@@ -206,21 +203,27 @@
   document.getElementById("inp-pass").addEventListener("keydown",e=>{ if(e.key==="Enter") doLogin(); });
   document.getElementById("inp-user").addEventListener("keydown",e=>{ if(e.key==="Enter") document.getElementById("inp-pass").focus(); });
 
-  window.doLogin = function(){
-    const user=document.getElementById("inp-user").value.trim().toLowerCase();
+  window.doLogin = async function(){
+    const email=document.getElementById("inp-user").value.trim();
     const pass=document.getElementById("inp-pass").value;
-    const match=ADMINS.find(a=>a.user===user&&a.pass===pass);
-    if(!match){ document.getElementById("login-err").style.display="block"; document.getElementById("inp-pass").value=""; return; }
-    currentAdmin=match.user;
-    sessionStorage.setItem("gbs_admin",match.user);
-    document.getElementById("login-screen").style.display="none";
-    document.getElementById("admin-user-label").textContent=match.user;
-    subscribeData();
+    const errEl=document.getElementById("login-err");
+    errEl.style.display="none";
+    try {
+      const cred = await signInWithEmailAndPassword(auth, email, pass);
+      currentAdmin = cred.user.email;
+      document.getElementById("login-screen").style.display="none";
+      document.getElementById("admin-user-label").textContent=currentAdmin;
+      subscribeData();
+    } catch(err){
+      errEl.style.display="block";
+      document.getElementById("inp-pass").value="";
+    }
   };
 
-  window.doLogout = function(){
+  window.doLogout = async function(){
     if(!confirm("Deseja sair do painel?")) return;
-    sessionStorage.removeItem("gbs_admin"); location.reload();
+    await signOut(auth);
+    location.reload();
   };
 
   function subscribeData(){
@@ -306,15 +309,17 @@
   };
 
   window.addEventListener("DOMContentLoaded",()=>{
-    document.getElementById("app-loading").style.display="none";
-    const saved=sessionStorage.getItem("gbs_admin");
-    if(saved&&ADMINS.find(a=>a.user===saved)){
-      currentAdmin=saved;
-      document.getElementById("admin-user-label").textContent=saved;
-      subscribeData();
-    } else {
-      document.getElementById("login-screen").style.display="flex";
-    }
+    onAuthStateChanged(auth, user => {
+      document.getElementById("app-loading").style.display="none";
+      if(user){
+        currentAdmin = user.email;
+        document.getElementById("admin-user-label").textContent=currentAdmin;
+        document.getElementById("login-screen").style.display="none";
+        subscribeData();
+      } else {
+        document.getElementById("login-screen").style.display="flex";
+      }
+    });
   });
 </script>
 </body>
