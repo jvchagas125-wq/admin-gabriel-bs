@@ -152,6 +152,7 @@
           <th onclick="sortBy('date')">Data <span id="sort-date"></span></th>
           <th onclick="sortBy('time')">Horario <span id="sort-time"></span></th>
           <th>Status</th>
+          <th>Justificativa</th>
           <th>Acao</th>
         </tr>
       </thead>
@@ -272,7 +273,10 @@
       const fmtDate=new Date(apt.date+"T12:00:00").toLocaleDateString("pt-BR",{weekday:"short",day:"2-digit",month:"short"});
       const badgeClass=st==="passado"?"badge-past":st==="hoje"?"badge-today":"badge-ok";
       const badgeLabel=st==="passado"?"Realizado":st==="hoje"?"Hoje":"Confirmado";
-      return '<tr><td><strong>'+esc(apt.name)+'</strong></td><td style="color:var(--text-muted)">'+esc(apt.phone)+'</td><td>'+esc(apt.service)+'</td><td>'+fmtDate+'</td><td style="font-family:Bebas Neue,sans-serif;font-size:15px;color:var(--gold)">'+esc(apt.time)+'</td><td><span class="badge '+badgeClass+'">'+badgeLabel+'</span></td><td><button class="del-btn" onclick="deleteApt(\''+apt.id+'\')">Cancelar</button></td></tr>';
+      const justifyCell = apt.justification
+        ? '<td style="max-width:200px;"><span style="display:inline-block;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.25);border-radius:6px;padding:3px 8px;font-size:11px;color:#f0d78c;" title="'+esc(apt.justification)+'">'+esc(apt.justification.length>40?apt.justification.slice(0,40)+'...':apt.justification)+'</span></td>'
+        : '<td style="color:var(--text-dim);font-size:12px;">—</td>';
+      return '<tr><td><strong>'+esc(apt.name)+'</strong></td><td style="color:var(--text-muted)">'+esc(apt.phone)+'</td><td>'+esc(apt.service)+'</td><td>'+fmtDate+'</td><td style="font-family:Bebas Neue,sans-serif;font-size:15px;color:var(--gold)">'+esc(apt.time)+'</td><td><span class="badge '+badgeClass+'">'+badgeLabel+'</span></td>'+justifyCell+'<td><button class="del-btn" onclick="deleteApt(\''+apt.id+'\')">Cancelar</button></td></tr>';
     }).join("");
   };
 
