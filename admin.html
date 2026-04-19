@@ -76,6 +76,29 @@
     @keyframes toastUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
     @keyframes fadeIn{from{opacity:0}to{opacity:1}}
     .fade-in{animation:fadeIn .35s ease-out}
+    .tab-btn{padding:10px 18px;border:none;background:none;color:var(--text-muted);font-size:13px;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;font-family:"DM Sans",sans-serif;}
+    .tab-btn:hover{color:var(--text)}
+    .tab-btn.active{color:var(--gold);border-bottom-color:var(--gold)}
+    .cfg-card{background:var(--bg2);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:24px;margin-bottom:20px}
+    .cfg-title{font-family:"Bebas Neue",sans-serif;font-size:22px;color:var(--gold);margin-bottom:6px}
+    .cfg-subtitle{font-size:13px;font-weight:700;color:var(--text-muted);margin-bottom:10px;margin-top:16px}
+    .cfg-hint{font-size:12px;color:var(--text-dim);margin-bottom:18px}
+    .cfg-label{display:block;font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+    .cfg-input{padding:8px 12px;border-radius:8px;background:var(--bg3);border:1px solid rgba(255,255,255,0.08);color:var(--text);font-size:14px;font-family:"DM Sans",sans-serif;transition:border-color .2s}
+    .cfg-input:focus{outline:none;border-color:var(--gold)}
+    .cfg-row{display:grid;grid-template-columns:120px 1fr 1fr;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.04)}
+    .cfg-row:last-child{border-bottom:none}
+    .cfg-toggle{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600}
+    .cfg-toggle input[type=checkbox]{width:18px;height:18px;accent-color:var(--gold);cursor:pointer}
+    .cfg-break-row{display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap}
+    .cfg-add-btn{background:none;border:1px solid var(--gold-border);color:var(--gold);font-size:12px;font-weight:700;padding:6px 14px;border-radius:7px;cursor:pointer;transition:background .15s;font-family:"DM Sans",sans-serif;margin-top:8px}
+    .cfg-add-btn:hover{background:var(--gold-dim)}
+    .cfg-rm-btn{background:none;border:1px solid rgba(220,38,38,.25);color:#f87171;font-size:11px;padding:4px 10px;border-radius:6px;cursor:pointer;transition:background .15s;font-family:"DM Sans",sans-serif}
+    .cfg-rm-btn:hover{background:var(--red-dim)}
+    .cfg-svc-row{display:grid;grid-template-columns:1fr 120px;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.04)}
+    .cfg-svc-row:last-child{border-bottom:none}
+    .cfg-save-btn{width:100%;padding:14px;border-radius:10px;border:none;background:var(--gold);color:#111;font-weight:700;font-size:16px;cursor:pointer;font-family:"DM Sans",sans-serif;transition:opacity .2s;margin-top:4px}
+    .cfg-save-btn:hover{opacity:.88}
   </style>
 </head>
 <body>
@@ -113,9 +136,15 @@
       <button class="logout-btn" onclick="doLogout()">Sair</button>
     </div>
   </div>
+  <div style="max-width:1100px;margin:0 auto;padding:0 20px;display:flex;gap:4px;border-top:1px solid rgba(255,255,255,0.05);">
+    <button class="tab-btn active" onclick="switchTab('appointments')">📋 Agendamentos</button>
+    <button class="tab-btn" onclick="switchTab('settings')">⚙️ Configuracoes</button>
+  </div>
 </header>
 
 <main>
+  <!-- ABA AGENDAMENTOS -->
+  <div id="tab-appointments">
   <div class="stats-grid">
     <div class="stat-card"><div class="stat-label">Total de Agendamentos</div><div class="stat-value" id="stat-total">0</div><div class="stat-sub">todos os registros</div></div>
     <div class="stat-card"><div class="stat-label">Hoje</div><div class="stat-value" id="stat-today">0</div><div class="stat-sub" id="stat-today-date">-</div></div>
@@ -161,13 +190,43 @@
     </table>
     <div class="empty" id="empty-state" style="display:none;"><div class="empty-icon">no data</div><p>Nenhum agendamento encontrado.</p></div>
   </div>
+  </div>
+
+  <!-- ABA CONFIGURAÇÕES -->
+  <div id="tab-settings" style="display:none;">
+    <div style="max-width:720px;">
+
+      <div class="cfg-card">
+        <div class="cfg-title">📅 Dias e Horarios de Funcionamento</div>
+        <div class="cfg-hint">Defina quais dias funcionam e os horarios de cada um.</div>
+        <div id="days-config"></div>
+        <div style="margin-top:20px;">
+          <div class="cfg-subtitle">⚠️ Intervalos especiais (ex: sexta 12–18)</div>
+          <div id="breaks-config"></div>
+          <button class="cfg-add-btn" onclick="addBreak()">+ Adicionar intervalo</button>
+        </div>
+      </div>
+
+      <div class="cfg-card">
+        <div class="cfg-title">⏱️ Duracao dos Servicos</div>
+        <div class="cfg-hint">Tempo de atendimento de cada servico (em minutos). O intervalo entre clientes sera aplicado automaticamente.</div>
+        <div style="margin-bottom:14px;">
+          <label class="cfg-label">Intervalo entre atendimentos (min)</label>
+          <input type="number" id="cfg-buffer" min="0" max="30" step="5" value="5" class="cfg-input" style="width:100px;">
+        </div>
+        <div id="services-config"></div>
+      </div>
+
+      <button class="cfg-save-btn" onclick="saveSettings()">💾 Salvar Configuracoes</button>
+    </div>
+  </div>
 </main>
 
 <div id="toast"><div class="toast-box" id="toast-box"></div></div>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getFirestore, collection, deleteDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { getFirestore, collection, deleteDoc, doc, onSnapshot, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
   import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
   const firebaseConfig = {
@@ -309,6 +368,168 @@
     showToast("CSV exportado!","green");
   };
 
+  // ===== CONFIGURAÇÕES =====
+  const DAYS = [
+    {key:'tue', label:'Terca-feira'},
+    {key:'wed', label:'Quarta-feira'},
+    {key:'thu', label:'Quinta-feira'},
+    {key:'fri', label:'Sexta-feira'},
+    {key:'sat', label:'Sabado'},
+  ];
+
+  const SERVICES = ['Cabelo','Barba','Pezinho','Cabelo & Barba','Raspar Cabeca','Sobrancelha'];
+
+  const DEFAULT_SETTINGS = {
+    days: {
+      tue: {open:true,  start:'10:00', end:'21:00'},
+      wed: {open:true,  start:'10:00', end:'15:00'},
+      thu: {open:true,  start:'10:00', end:'21:00'},
+      fri: {open:true,  start:'10:00', end:'21:00'},
+      sat: {open:true,  start:'10:00', end:'21:00'},
+    },
+    breaks: [
+      {days:['tue','thu','sat'], start:'12:00', end:'14:00', label:'Almoco'},
+      {days:['fri'],             start:'12:00', end:'18:00', label:'Intervalo sexta'},
+    ],
+    services: {
+      'Cabelo':        {duration:45},
+      'Barba':         {duration:15},
+      'Pezinho':       {duration:15},
+      'Cabelo & Barba':{duration:70},
+      'Raspar Cabeca': {duration:15},
+      'Sobrancelha':   {duration:15},
+    },
+    buffer: 5,
+  };
+
+  let currentSettings = JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
+
+  async function loadSettings(){
+    try {
+      const snap = await getDoc(doc(db,'config','schedule'));
+      if(snap.exists()) currentSettings = snap.data();
+    } catch(e){ console.error('loadSettings error',e); }
+    renderSettingsUI();
+  }
+
+  function renderSettingsUI(){
+    const s = currentSettings;
+
+    // Dias
+    document.getElementById('days-config').innerHTML = DAYS.map(d=>{
+      const cfg = s.days[d.key]||{open:false,start:'10:00',end:'21:00'};
+      return `<div class="cfg-row">
+        <div class="cfg-toggle">
+          <input type="checkbox" id="day-open-${d.key}" ${cfg.open?'checked':''}>
+          <label for="day-open-${d.key}">${d.label}</label>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span style="font-size:12px;color:var(--text-dim)">Inicio</span>
+          <input type="time" class="cfg-input" id="day-start-${d.key}" value="${cfg.start}" style="width:110px;">
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span style="font-size:12px;color:var(--text-dim)">Fim</span>
+          <input type="time" class="cfg-input" id="day-end-${d.key}" value="${cfg.end}" style="width:110px;">
+        </div>
+      </div>`;
+    }).join('');
+
+    // Intervalos
+    renderBreaksUI();
+
+    // Buffer
+    document.getElementById('cfg-buffer').value = s.buffer||5;
+
+    // Serviços
+    document.getElementById('services-config').innerHTML = SERVICES.map(svc=>{
+      const dur = (s.services&&s.services[svc])?s.services[svc].duration:15;
+      const id = svc.replace(/[^a-z0-9]/gi,'_');
+      return `<div class="cfg-svc-row">
+        <div style="font-size:14px;font-weight:600;">${svc}</div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <input type="number" class="cfg-input" id="svc-dur-${id}" value="${dur}" min="5" max="180" step="5" style="width:80px;">
+          <span style="font-size:12px;color:var(--text-dim)">min</span>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function renderBreaksUI(){
+    const breaks = currentSettings.breaks||[];
+    document.getElementById('breaks-config').innerHTML = breaks.map((b,i)=>`
+      <div class="cfg-break-row" id="break-row-${i}">
+        <input type="text" class="cfg-input" id="break-label-${i}" value="${b.label||''}" placeholder="Nome do intervalo" style="width:160px;">
+        <span style="font-size:12px;color:var(--text-dim)">Dias:</span>
+        ${DAYS.map(d=>`<label style="font-size:12px;display:flex;align-items:center;gap:3px;color:var(--text-muted);cursor:pointer;">
+          <input type="checkbox" id="break-day-${i}-${d.key}" ${(b.days||[]).includes(d.key)?'checked':''} style="accent-color:var(--gold)"> ${d.label.split('-')[0]}
+        </label>`).join('')}
+        <input type="time" class="cfg-input" id="break-start-${i}" value="${b.start}" style="width:100px;">
+        <span style="font-size:12px;color:var(--text-dim)">ate</span>
+        <input type="time" class="cfg-input" id="break-end-${i}" value="${b.end}" style="width:100px;">
+        <button class="cfg-rm-btn" onclick="removeBreak(${i})">Remover</button>
+      </div>`).join('');
+  }
+
+  window.addBreak = function(){
+    currentSettings.breaks = currentSettings.breaks||[];
+    currentSettings.breaks.push({days:[], start:'12:00', end:'14:00', label:'Novo intervalo'});
+    renderBreaksUI();
+  };
+
+  window.removeBreak = function(i){
+    currentSettings.breaks.splice(i,1);
+    renderBreaksUI();
+  };
+
+  window.saveSettings = async function(){
+    const s = {days:{}, breaks:[], services:{}, buffer:0};
+
+    // Lê dias
+    DAYS.forEach(d=>{
+      s.days[d.key] = {
+        open:  document.getElementById('day-open-'+d.key).checked,
+        start: document.getElementById('day-start-'+d.key).value,
+        end:   document.getElementById('day-end-'+d.key).value,
+      };
+    });
+
+    // Lê intervalos
+    const breakRows = document.querySelectorAll('[id^="break-row-"]');
+    breakRows.forEach((_,i)=>{
+      const days = DAYS.filter(d=>document.getElementById('break-day-'+i+'-'+d.key)?.checked).map(d=>d.key);
+      s.breaks.push({
+        label: document.getElementById('break-label-'+i).value,
+        days,
+        start: document.getElementById('break-start-'+i).value,
+        end:   document.getElementById('break-end-'+i).value,
+      });
+    });
+
+    // Lê buffer
+    s.buffer = parseInt(document.getElementById('cfg-buffer').value)||5;
+
+    // Lê serviços
+    SERVICES.forEach(svc=>{
+      const id = svc.replace(/[^a-z0-9]/gi,'_');
+      s.services[svc] = { duration: parseInt(document.getElementById('svc-dur-'+id).value)||15 };
+    });
+
+    try {
+      await setDoc(doc(db,'config','schedule'), s);
+      currentSettings = s;
+      showToast('Configuracoes salvas!','green');
+    } catch(e){
+      console.error(e);
+      showToast('Erro ao salvar configuracoes','red');
+    }
+  };
+
+  window.switchTab = function(tab){
+    document.getElementById('tab-appointments').style.display = tab==='appointments'?'block':'none';
+    document.getElementById('tab-settings').style.display     = tab==='settings'?'block':'none';
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active', b.textContent.toLowerCase().includes(tab==='appointments'?'agenda':'config')));
+  };
+
   window.addEventListener("DOMContentLoaded",()=>{
     onAuthStateChanged(auth, user => {
       document.getElementById("app-loading").style.display="none";
@@ -317,6 +538,7 @@
         document.getElementById("admin-user-label").textContent=currentAdmin;
         document.getElementById("login-screen").style.display="none";
         subscribeData();
+        loadSettings();
       } else {
         document.getElementById("login-screen").style.display="flex";
       }
