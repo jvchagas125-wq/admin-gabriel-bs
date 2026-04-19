@@ -522,22 +522,26 @@
 
   // ===== CONFIGURAÇÕES =====
   const DAYS = [
+    {key:'mon', label:'Segunda-feira'},
     {key:'tue', label:'Terca-feira'},
     {key:'wed', label:'Quarta-feira'},
     {key:'thu', label:'Quinta-feira'},
     {key:'fri', label:'Sexta-feira'},
     {key:'sat', label:'Sabado'},
+    {key:'sun', label:'Domingo'},
   ];
 
   const SERVICES = ['Cabelo','Barba','Pezinho','Cabelo & Barba','Raspar Cabeca','Sobrancelha'];
 
   const DEFAULT_SETTINGS = {
     days: {
+      mon: {open:false, start:'10:00', end:'21:00'},
       tue: {open:true,  start:'10:00', end:'21:00'},
       wed: {open:true,  start:'10:00', end:'15:00'},
       thu: {open:true,  start:'10:00', end:'21:00'},
       fri: {open:true,  start:'10:00', end:'21:00'},
       sat: {open:true,  start:'10:00', end:'21:00'},
+      sun: {open:false, start:'10:00', end:'21:00'},
     },
     breaks: [
       {days:['tue','thu','sat'], start:'12:00', end:'14:00', label:'Almoco'},
