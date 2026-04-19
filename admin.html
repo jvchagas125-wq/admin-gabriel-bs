@@ -99,6 +99,80 @@
     .cfg-svc-row:last-child{border-bottom:none}
     .cfg-save-btn{width:100%;padding:14px;border-radius:10px;border:none;background:var(--gold);color:#111;font-weight:700;font-size:16px;cursor:pointer;font-family:"DM Sans",sans-serif;transition:opacity .2s;margin-top:4px}
     .cfg-save-btn:hover{opacity:.88}
+
+    /* ════ MOBILE ════ */
+    @media (max-width: 640px) {
+      /* Header */
+      .header-inner { padding: 10px 14px; }
+      .header-logo img { height: 26px; }
+      .header-divider { display: none; }
+      .admin-badge { font-size: 9px; padding: 2px 8px; }
+      .admin-user { display: none; }
+      .logout-btn { padding: 5px 10px; font-size: 11px; }
+
+      /* Tabs */
+      header > div:last-child { padding: 0 12px; }
+      .tab-btn { padding: 8px 12px; font-size: 12px; }
+
+      /* Main */
+      main { padding: 16px 12px 60px; }
+
+      /* Stats: 2 colunas */
+      .stats-grid { grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px; }
+      .stat-card { padding: 14px; }
+      .stat-value { font-size: 28px; }
+      .stat-label { font-size: 10px; }
+
+      /* Toolbar: empilhada */
+      .toolbar { flex-direction: column; align-items: stretch; gap: 8px; }
+      .toolbar-title { font-size: 22px; }
+      .search-input { width: 100%; }
+      .filter-select { width: 100%; }
+      .export-btn, .clear-btn { width: 100%; text-align: center; padding: 10px; }
+
+      /* Tabela → oculta, mostra cards */
+      .table-wrap table { display: none; }
+      .table-wrap { border: none; background: none; }
+
+      /* Cards mobile para cada agendamento */
+      .mobile-apt-card {
+        background: var(--bg2);
+        border: 1px solid rgba(255,255,255,0.06);
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 12px;
+      }
+      .mobile-apt-card .mac-header {
+        display: flex; justify-content: space-between; align-items: flex-start;
+        margin-bottom: 12px;
+      }
+      .mobile-apt-card .mac-name { font-weight: 700; font-size: 15px; }
+      .mobile-apt-card .mac-phone { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+      .mobile-apt-card .mac-grid {
+        display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px;
+      }
+      .mobile-apt-card .mac-field span { font-size: 11px; color: var(--text-dim); display: block; }
+      .mobile-apt-card .mac-field strong { font-size: 13px; }
+      .mobile-apt-card .mac-footer {
+        display: flex; justify-content: space-between; align-items: center;
+        margin-top: 4px;
+      }
+      .mobile-apt-cards { display: block; }
+
+      /* Configurações */
+      .cfg-row { grid-template-columns: 1fr; gap: 8px; padding: 14px 0; }
+      .cfg-toggle { margin-bottom: 4px; }
+      .cfg-break-row { flex-direction: column; align-items: flex-start; gap: 8px; }
+      .cfg-break-row input[type=time] { width: 100% !important; }
+      .cfg-break-row input[type=text] { width: 100% !important; }
+      .cfg-svc-row { grid-template-columns: 1fr auto; }
+      .cfg-save-btn { font-size: 15px; padding: 13px; }
+    }
+
+    /* Desktop: esconde cards mobile */
+    @media (min-width: 641px) {
+      .mobile-apt-cards { display: none; }
+    }
   </style>
 </head>
 <body>
@@ -188,8 +262,10 @@
       </thead>
       <tbody id="apt-tbody"></tbody>
     </table>
-    <div class="empty" id="empty-state" style="display:none;"><div class="empty-icon">no data</div><p>Nenhum agendamento encontrado.</p></div>
+    <div class="empty" id="empty-state" style="display:none;"><div class="empty-icon">📭</div><p>Nenhum agendamento encontrado.</p></div>
   </div>
+  <!-- Cards mobile -->
+  <div class="mobile-apt-cards" id="mobile-apt-cards"></div>
   </div>
 
   <!-- ABA CONFIGURAÇÕES -->
@@ -341,6 +417,35 @@
         : '<td style="color:var(--text-dim);font-size:12px;">—</td>';
       return '<tr><td><strong>'+esc(apt.name)+'</strong></td><td style="color:var(--text-muted)">'+esc(apt.phone)+'</td><td>'+esc(apt.service)+'</td><td>'+fmtDate+'</td><td style="font-family:Bebas Neue,sans-serif;font-size:15px;color:var(--gold)">'+esc(apt.time)+'</td><td><span class="badge '+badgeClass+'">'+badgeLabel+'</span></td>'+justifyCell+'<td><button class="del-btn" onclick="deleteApt(\''+apt.id+'\')">Cancelar</button></td></tr>';
     }).join("");
+
+    // Mobile cards
+    const mobileContainer = document.getElementById("mobile-apt-cards");
+    if(mobileContainer){
+      mobileContainer.innerHTML = data.map(apt=>{
+        const st=getStatusType(apt);
+        const fmtDate=new Date(apt.date+"T12:00:00").toLocaleDateString("pt-BR",{weekday:"short",day:"numeric",month:"short"});
+        const badgeClass=st==="passado"?"badge-past":st==="hoje"?"badge-today":"badge-ok";
+        const badgeLabel=st==="passado"?"Realizado":st==="hoje"?"Hoje":"Confirmado";
+        const justifyHtml = apt.justification
+          ? '<div style="margin-top:8px;padding:6px 10px;background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);border-radius:6px;font-size:11px;color:#f0d78c;">'+esc(apt.justification)+'</div>'
+          : '';
+        return '<div class="mobile-apt-card">'
+          +'<div class="mac-header">'
+          +'<div><div class="mac-name">'+esc(apt.name)+'</div><div class="mac-phone">'+esc(apt.phone)+'</div></div>'
+          +'<span class="badge '+badgeClass+'">'+badgeLabel+'</span>'
+          +'</div>'
+          +'<div class="mac-grid">'
+          +'<div class="mac-field"><span>Servico</span><strong>'+esc(apt.service)+'</strong></div>'
+          +'<div class="mac-field"><span>Horario</span><strong style="font-family:Bebas Neue,sans-serif;font-size:16px;color:var(--gold)">'+esc(apt.time)+'</strong></div>'
+          +'<div class="mac-field"><span>Data</span><strong>'+fmtDate+'</strong></div>'
+          +'</div>'
+          +justifyHtml
+          +'<div class="mac-footer">'
+          +'<button class="del-btn" onclick="deleteApt(''+apt.id+'')">Cancelar</button>'
+          +'</div>'
+          +'</div>';
+      }).join("");
+    }
   };
 
   window.deleteApt = async function(id){
