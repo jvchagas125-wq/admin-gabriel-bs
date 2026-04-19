@@ -99,6 +99,158 @@
     .cfg-svc-row:last-child{border-bottom:none}
     .cfg-save-btn{width:100%;padding:14px;border-radius:10px;border:none;background:var(--gold);color:#111;font-weight:700;font-size:16px;cursor:pointer;font-family:"DM Sans",sans-serif;transition:opacity .2s;margin-top:4px}
     .cfg-save-btn:hover{opacity:.88}
+
+
+    /* ════ MOBILE — apenas configurações ════ */
+    @media (max-width: 640px) {
+
+      /* Header compacto */
+      .header-inner { padding: 10px 12px; }
+      .header-logo img { height: 26px; }
+      .header-divider { display: none; }
+      .admin-user { font-size: 11px; max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .logout-btn { padding: 5px 10px; font-size: 11px; }
+      header > div:last-child { padding: 0 10px; }
+      .tab-btn { padding: 8px 12px; font-size: 12px; }
+
+      /* Main padding */
+      main { padding: 16px 12px 60px; }
+
+      /* Stats 2 colunas */
+      .stats-grid { grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px; }
+      .stat-card { padding: 14px; }
+      .stat-value { font-size: 28px; }
+      .stat-label { font-size: 10px; }
+
+      /* Toolbar empilhada */
+      .toolbar { flex-direction: column; align-items: stretch; gap: 8px; }
+      .toolbar-title { font-size: 22px; }
+      .search-input { width: 100%; }
+      .filter-select { width: 100%; }
+      .export-btn, .clear-btn { width: 100%; text-align: center; padding: 10px; }
+
+      /* Tabela scroll horizontal */
+      .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+      /* ── CONFIGURAÇÕES ── */
+
+      /* Card de configuração */
+      .cfg-card { padding: 16px 14px; }
+      .cfg-title { font-size: 18px; }
+      .cfg-hint { font-size: 12px; }
+
+      /* Linha de dia: empilha checkbox + horários */
+      .cfg-row {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding: 14px 0;
+      }
+      .cfg-toggle {
+        font-size: 15px;
+        font-weight: 700;
+      }
+      /* Linha de horário dentro de cfg-row */
+      .cfg-row > div:not(.cfg-toggle) {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        width: 100%;
+      }
+      .cfg-row > div:not(.cfg-toggle) input[type="time"] {
+        flex: 1;
+        width: auto !important;
+        font-size: 15px;
+        padding: 9px 10px;
+      }
+      .cfg-row > div:not(.cfg-toggle) span {
+        font-size: 13px;
+        white-space: nowrap;
+        min-width: 28px;
+      }
+
+      /* Intervalos especiais */
+      .cfg-break-row {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding: 12px 0;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+      }
+      .cfg-break-row:last-child { border-bottom: none; }
+
+      /* Nome do intervalo */
+      .cfg-break-row > input[type="text"] {
+        width: 100% !important;
+        font-size: 14px;
+        padding: 9px 12px;
+      }
+
+      /* Checkboxes de dias em grade 3 colunas */
+      .cfg-break-row-days {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+      }
+      .cfg-break-row-days label {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 13px;
+        color: var(--text-muted);
+        cursor: pointer;
+        padding: 6px 8px;
+        border-radius: 7px;
+        background: rgba(255,255,255,0.04);
+        border: 1px solid rgba(255,255,255,0.06);
+      }
+      .cfg-break-row-days input[type="checkbox"] {
+        width: 15px; height: 15px;
+      }
+
+      /* Linha de horário do intervalo */
+      .cfg-break-row-times {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .cfg-break-row-times input[type="time"] {
+        flex: 1;
+        width: auto !important;
+        font-size: 15px;
+        padding: 9px 10px;
+      }
+      .cfg-break-row-times span {
+        font-size: 13px;
+        white-space: nowrap;
+      }
+      .cfg-rm-btn {
+        width: 100%;
+        padding: 8px;
+        text-align: center;
+        font-size: 13px;
+      }
+
+      /* Serviços */
+      .cfg-svc-row {
+        grid-template-columns: 1fr auto;
+        gap: 10px;
+        padding: 12px 0;
+      }
+      .cfg-svc-row input[type="number"] {
+        width: 70px !important;
+        font-size: 14px;
+      }
+
+      /* Buffer */
+      #cfg-buffer { width: 100% !important; font-size: 15px; padding: 9px 12px; }
+
+      /* Botão salvar */
+      .cfg-save-btn { font-size: 15px; padding: 14px; }
+
+      /* Botão adicionar intervalo */
+      .cfg-add-btn { width: 100%; padding: 10px; text-align: center; font-size: 13px; margin-top: 12px; }
+    }
   </style>
 </head>
 <body>
@@ -458,14 +610,19 @@
     const breaks = currentSettings.breaks||[];
     document.getElementById('breaks-config').innerHTML = breaks.map((b,i)=>`
       <div class="cfg-break-row" id="break-row-${i}">
-        <input type="text" class="cfg-input" id="break-label-${i}" value="${b.label||''}" placeholder="Nome do intervalo" style="width:160px;">
-        <span style="font-size:12px;color:var(--text-dim)">Dias:</span>
-        ${DAYS.map(d=>`<label style="font-size:12px;display:flex;align-items:center;gap:3px;color:var(--text-muted);cursor:pointer;">
-          <input type="checkbox" id="break-day-${i}-${d.key}" ${(b.days||[]).includes(d.key)?'checked':''} style="accent-color:var(--gold)"> ${d.label.split('-')[0]}
-        </label>`).join('')}
-        <input type="time" class="cfg-input" id="break-start-${i}" value="${b.start}" style="width:100px;">
-        <span style="font-size:12px;color:var(--text-dim)">ate</span>
-        <input type="time" class="cfg-input" id="break-end-${i}" value="${b.end}" style="width:100px;">
+        <input type="text" class="cfg-input" id="break-label-${i}" value="${b.label||''}" placeholder="Nome do intervalo" style="width:100%;">
+        <div style="font-size:12px;color:var(--text-dim);font-weight:600;margin-top:2px;">Dias:</div>
+        <div class="cfg-break-row-days">
+          ${DAYS.map(d=>`<label>
+            <input type="checkbox" id="break-day-${i}-${d.key}" ${(b.days||[]).includes(d.key)?'checked':''} style="accent-color:var(--gold)"> ${d.label.split('-')[0]}
+          </label>`).join('')}
+        </div>
+        <div class="cfg-break-row-times">
+          <span style="font-size:12px;color:var(--text-dim);min-width:32px;">Inicio</span>
+          <input type="time" class="cfg-input" id="break-start-${i}" value="${b.start}" style="flex:1;">
+          <span style="font-size:12px;color:var(--text-dim);min-width:20px;">ate</span>
+          <input type="time" class="cfg-input" id="break-end-${i}" value="${b.end}" style="flex:1;">
+        </div>
         <button class="cfg-rm-btn" onclick="removeBreak(${i})">Remover</button>
       </div>`).join('');
   }
