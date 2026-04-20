@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin — Gabriel Barber Studio</title>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"><\/script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     :root{--gold:#c9a84c;--gold-dim:rgba(201,168,76,0.13);--gold-border:rgba(201,168,76,0.25);--bg:#0e0e0e;--bg2:#161616;--bg3:#1e1e1e;--text:#e5e5e5;--text-muted:#888;--text-dim:#444;--red:#dc2626;--red-dim:rgba(220,38,38,0.12);--green:#16a34a;--green-dim:rgba(22,163,74,0.12)}
@@ -42,6 +42,11 @@
     .logout-btn:hover{background:var(--red-dim)}
     main{max-width:1100px;margin:0 auto;padding:32px 20px 60px}
     .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px}
+
+    .rev-period-btn{padding:6px 14px;border-radius:7px;border:1px solid rgba(255,255,255,0.08);background:none;color:var(--text-muted);font-size:12px;font-weight:700;cursor:pointer;font-family:"DM Sans",sans-serif;transition:all .15s;}
+    .rev-period-btn:hover{color:var(--text);}
+    .rev-period-btn.active-period{border-color:var(--gold-border);background:var(--gold-dim);color:var(--gold);}
+    @media(max-width:700px){#revenue-block .stats-grid-inner{grid-template-columns:1fr!important;}}
     @media(max-width:700px){.stats-grid{grid-template-columns:1fr 1fr}}
     .stat-card{background:var(--bg2);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:18px 20px}
     .stat-label{font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px}
@@ -315,17 +320,16 @@
   </div>
 
   <!-- GRÁFICO DE FATURAMENTO -->
-  <div style="background:var(--bg2);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:24px;margin-bottom:28px;">
+  <div style="background:var(--bg2);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:24px;margin-bottom:28px;" id="revenue-block">
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px;">
       <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;background:linear-gradient(135deg,#c9a84c,#f0d78c,#c9a84c);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">💰 Faturamento</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <button onclick="setRevPeriod('day')" id="rev-btn-day" style="padding:6px 14px;border-radius:7px;border:1px solid var(--gold-border);background:var(--gold-dim);color:var(--gold);font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">Hoje</button>
-        <button onclick="setRevPeriod('month')" id="rev-btn-month" style="padding:6px 14px;border-radius:7px;border:1px solid rgba(255,255,255,0.08);background:none;color:var(--text-muted);font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">Este Mês</button>
-        <button onclick="setRevPeriod('year')" id="rev-btn-year" style="padding:6px 14px;border-radius:7px;border:1px solid rgba(255,255,255,0.08);background:none;color:var(--text-muted);font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">Este Ano</button>
+        <button onclick="setRevPeriod('day')" id="rev-btn-day" class="rev-period-btn active-period">Hoje</button>
+        <button onclick="setRevPeriod('month')" id="rev-btn-month" class="rev-period-btn">Este Mês</button>
+        <button onclick="setRevPeriod('year')" id="rev-btn-year" class="rev-period-btn">Este Ano</button>
       </div>
     </div>
-    <!-- Cards de faturamento -->
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px;" id="rev-cards">
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px;">
       <div style="background:var(--bg3);border:1px solid rgba(201,168,76,0.2);border-radius:10px;padding:16px;text-align:center;">
         <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px;">Hoje</div>
         <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--gold);" id="rev-day-val">R$ 0,00</div>
@@ -342,8 +346,7 @@
         <div style="font-size:12px;color:var(--text-dim);margin-top:2px;" id="rev-year-count">0 atendimentos</div>
       </div>
     </div>
-    <!-- Gráfico de barras -->
-    <canvas id="revenue-chart" height="180" style="width:100%;max-width:100%;"></canvas>
+    <canvas id="revenue-chart" height="160" style="width:100%;display:block;"></canvas>
     <div style="font-size:11px;color:var(--text-dim);text-align:center;margin-top:8px;" id="rev-chart-label">Faturamento por serviço — hoje</div>
   </div>
   <div class="toolbar">
@@ -391,10 +394,11 @@
   <div id="tab-settings" style="display:none;">
     <div style="max-width:720px;">
 
+
       <!-- AVISOS / PROMOÇÕES DO SITE -->
       <div class="cfg-card">
         <div class="cfg-title">📢 Avisos, Promoções e Ofertas</div>
-        <div class="cfg-hint">Adicione banners de aviso, promoções ou ofertas que aparecem no topo da página inicial para os clientes.</div>
+        <div class="cfg-hint">Adicione banners que aparecem no topo da página inicial para os clientes (promoções, avisos, ofertas).</div>
         <div id="banners-admin-list"></div>
         <button class="cfg-add-btn" onclick="addBanner()" style="margin-top:8px;">+ Adicionar aviso / promoção</button>
         <button class="cfg-save-btn" onclick="saveBanners()" style="margin-top:14px;">💾 Salvar Avisos</button>
@@ -657,7 +661,7 @@
           </div>
         </div>
         <div style="margin-top:10px;">
-          <span class="plan-admin-label" style="margin-bottom:6px;display:block;">Características do serviço (aparece no card do site)</span>
+          <span class="plan-admin-label" style="margin-bottom:6px;display:block;">Descrição / Características (aparecem no card do site)</span>
           <div id="svc-features-${i}" style="display:flex;flex-direction:column;gap:5px;margin-bottom:6px;">
             ${(svc.features||[]).map((ft,fi)=>`
               <div style="display:flex;gap:6px;align-items:center;">
@@ -680,7 +684,7 @@
   };
 
   window.addService = function(){
-    adminServices.push({name:'Novo Serviço', price:'0,00', duration:15, features:[]});
+    adminServices.push({name:'Novo Serviço', price:'0,00', duration:15});
     renderServicesAdminUI();
     // Foca no nome do novo serviço
     setTimeout(()=>{ const el=document.getElementById('svc-name-'+(adminServices.length-1)); if(el){el.focus();el.select();} },50);
@@ -711,12 +715,12 @@
   }
 
   window.addSvcFeature = function(i){
-    const existing = collectSvcFeatures(i);
-    adminServices[i].features = existing;
+    adminServices[i] = Object.assign({}, adminServices[i]);
+    adminServices[i].features = collectSvcFeatures(i);
     adminServices[i].features.push('');
     renderServicesAdminUI();
     setTimeout(()=>{
-      const all=document.querySelectorAll(`[id^="svc-ft-${i}-"]`);
+      const all=document.querySelectorAll('[id^="svc-ft-'+i+'-"]');
       if(all.length) all[all.length-1].focus();
     },50);
   };
@@ -887,7 +891,7 @@
     const sel = document.getElementById('filter-service');
     if(!sel) return;
     const current = sel.value;
-    sel.innerHTML = '<option value="">Todos os serviços</option>' +
+    sel.innerHTML = '<option value="">Todos os servicos</option>' +
       services.map(s=>`<option${s.name===current?' selected':''}>${s.name}</option>`).join('');
   }
 
@@ -934,17 +938,16 @@
           <input class="plan-admin-input" id="p-link-${i}" value="${esc(p.mpLink||'')}" placeholder="https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=...">
         </div>
 
-        <div style="margin-bottom:10px;">
+        <div style="margin-bottom:8px;">
           <label class="plan-admin-toggle">
             <input type="checkbox" id="p-featured-${i}" ${p.featured?'checked':''}>
             Destacar como "Mais Popular"
           </label>
         </div>
-
         <div style="margin-bottom:10px;">
           <label class="plan-admin-toggle">
             <input type="checkbox" id="p-bestvalue-${i}" ${p.bestValue?'checked':''}>
-            Destacar como "Melhor Custo‑Benefício"
+            Destacar como "Melhor Custo-Benefício"
           </label>
         </div>
 
@@ -957,13 +960,13 @@
                 <button onclick="removeBenefit(${i},${j})" class="cfg-rm-btn" style="white-space:nowrap;padding:6px 10px;">✕</button>
               </div>`).join('')}
           </div>
-          <button onclick="addBenefit(${i})" class="cfg-add-btn" style="margin-top:6px;font-size:11px;">+ Benefício</button>
+          <button onclick="addBenefit(${i})" class="cfg-add-btn" style="margin-top:6px;font-size:11px;">+ Beneficio</button>
         </div>
       </div>`).join('');
   }
 
   window.addPlan = function(){
-    adminPlans.push({ id:'plan_'+Date.now(), order:adminPlans.length+1, emoji:'✂️', name:'Novo Plano', price:'0,00', featured:false, bestValue:false, mpLink:'', benefits:['Benefício 1'] });
+    adminPlans.push({ id:'plan_'+Date.now(), order:adminPlans.length+1, emoji:'✂️', name:'Novo Plano', price:'0,00', featured:false, mpLink:'', benefits:['Benefício 1'] });
     renderAdminPlans();
   };
 
@@ -1084,222 +1087,144 @@
     });
   });
 
-  // ===== FATURAMENTO / RECEITA =====
+  // ═══════════════════════════════════════
+  // FATURAMENTO / RECEITA
+  // ═══════════════════════════════════════
   let currentRevPeriod = 'day';
   let revenueChartInstance = null;
 
   function getServicePriceMap(){
-    const map = {};
+    const map={};
     adminServices.forEach(s=>{
-      const val = parseFloat((s.price||'0').replace(',','.')) || 0;
-      map[s.name] = val;
+      map[s.name]=parseFloat((s.price||'0').replace(',','.'))||0;
     });
     return map;
   }
 
-  function calcRevenue(data, priceMap){
-    return data.reduce((sum, a)=>{
-      if(a.status==='Bloqueado') return sum;
-      return sum + (priceMap[a.service]||0);
-    }, 0);
+  function calcRevenue(data,priceMap){
+    return data.reduce((sum,a)=>a.status==='Bloqueado'?sum:sum+(priceMap[a.service]||0),0);
   }
 
   function formatBRL(val){
-    return 'R$ ' + val.toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+    return 'R$ '+val.toFixed(2).replace('.',',');
   }
 
   function updateRevenueCards(){
-    const priceMap = getServicePriceMap();
-    const today = getTodayStr();
-    const nowDate = new Date();
-    const thisMonth = today.slice(0,7);
-    const thisYear = today.slice(0,4);
-
-    const dayData    = allData.filter(a=>a.date===today);
-    const monthData  = allData.filter(a=>a.date.startsWith(thisMonth));
-    const yearData   = allData.filter(a=>a.date.startsWith(thisYear));
-
-    const revDay   = calcRevenue(dayData,   priceMap);
-    const revMonth = calcRevenue(monthData, priceMap);
-    const revYear  = calcRevenue(yearData,  priceMap);
-
-    const countDay   = dayData.filter(a=>a.status!=='Bloqueado').length;
-    const countMonth = monthData.filter(a=>a.status!=='Bloqueado').length;
-    const countYear  = yearData.filter(a=>a.status!=='Bloqueado').length;
-
-    document.getElementById('rev-day-val').textContent   = formatBRL(revDay);
-    document.getElementById('rev-month-val').textContent = formatBRL(revMonth);
-    document.getElementById('rev-year-val').textContent  = formatBRL(revYear);
-    document.getElementById('rev-day-count').textContent   = countDay   + (countDay===1?' atendimento':' atendimentos');
-    document.getElementById('rev-month-count').textContent = countMonth + (countMonth===1?' atendimento':' atendimentos');
-    document.getElementById('rev-year-count').textContent  = countYear  + (countYear===1?' atendimento':' atendimentos');
-
+    const priceMap=getServicePriceMap();
+    const today=getTodayStr();
+    const ym=today.slice(0,7), yr=today.slice(0,4);
+    const dayD=allData.filter(a=>a.date===today);
+    const monD=allData.filter(a=>a.date.startsWith(ym));
+    const yrD =allData.filter(a=>a.date.startsWith(yr));
+    const fn=d=>d.filter(a=>a.status!=='Bloqueado').length;
+    document.getElementById('rev-day-val').textContent  =formatBRL(calcRevenue(dayD,priceMap));
+    document.getElementById('rev-month-val').textContent=formatBRL(calcRevenue(monD,priceMap));
+    document.getElementById('rev-year-val').textContent =formatBRL(calcRevenue(yrD, priceMap));
+    document.getElementById('rev-day-count').textContent  =fn(dayD)+(fn(dayD)===1?' atendimento':' atendimentos');
+    document.getElementById('rev-month-count').textContent=fn(monD)+(fn(monD)===1?' atendimento':' atendimentos');
+    document.getElementById('rev-year-count').textContent =fn(yrD )+(fn(yrD )===1?' atendimento':' atendimentos');
     drawRevenueChart(currentRevPeriod);
   }
 
-  window.setRevPeriod = function(period){
-    currentRevPeriod = period;
-    ['day','month','year'].forEach(p=>{
-      const btn = document.getElementById('rev-btn-'+p);
-      if(!btn) return;
-      if(p===period){
-        btn.style.background='var(--gold-dim)';
-        btn.style.borderColor='var(--gold-border)';
-        btn.style.color='var(--gold)';
-      } else {
-        btn.style.background='none';
-        btn.style.borderColor='rgba(255,255,255,0.08)';
-        btn.style.color='var(--text-muted)';
-      }
-    });
+  window.setRevPeriod=function(period){
+    currentRevPeriod=period;
+    document.querySelectorAll('.rev-period-btn').forEach(b=>b.classList.remove('active-period'));
+    const btn=document.getElementById('rev-btn-'+period);
+    if(btn) btn.classList.add('active-period');
     drawRevenueChart(period);
   };
 
   function drawRevenueChart(period){
-    const priceMap = getServicePriceMap();
-    const today = getTodayStr();
-    const thisMonth = today.slice(0,7);
-    const thisYear = today.slice(0,4);
-
-    let filteredData, labels, labelText;
+    const priceMap=getServicePriceMap();
+    const today=getTodayStr();
+    const ym=today.slice(0,7), yr=today.slice(0,4);
+    let labels,values,labelText;
 
     if(period==='day'){
-      // Por serviço hoje
-      const dayData = allData.filter(a=>a.date===today && a.status!=='Bloqueado');
-      const svcNames = [...new Set(dayData.map(a=>a.service))];
-      labels = svcNames;
-      filteredData = svcNames.map(svc=>{
-        const items = dayData.filter(a=>a.service===svc);
-        return calcRevenue(items, priceMap);
-      });
-      labelText = 'Faturamento por serviço — hoje';
+      const d=allData.filter(a=>a.date===today&&a.status!=='Bloqueado');
+      const svcs=[...new Set(d.map(a=>a.service))];
+      labels=svcs; values=svcs.map(s=>calcRevenue(d.filter(a=>a.service===s),priceMap));
+      labelText='Faturamento por serviço — hoje';
     } else if(period==='month'){
-      // Por dia do mês
-      const monthData = allData.filter(a=>a.date.startsWith(thisMonth) && a.status!=='Bloqueado');
-      const daysInMonth = new Date(parseInt(thisYear), parseInt(thisMonth.slice(5)), 0).getDate();
-      labels = Array.from({length:daysInMonth},(_,i)=>String(i+1).padStart(2,'0')+'/'+thisMonth.slice(5));
-      filteredData = labels.map((_,i)=>{
-        const dayStr = thisMonth+'-'+String(i+1).padStart(2,'0');
-        const items = monthData.filter(a=>a.date===dayStr);
-        return calcRevenue(items, priceMap);
+      const d=allData.filter(a=>a.date.startsWith(ym)&&a.status!=='Bloqueado');
+      const dim=new Date(parseInt(yr),parseInt(ym.slice(5)),0).getDate();
+      labels=Array.from({length:dim},(_,i)=>String(i+1).padStart(2,'0'));
+      values=labels.map((_,i)=>{
+        const ds=ym+'-'+String(i+1).padStart(2,'0');
+        return calcRevenue(d.filter(a=>a.date===ds),priceMap);
       });
-      labelText = 'Faturamento por dia — '+thisMonth.slice(5)+'/'+thisYear;
+      labelText='Faturamento por dia — '+ym.slice(5)+'/'+yr;
     } else {
-      // Por mês do ano
-      const yearData = allData.filter(a=>a.date.startsWith(thisYear) && a.status!=='Bloqueado');
-      const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-      labels = meses;
-      filteredData = meses.map((_,i)=>{
-        const m = String(i+1).padStart(2,'0');
-        const items = yearData.filter(a=>a.date.startsWith(thisYear+'-'+m));
-        return calcRevenue(items, priceMap);
+      const d=allData.filter(a=>a.date.startsWith(yr)&&a.status!=='Bloqueado');
+      labels=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+      values=labels.map((_,i)=>{
+        const m=String(i+1).padStart(2,'0');
+        return calcRevenue(d.filter(a=>a.date.startsWith(yr+'-'+m)),priceMap);
       });
-      labelText = 'Faturamento por mês — '+thisYear;
+      labelText='Faturamento por mês — '+yr;
     }
 
-    document.getElementById('rev-chart-label').textContent = labelText;
-
-    const canvas = document.getElementById('revenue-chart');
+    const lbl=document.getElementById('rev-chart-label');
+    if(lbl) lbl.textContent=labelText;
+    const canvas=document.getElementById('revenue-chart');
     if(!canvas) return;
-    const ctx = canvas.getContext('2d');
 
-    if(revenueChartInstance){ revenueChartInstance.destroy(); revenueChartInstance=null; }
+    if(revenueChartInstance){revenueChartInstance.destroy();revenueChartInstance=null;}
 
-    if(typeof Chart === 'undefined'){
-      // Fallback: desenha barras manualmente em SVG
-      drawFallbackBars(canvas, labels, filteredData);
-      return;
+    if(typeof Chart!=='undefined'){
+      revenueChartInstance=new Chart(canvas.getContext('2d'),{
+        type:'bar',
+        data:{labels,datasets:[{label:'R$',data:values,backgroundColor:'rgba(201,168,76,0.55)',borderColor:'#c9a84c',borderWidth:1,borderRadius:5}]},
+        options:{responsive:true,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>formatBRL(c.parsed.y)}}},
+          scales:{x:{ticks:{color:'#666',font:{size:10}},grid:{color:'rgba(255,255,255,0.04)'}},
+                  y:{ticks:{color:'#666',font:{size:10},callback:v=>formatBRL(v)},grid:{color:'rgba(255,255,255,0.04)'}}}}
+      });
+    } else {
+      // fallback canvas manual
+      const W=canvas.clientWidth||600, H=160;
+      canvas.width=W; canvas.height=H;
+      const ctx=canvas.getContext('2d');
+      ctx.clearRect(0,0,W,H);
+      const max=Math.max(...values,1);
+      const n=labels.length; if(!n) return;
+      const gap=W/n, bw=Math.max(3,gap*0.6);
+      values.forEach((v,i)=>{
+        const h=(v/max)*(H-30);
+        const x=i*gap+gap/2-bw/2, y=H-20-h;
+        ctx.fillStyle='rgba(201,168,76,0.65)';
+        ctx.fillRect(x,y,bw,h);
+        if(n<=15){ctx.fillStyle='#555';ctx.font='9px sans-serif';ctx.textAlign='center';ctx.fillText(labels[i],x+bw/2,H-4);}
+      });
     }
-
-    revenueChartInstance = new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels,
-        datasets:[{
-          label: 'Faturamento (R$)',
-          data: filteredData,
-          backgroundColor: 'rgba(201,168,76,0.55)',
-          borderColor: '#c9a84c',
-          borderWidth: 1,
-          borderRadius: 5,
-        }]
-      },
-      options:{
-        responsive:true,
-        plugins:{ legend:{display:false}, tooltip:{
-          callbacks:{ label: ctx => formatBRL(ctx.parsed.y) }
-        }},
-        scales:{
-          x:{ ticks:{color:'#666',font:{size:10}}, grid:{color:'rgba(255,255,255,0.04)'} },
-          y:{ ticks:{color:'#666',font:{size:10}, callback: v=>formatBRL(v)}, grid:{color:'rgba(255,255,255,0.04)'} }
-        }
-      }
-    });
   }
 
-  function drawFallbackBars(canvas, labels, data){
-    const max = Math.max(...data, 1);
-    const W = canvas.offsetWidth || 600;
-    const H = 180;
-    canvas.width = W; canvas.height = H;
-    const ctx = canvas.getContext('2d');
-    ctx.clearRect(0,0,W,H);
-    const n = labels.length;
-    if(n===0) return;
-    const barW = Math.max(4, (W - 40) / n - 4);
-    const gap  = (W - 40) / n;
-    ctx.fillStyle = '#333';
-    ctx.fillRect(40,0,W-40,H-20);
-
-    data.forEach((val,i)=>{
-      const h = ((val/max)*(H-40));
-      const x = 40 + i*gap + gap/2 - barW/2;
-      const y = H-20-h;
-      ctx.fillStyle='rgba(201,168,76,0.65)';
-      ctx.beginPath();
-      ctx.roundRect(x,y,barW,h,3);
-      ctx.fill();
-
-      if(n<=14){
-        ctx.fillStyle='#666';
-        ctx.font='9px DM Sans';
-        ctx.textAlign='center';
-        ctx.fillText(labels[i], x+barW/2, H-4);
-      }
-      if(val>0){
-        ctx.fillStyle='#c9a84c';
-        ctx.font='10px DM Sans';
-        ctx.textAlign='center';
-        ctx.fillText(formatBRL(val).replace('R$ ',''), x+barW/2, y-4);
-      }
-    });
-  }
-
-  // ===== BANNERS / AVISOS =====
-  let adminBanners = [];
+  // ═══════════════════════════════════════
+  // BANNERS / AVISOS DO SITE
+  // ═══════════════════════════════════════
+  let adminBanners=[];
 
   async function loadAdminBanners(){
-    try {
-      const snap = await getDoc(doc(db,'config','banners'));
-      if(snap.exists() && snap.data().list) adminBanners = snap.data().list;
-    } catch(e){ console.error('loadAdminBanners',e); }
+    try{
+      const snap=await getDoc(doc(db,'config','banners'));
+      if(snap.exists()&&snap.data().list) adminBanners=snap.data().list;
+    }catch(e){console.error('loadAdminBanners',e);}
     renderAdminBannersUI();
   }
 
   function renderAdminBannersUI(){
-    const container = document.getElementById('banners-admin-list');
-    if(!container) return;
-    if(adminBanners.length===0){
-      container.innerHTML='<p style="color:var(--text-dim);font-size:13px;padding:8px 0 4px;">Nenhum aviso cadastrado.</p>';
+    const c=document.getElementById('banners-admin-list');
+    if(!c) return;
+    if(!adminBanners.length){
+      c.innerHTML='<p style="color:var(--text-dim);font-size:13px;padding:8px 0 4px;">Nenhum aviso cadastrado ainda.</p>';
       return;
     }
-    container.innerHTML = adminBanners.map((b,i)=>`
+    c.innerHTML=adminBanners.map((b,i)=>`
       <div style="background:var(--bg3);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:14px;margin-bottom:10px;">
         <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;align-items:center;">
-          <select id="ban-type-${i}" class="plan-admin-input" style="width:130px;">
-            <option value="info"  ${(b.type||'info')==='info'  ?'selected':''}>ℹ️ Informação</option>
+          <select id="ban-type-${i}" class="plan-admin-input" style="width:140px;">
+            <option value="info"  ${(b.type||'info')==='info'?'selected':''}>ℹ️ Informação</option>
             <option value="promo" ${(b.type||'')==='promo'?'selected':''}>🏷️ Promoção</option>
-            <option value="warn"  ${(b.type||'')==='warn' ?'selected':''}>⚠️ Aviso</option>
+            <option value="warn"  ${(b.type||'')==='warn'?'selected':''}>⚠️ Aviso</option>
           </select>
           <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-muted);cursor:pointer;">
             <input type="checkbox" id="ban-active-${i}" ${b.active!==false?'checked':''} style="accent-color:var(--gold);width:15px;height:15px;">
@@ -1307,46 +1232,32 @@
           </label>
           <button onclick="removeBanner(${i})" class="cfg-rm-btn" style="margin-left:auto;">Remover</button>
         </div>
-        <input class="plan-admin-input" id="ban-text-${i}" value="${esc(b.text||'')}" placeholder="Texto do aviso, promoção ou oferta..." style="margin-bottom:6px;">
-        <input class="plan-admin-input" id="ban-link-${i}" value="${esc(b.link||'')}" placeholder="Link (opcional)" style="margin-top:6px;">
+        <input class="plan-admin-input" id="ban-text-${i}" value="${esc(b.text||'')}" placeholder="Texto do aviso, promoção ou oferta...">
+        <input class="plan-admin-input" id="ban-link-${i}" value="${esc(b.link||'')}" placeholder="Link opcional (ex: https://...)" style="margin-top:6px;">
       </div>`).join('');
   }
 
-  window.addBanner = function(){
-    adminBanners.push({type:'info', text:'', link:'', active:true});
+  window.addBanner=function(){
+    adminBanners.push({type:'info',text:'',link:'',active:true});
     renderAdminBannersUI();
-    setTimeout(()=>{ const el=document.getElementById('ban-text-'+(adminBanners.length-1)); if(el){el.focus();} },50);
+    setTimeout(()=>{const el=document.getElementById('ban-text-'+(adminBanners.length-1));if(el)el.focus();},50);
   };
 
-  window.removeBanner = function(i){
-    adminBanners.splice(i,1);
-    renderAdminBannersUI();
-  };
+  window.removeBanner=function(i){adminBanners.splice(i,1);renderAdminBannersUI();};
 
-  function collectAdminBanners(){
-    return adminBanners.map((_,i)=>({
-      type:   document.getElementById('ban-type-'+i)?.value||'info',
-      text:   (document.getElementById('ban-text-'+i)?.value||'').trim(),
-      link:   (document.getElementById('ban-link-'+i)?.value||'').trim(),
+  window.saveBanners=async function(){
+    const banners=adminBanners.map((_,i)=>({
+      type: document.getElementById('ban-type-'+i)?.value||'info',
+      text: (document.getElementById('ban-text-'+i)?.value||'').trim(),
+      link: (document.getElementById('ban-link-'+i)?.value||'').trim(),
       active: document.getElementById('ban-active-'+i)?.checked!==false,
     })).filter(b=>b.text);
-  }
-
-  window.saveBanners = async function(){
-    const banners = collectAdminBanners();
-    try {
-      await setDoc(doc(db,'config','banners'), { list: banners });
-      adminBanners = banners;
+    try{
+      await setDoc(doc(db,'config','banners'),{list:banners});
+      adminBanners=banners;
       showToast('Avisos salvos!','green');
-    } catch(e){
-      console.error(e);
-      showToast('Erro ao salvar avisos','red');
-    }
+    }catch(e){showToast('Erro ao salvar avisos','red');}
   };
-
-  // ===== SERVICE FEATURES (descrições dos serviços) =====
-  // Agora o renderServicesAdminUI já inclui campo features; precisamos ajustar collectAdminServices
-  // para incluir features e renderServicesAdminUI para exibi-las
 
 </script>
 </body>
