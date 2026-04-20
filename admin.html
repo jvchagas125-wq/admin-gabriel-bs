@@ -1413,18 +1413,18 @@
       }
       el.innerHTML=items.map(r=>{
         const date=r.requestedAt?new Date(r.requestedAt).toLocaleString('pt-BR'):'—';
-        const details=r.details?'<div style="font-size:12px;color:#888;margin-top:3px;font-style:italic;">"'+esc(r.details)+'"</div>':'';
+        const details=r.details?'<div style="font-size:12px;color:#888;margin-top:3px;font-style:italic;">&ldquo;'+esc(r.details)+'&rdquo;</div>':'';
         return '<div style="background:rgba(220,38,38,0.06);border:1px solid rgba(220,38,38,0.2);border-radius:10px;padding:14px;margin-bottom:10px;">'
           +'<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">'
           +'<div>'
           +'<div style="font-weight:700;font-size:14px;color:#f87171;">'+esc(r.phone||'—')+'</div>'
-          +'<div style="font-size:12px;color:var(--text-muted);margin-top:2px;">Plano: <span style="color:var(--gold);font-weight:700;">'+esc(r.planName||'—')+'</span> • '+date+'</div>'
+          +'<div style="font-size:12px;color:var(--text-muted);margin-top:2px;">Plano: <span style="color:var(--gold);font-weight:700;">'+esc(r.planName||'—')+'</span> &bull; '+date+'</div>'
           +'<div style="font-size:13px;color:#ccc;margin-top:4px;">Motivo: <strong>'+esc(r.reason||'—')+'</strong></div>'
           +details
           +'</div>'
           +'<div style="display:flex;gap:8px;flex-wrap:wrap;">'
-          +'<button onclick="dismissCancelRequest(''+esc(r.id)+'')" style="padding:7px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:none;color:var(--text-muted);font-size:12px;font-weight:700;cursor:pointer;">&#10003; Visto</button>'
-          +'<button onclick="revokeVipFromCancel(''+esc(r.id)+'',''+esc(r.phone||'')+'',''+esc(r.planName||'')+'')" style="padding:7px 14px;border-radius:8px;border:1px solid rgba(220,38,38,.35);background:rgba(220,38,38,.1);color:#f87171;font-size:12px;font-weight:700;cursor:pointer;">&#128683; Revogar VIP</button>'
+          +'<button data-id="'+esc(r.id)+'" onclick="dismissCancelRequest(this.dataset.id)" style="padding:7px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:none;color:var(--text-muted);font-size:12px;font-weight:700;cursor:pointer;">&#10003; Visto</button>'
+          +'<button data-id="'+esc(r.id)+'" data-phone="'+esc(r.phone||'')+'" data-plan="'+esc(r.planName||'')+'" onclick="revokeVipFromCancel(this.dataset.id,this.dataset.phone,this.dataset.plan)" style="padding:7px 14px;border-radius:8px;border:1px solid rgba(220,38,38,.35);background:rgba(220,38,38,.1);color:#f87171;font-size:12px;font-weight:700;cursor:pointer;">&#128683; Revogar VIP</button>'
           +'</div>'
           +'</div>'
           +'</div>';
