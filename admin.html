@@ -521,10 +521,11 @@
 
   function updateStats(){
     const today=getTodayStr(); const weekEnd=getWeekEnd();
-    document.getElementById("stat-total").textContent=allData.length;
-    document.getElementById("stat-today").textContent=allData.filter(a=>a.date===today).length;
-    document.getElementById("stat-week").textContent=allData.filter(a=>a.date>=today&&a.date<=weekEnd).length;
-    document.getElementById("stat-clients").textContent=new Set(allData.map(a=>a.phone)).size;
+    const real=allData.filter(a=>a.status!=='Bloqueado');
+    document.getElementById("stat-total").textContent=real.length;
+    document.getElementById("stat-today").textContent=real.filter(a=>a.date===today).length;
+    document.getElementById("stat-week").textContent=real.filter(a=>a.date>=today&&a.date<=weekEnd).length;
+    document.getElementById("stat-clients").textContent=new Set(real.map(a=>a.phone)).size;
     document.getElementById("stat-today-date").textContent=new Date().toLocaleDateString("pt-BR",{weekday:"long",day:"numeric",month:"short"});
   }
 
@@ -542,7 +543,7 @@
     const search=document.getElementById("search").value.toLowerCase().trim();
     const fStatus=document.getElementById("filter-status").value;
     const fSvc=document.getElementById("filter-service").value;
-    let data=[...allData];
+    let data=allData.filter(a=>a.status!=='Bloqueado');
     if(search) data=data.filter(a=>a.name.toLowerCase().includes(search)||a.phone.includes(search));
     if(fStatus) data=data.filter(a=>getStatusType(a)===fStatus);
     if(fSvc) data=data.filter(a=>a.service===fSvc);
@@ -573,7 +574,13 @@
     const apt=allData.find(a=>a.id===id);
     if(!apt) return;
     if(!confirm("Cancelar agendamento de "+apt.name+"?")) return;
-    try{ await deleteDoc(doc(db,COL,id)); showToast("Agendamento cancelado","red"); }
+    try{
+      await deleteDoc(doc(db,COL,id));
+      // Cancela slots bloqueados vinculados a este agendamento
+      const blocked=allData.filter(a=>a.status==='Bloqueado'&&a.date===apt.date&&a.phone===apt.phone&&a.blockedBy===apt.time);
+      for(const b of blocked) await deleteDoc(doc(db,COL,b.id));
+      showToast("Agendamento cancelado","red");
+    }
     catch(err){ showToast("Erro ao cancelar","red"); }
   };
 
@@ -586,7 +593,7 @@
 
   window.exportCSV = function(){
     const rows=[["Nome","Telefone","Serviço","Data","Horário","Status"]];
-    allData.forEach(a=>rows.push([a.name,a.phone,a.service,a.date,a.time,getStatusType(a)]));
+    allData.filter(a=>a.status!=='Bloqueado').forEach(a=>rows.push([a.name,a.phone,a.service,a.date,a.time,getStatusType(a)]));
     const csv=rows.map(r=>r.map(v=>'"'+v+'"').join(",")).join("\n");
     const blob=new Blob(["\uFEFF"+csv],{type:"text/csv;charset=utf-8;"});
     const url=URL.createObjectURL(blob);
