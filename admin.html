@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin — Gabriel Barber Studio</title>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"><\/script>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     :root{--gold:#c9a84c;--gold-dim:rgba(201,168,76,0.13);--gold-border:rgba(201,168,76,0.25);--bg:#0e0e0e;--bg2:#161616;--bg3:#1e1e1e;--text:#e5e5e5;--text-muted:#888;--text-dim:#444;--red:#dc2626;--red-dim:rgba(220,38,38,0.12);--green:#16a34a;--green-dim:rgba(22,163,74,0.12)}
@@ -275,12 +276,12 @@
     <div class="login-card">
       <div class="login-tag">Acesso Restrito</div>
       <div class="login-title">Painel Admin</div>
-      <div class="login-sub">Gabriel Barber Studio - so para administradores</div>
-      <div class="login-err" id="login-err">Usuario ou senha incorretos.</div>
+      <div class="login-sub">Gabriel Barber Studio — somente para administradores</div>
+      <div class="login-err" id="login-err">Usuário ou senha incorretos.</div>
       <div class="field"><label>Email</label><input type="email" id="inp-user" placeholder="admin@email.com" autocomplete="username"></div>
       <div class="field"><label>Senha</label><input type="password" id="inp-pass" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" autocomplete="current-password"></div>
       <button class="login-btn" onclick="doLogin()">Entrar no Painel</button>
-      <p class="login-notice">Acesso restrito - nao compartilhe suas credenciais</p>
+      <p class="login-notice">Acesso restrito — não compartilhe suas credenciais</p>
     </div>
   </div>
 </div>
@@ -310,7 +311,40 @@
     <div class="stat-card"><div class="stat-label">Total de Agendamentos</div><div class="stat-value" id="stat-total">0</div><div class="stat-sub">todos os registros</div></div>
     <div class="stat-card"><div class="stat-label">Hoje</div><div class="stat-value" id="stat-today">0</div><div class="stat-sub" id="stat-today-date">-</div></div>
     <div class="stat-card"><div class="stat-label">Esta Semana</div><div class="stat-value" id="stat-week">0</div><div class="stat-sub">próximos 7 dias</div></div>
-    <div class="stat-card"><div class="stat-label">Clientes únicos</div><div class="stat-value" id="stat-clients">0</div><div class="stat-sub">telefones distintos</div></div>
+    <div class="stat-card"><div class="stat-label">Clientes Únicos</div><div class="stat-value" id="stat-clients">0</div><div class="stat-sub">telefones distintos</div></div>
+  </div>
+
+  <!-- GRÁFICO DE FATURAMENTO -->
+  <div style="background:var(--bg2);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:24px;margin-bottom:28px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;background:linear-gradient(135deg,#c9a84c,#f0d78c,#c9a84c);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">💰 Faturamento</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button onclick="setRevPeriod('day')" id="rev-btn-day" style="padding:6px 14px;border-radius:7px;border:1px solid var(--gold-border);background:var(--gold-dim);color:var(--gold);font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">Hoje</button>
+        <button onclick="setRevPeriod('month')" id="rev-btn-month" style="padding:6px 14px;border-radius:7px;border:1px solid rgba(255,255,255,0.08);background:none;color:var(--text-muted);font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">Este Mês</button>
+        <button onclick="setRevPeriod('year')" id="rev-btn-year" style="padding:6px 14px;border-radius:7px;border:1px solid rgba(255,255,255,0.08);background:none;color:var(--text-muted);font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">Este Ano</button>
+      </div>
+    </div>
+    <!-- Cards de faturamento -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px;" id="rev-cards">
+      <div style="background:var(--bg3);border:1px solid rgba(201,168,76,0.2);border-radius:10px;padding:16px;text-align:center;">
+        <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px;">Hoje</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--gold);" id="rev-day-val">R$ 0,00</div>
+        <div style="font-size:12px;color:var(--text-dim);margin-top:2px;" id="rev-day-count">0 atendimentos</div>
+      </div>
+      <div style="background:var(--bg3);border:1px solid rgba(201,168,76,0.2);border-radius:10px;padding:16px;text-align:center;">
+        <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px;">Este Mês</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--gold);" id="rev-month-val">R$ 0,00</div>
+        <div style="font-size:12px;color:var(--text-dim);margin-top:2px;" id="rev-month-count">0 atendimentos</div>
+      </div>
+      <div style="background:var(--bg3);border:1px solid rgba(201,168,76,0.2);border-radius:10px;padding:16px;text-align:center;">
+        <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px;">Este Ano</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--gold);" id="rev-year-val">R$ 0,00</div>
+        <div style="font-size:12px;color:var(--text-dim);margin-top:2px;" id="rev-year-count">0 atendimentos</div>
+      </div>
+    </div>
+    <!-- Gráfico de barras -->
+    <canvas id="revenue-chart" height="180" style="width:100%;max-width:100%;"></canvas>
+    <div style="font-size:11px;color:var(--text-dim);text-align:center;margin-top:8px;" id="rev-chart-label">Faturamento por serviço — hoje</div>
   </div>
   <div class="toolbar">
     <div class="toolbar-title">Agendamentos</div>
@@ -349,7 +383,7 @@
       </thead>
       <tbody id="apt-tbody"></tbody>
     </table>
-    <div class="empty" id="empty-state" style="display:none;"><div class="empty-icon">no data</div><p>Nenhum agendamento encontrado.</p></div>
+    <div class="empty" id="empty-state" style="display:none;"><div class="empty-icon">🗓️</div><p>Nenhum agendamento encontrado.</p></div>
   </div>
   </div>
 
@@ -357,9 +391,18 @@
   <div id="tab-settings" style="display:none;">
     <div style="max-width:720px;">
 
+      <!-- AVISOS / PROMOÇÕES DO SITE -->
       <div class="cfg-card">
-        <div class="cfg-title">📅 Dias e Horarios de Funcionamento</div>
-        <div class="cfg-hint">Defina quais dias funcionam e os horarios de cada um.</div>
+        <div class="cfg-title">📢 Avisos, Promoções e Ofertas</div>
+        <div class="cfg-hint">Adicione banners de aviso, promoções ou ofertas que aparecem no topo da página inicial para os clientes.</div>
+        <div id="banners-admin-list"></div>
+        <button class="cfg-add-btn" onclick="addBanner()" style="margin-top:8px;">+ Adicionar aviso / promoção</button>
+        <button class="cfg-save-btn" onclick="saveBanners()" style="margin-top:14px;">💾 Salvar Avisos</button>
+      </div>
+
+      <div class="cfg-card">
+        <div class="cfg-title">📅 Dias e Horários de Funcionamento</div>
+        <div class="cfg-hint">Defina quais dias funcionam e os horários de cada um.</div>
         <div id="days-config"></div>
         <div style="margin-top:20px;">
           <div class="cfg-subtitle">⚠️ Intervalos especiais (ex: sexta 12–18)</div>
@@ -377,7 +420,7 @@
 
       <div class="cfg-card">
         <div class="cfg-title">⏱️ Intervalo entre Atendimentos</div>
-        <div class="cfg-hint">Tempo de descanso aplicado automaticamente apos cada serviço (em minutos).</div>
+        <div class="cfg-hint">Tempo de descanso aplicado automaticamente após cada serviço (em minutos).</div>
         <div style="display:flex;align-items:center;gap:10px;">
           <input type="number" id="cfg-buffer" min="0" max="30" step="5" value="5" class="cfg-input" style="width:100px;">
           <span style="font-size:13px;color:var(--text-muted)">minutos</span>
@@ -389,7 +432,7 @@
       <!-- PLANOS -->
       <div class="cfg-card" style="margin-top:24px;">
         <div class="cfg-title">💎 Planos de Assinatura</div>
-        <div class="cfg-hint">Adicione, edite ou remova os planos exibidos no site. As alterações sao refletidas imediatamente para os clientes.</div>
+        <div class="cfg-hint">Adicione, edite ou remova os planos exibidos no site. As alterações são refletidas imediatamente para os clientes.</div>
         <div id="plans-admin-list"></div>
         <button class="cfg-add-btn" onclick="addPlan()" style="margin-top:12px;">+ Adicionar plano</button>
       </div>
@@ -451,6 +494,7 @@
       document.getElementById("login-screen").style.display="none";
       document.getElementById("admin-user-label").textContent=currentAdmin;
       subscribeData();
+      loadAdminBanners();
     } catch(err){
       errEl.style.display="block";
       document.getElementById("inp-pass").value="";
@@ -466,7 +510,7 @@
   function subscribeData(){
     onSnapshot(collection(db,COL),snap=>{
       allData=snap.docs.map(d=>({id:d.id,...d.data()}));
-      updateStats(); renderTable();
+      updateStats(); renderTable(); updateRevenueCards();
     });
   }
 
@@ -536,7 +580,7 @@
   };
 
   window.exportCSV = function(){
-    const rows=[["Nome","Telefone","Servico","Data","Horario","Status"]];
+    const rows=[["Nome","Telefone","Serviço","Data","Horário","Status"]];
     allData.forEach(a=>rows.push([a.name,a.phone,a.service,a.date,a.time,getStatusType(a)]));
     const csv=rows.map(r=>r.map(v=>'"'+v+'"').join(",")).join("\n");
     const blob=new Blob(["\uFEFF"+csv],{type:"text/csv;charset=utf-8;"});
@@ -548,11 +592,11 @@
   // ===== CONFIGURAÇÕES =====
   const DAYS = [
     {key:'mon', label:'Segunda-feira'},
-    {key:'tue', label:'Terca-feira'},
+    {key:'tue', label:'Terça-feira'},
     {key:'wed', label:'Quarta-feira'},
     {key:'thu', label:'Quinta-feira'},
     {key:'fri', label:'Sexta-feira'},
-    {key:'sat', label:'Sabado'},
+    {key:'sat', label:'Sábado'},
     {key:'sun', label:'Domingo'},
   ];
 
@@ -562,7 +606,7 @@
     {name:'Barba',         price:'25,00', duration:15},
     {name:'Pezinho',       price:'15,00', duration:15},
     {name:'Cabelo & Barba',price:'50,00', duration:70},
-    {name:'Raspar Cabeca', price:'20,00', duration:15},
+    {name:'Raspar Cabeça', price:'20,00', duration:15},
     {name:'Sobrancelha',   price:'15,00', duration:15},
   ];
 
@@ -580,7 +624,7 @@
     container.innerHTML = adminServices.map((svc,i)=>`
       <div class="plan-admin-card" id="svc-row-${i}" style="margin-bottom:10px;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-          <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--gold);">Servico ${i+1}</span>
+          <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--gold);">Serviço ${i+1}</span>
           <div style="display:flex;gap:6px;">
             ${i>0?`<button onclick="moveSvc(${i},-1)" style="padding:4px 10px;border-radius:6px;border:1px solid rgba(255,255,255,0.1);background:none;color:var(--text-muted);font-size:12px;cursor:pointer;">↑</button>`:''}
             ${i<adminServices.length-1?`<button onclick="moveSvc(${i},1)" style="padding:4px 10px;border-radius:6px;border:1px solid rgba(255,255,255,0.1);background:none;color:var(--text-muted);font-size:12px;cursor:pointer;">↓</button>`:''}
@@ -589,7 +633,7 @@
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px;">
           <div>
-            <span class="plan-admin-label">Nome do servico</span>
+            <span class="plan-admin-label">Nome do serviço</span>
             <input class="plan-admin-input" id="svc-name-${i}" value="${esc(svc.name||'')}" placeholder="Ex: Cabelo">
           </div>
           <div>
@@ -597,7 +641,7 @@
             <input class="plan-admin-input" id="svc-price-${i}" value="${esc(svc.price||'0,00')}" placeholder="Ex: 30,00">
           </div>
           <div>
-            <span class="plan-admin-label">Duracao (min)</span>
+            <span class="plan-admin-label">Duração (min)</span>
             <input type="number" class="plan-admin-input" id="svc-dur-${i}" value="${svc.duration||15}" min="5" max="240" step="5">
           </div>
         </div>
@@ -612,6 +656,17 @@
               : `<span style="font-size:10px;color:var(--text-dim);text-align:center;padding:4px;">sem img</span>`}
           </div>
         </div>
+        <div style="margin-top:10px;">
+          <span class="plan-admin-label" style="margin-bottom:6px;display:block;">Características do serviço (aparece no card do site)</span>
+          <div id="svc-features-${i}" style="display:flex;flex-direction:column;gap:5px;margin-bottom:6px;">
+            ${(svc.features||[]).map((ft,fi)=>`
+              <div style="display:flex;gap:6px;align-items:center;">
+                <input class="plan-admin-input" id="svc-ft-${i}-${fi}" value="${esc(ft)}" placeholder="Ex: Cortes com Máquina" style="flex:1;">
+                <button onclick="removeSvcFeature(${i},${fi})" class="cfg-rm-btn" style="padding:5px 9px;">✕</button>
+              </div>`).join('')}
+          </div>
+          <button onclick="addSvcFeature(${i})" class="cfg-add-btn" style="font-size:11px;margin-top:2px;">+ Característica</button>
+        </div>
       </div>`).join('');
   }
 
@@ -625,14 +680,14 @@
   };
 
   window.addService = function(){
-    adminServices.push({name:'Novo Servico', price:'0,00', duration:15});
+    adminServices.push({name:'Novo Serviço', price:'0,00', duration:15, features:[]});
     renderServicesAdminUI();
     // Foca no nome do novo serviço
     setTimeout(()=>{ const el=document.getElementById('svc-name-'+(adminServices.length-1)); if(el){el.focus();el.select();} },50);
   };
 
   window.removeSvc = function(i){
-    if(!confirm('Remover o servico "'+adminServices[i].name+'"?')) return;
+    if(!confirm('Remover o serviço "'+adminServices[i].name+'"?')) return;
     adminServices.splice(i,1);
     renderServicesAdminUI();
   };
@@ -644,12 +699,41 @@
     renderServicesAdminUI();
   };
 
+  function collectSvcFeatures(i){
+    const feats=[];
+    let fi=0;
+    while(document.getElementById('svc-ft-'+i+'-'+fi)){
+      const v=document.getElementById('svc-ft-'+i+'-'+fi).value.trim();
+      if(v) feats.push(v);
+      fi++;
+    }
+    return feats;
+  }
+
+  window.addSvcFeature = function(i){
+    const existing = collectSvcFeatures(i);
+    adminServices[i].features = existing;
+    adminServices[i].features.push('');
+    renderServicesAdminUI();
+    setTimeout(()=>{
+      const all=document.querySelectorAll(`[id^="svc-ft-${i}-"]`);
+      if(all.length) all[all.length-1].focus();
+    },50);
+  };
+
+  window.removeSvcFeature = function(i,fi){
+    adminServices[i].features = collectSvcFeatures(i);
+    adminServices[i].features.splice(fi,1);
+    renderServicesAdminUI();
+  };
+
   function collectAdminServices(){
     return adminServices.map((_,i)=>({
       name:     (document.getElementById('svc-name-'+i)?.value||'').trim(),
       price:    (document.getElementById('svc-price-'+i)?.value||'0,00').trim(),
       duration: parseInt(document.getElementById('svc-dur-'+i)?.value)||15,
       image:    (document.getElementById('svc-img-'+i)?.value||'').trim(),
+      features: collectSvcFeatures(i),
     })).filter(s=>s.name);
   }
 
@@ -666,15 +750,15 @@
       sun: {open:false, start:'10:00', end:'21:00'},
     },
     breaks: [
-      {days:['tue','thu','sat'], start:'12:00', end:'14:00', label:'Almoco'},
-      {days:['fri'],             start:'12:00', end:'18:00', label:'Intervalo sexta'},
+      {days:['tue','thu','sat'], start:'12:00', end:'14:00', label:'Almoço'},
+      {days:['fri'],             start:'12:00', end:'18:00', label:'Intervalo Sexta'},
     ],
     services: {
       'Cabelo':        {duration:45},
       'Barba':         {duration:15},
       'Pezinho':       {duration:15},
       'Cabelo & Barba':{duration:70},
-      'Raspar Cabeca': {duration:15},
+      'Raspar Cabeça': {duration:15},
       'Sobrancelha':   {duration:15},
     },
     buffer: 5,
@@ -702,7 +786,7 @@
           <label for="day-open-${d.key}">${d.label}</label>
         </div>
         <div style="display:flex;align-items:center;gap:6px;">
-          <span style="font-size:12px;color:var(--text-dim)">Inicio</span>
+          <span style="font-size:12px;color:var(--text-dim)">Início</span>
           <input type="time" class="cfg-input" id="day-start-${d.key}" value="${cfg.start}" style="width:110px;">
         </div>
         <div style="display:flex;align-items:center;gap:6px;">
@@ -731,9 +815,9 @@
           </label>`).join('')}
         </div>
         <div class="cfg-break-row-times">
-          <span style="font-size:12px;color:var(--text-dim);min-width:32px;">Inicio</span>
+          <span style="font-size:12px;color:var(--text-dim);min-width:32px;">Início</span>
           <input type="time" class="cfg-input" id="break-start-${i}" value="${b.start}" style="flex:1;">
-          <span style="font-size:12px;color:var(--text-dim);min-width:20px;">ate</span>
+          <span style="font-size:12px;color:var(--text-dim);min-width:20px;">até</span>
           <input type="time" class="cfg-input" id="break-end-${i}" value="${b.end}" style="flex:1;">
         </div>
         <button class="cfg-rm-btn" onclick="removeBreak(${i})">Remover</button>
@@ -742,7 +826,7 @@
 
   window.addBreak = function(){
     currentSettings.breaks = currentSettings.breaks||[];
-    currentSettings.breaks.push({days:[], start:'12:00', end:'14:00', label:'Novo intervalo'});
+    currentSettings.breaks.push({days:[], start:'12:00', end:'14:00', label:'Novo Intervalo'});
     renderBreaksUI();
   };
 
@@ -780,7 +864,7 @@
 
     // Lê serviços do novo UI dinâmico
     const services = collectAdminServices();
-    if(services.length===0){ showToast('Adicione ao menos um servico','red'); return; }
+    if(services.length===0){ showToast('Adicione ao menos um serviço','red'); return; }
     services.forEach(svc=>{ s.services[svc.name] = {duration: svc.duration}; });
 
     try {
@@ -792,10 +876,10 @@
       adminServices = services;
       // Atualiza filtro de serviços na tabela de agendamentos
       updateServicesFilter(services);
-      showToast('Configuracoes salvas!','green');
+      showToast('Configurações salvas!','green');
     } catch(e){
       console.error(e);
-      showToast('Erro ao salvar configuracoes','red');
+      showToast('Erro ao salvar configurações','red');
     }
   };
 
@@ -803,7 +887,7 @@
     const sel = document.getElementById('filter-service');
     if(!sel) return;
     const current = sel.value;
-    sel.innerHTML = '<option value="">Todos os servicos</option>' +
+    sel.innerHTML = '<option value="">Todos os serviços</option>' +
       services.map(s=>`<option${s.name===current?' selected':''}>${s.name}</option>`).join('');
   }
 
@@ -842,7 +926,7 @@
         <div style="display:grid;grid-template-columns:60px 1fr 1fr;gap:10px;margin-bottom:10px;">
           <div><span class="plan-admin-label">Emoji</span><input class="plan-admin-input" id="p-emoji-${i}" value="${esc(p.emoji||'')}" placeholder="🪓" maxlength="4"></div>
           <div><span class="plan-admin-label">Nome do plano</span><input class="plan-admin-input" id="p-name-${i}" value="${esc(p.name||'')}" placeholder="Ex: Lumberjack"></div>
-          <div><span class="plan-admin-label">Preco (R$)</span><input class="plan-admin-input" id="p-price-${i}" value="${esc(p.price||'')}" placeholder="Ex: 80,00"></div>
+          <div><span class="plan-admin-label">Preço (R$)</span><input class="plan-admin-input" id="p-price-${i}" value="${esc(p.price||'')}" placeholder="Ex: 80,00"></div>
         </div>
 
         <div style="margin-bottom:10px;">
@@ -857,22 +941,29 @@
           </label>
         </div>
 
+        <div style="margin-bottom:10px;">
+          <label class="plan-admin-toggle">
+            <input type="checkbox" id="p-bestvalue-${i}" ${p.bestValue?'checked':''}>
+            Destacar como "Melhor Custo‑Benefício"
+          </label>
+        </div>
+
         <div>
-          <span class="plan-admin-label">Beneficios (um por linha)</span>
+          <span class="plan-admin-label">Benefícios (um por linha)</span>
           <div class="plan-admin-benefits" id="p-benefits-${i}">
             ${(p.benefits||[]).map((b,j)=>`
               <div class="plan-admin-benefit-row">
-                <input class="plan-admin-input" id="p-b-${i}-${j}" value="${esc(b)}" placeholder="Ex: 1 Corte/mes" style="flex:1;">
+                <input class="plan-admin-input" id="p-b-${i}-${j}" value="${esc(b)}" placeholder="Ex: 1 Corte/mês" style="flex:1;">
                 <button onclick="removeBenefit(${i},${j})" class="cfg-rm-btn" style="white-space:nowrap;padding:6px 10px;">✕</button>
               </div>`).join('')}
           </div>
-          <button onclick="addBenefit(${i})" class="cfg-add-btn" style="margin-top:6px;font-size:11px;">+ Beneficio</button>
+          <button onclick="addBenefit(${i})" class="cfg-add-btn" style="margin-top:6px;font-size:11px;">+ Benefício</button>
         </div>
       </div>`).join('');
   }
 
   window.addPlan = function(){
-    adminPlans.push({ id:'plan_'+Date.now(), order:adminPlans.length+1, emoji:'✂️', name:'Novo Plano', price:'0,00', featured:false, mpLink:'', benefits:['Beneficio 1'] });
+    adminPlans.push({ id:'plan_'+Date.now(), order:adminPlans.length+1, emoji:'✂️', name:'Novo Plano', price:'0,00', featured:false, bestValue:false, mpLink:'', benefits:['Benefício 1'] });
     renderAdminPlans();
   };
 
@@ -927,6 +1018,7 @@
       price:    (document.getElementById('p-price-'+i)?.value||'').trim(),
       mpLink:   (document.getElementById('p-link-'+i)?.value||'').trim(),
       featured: document.getElementById('p-featured-'+i)?.checked||false,
+      bestValue: document.getElementById('p-bestvalue-'+i)?.checked||false,
       benefits: collectBenefits(i),
     }));
   }
@@ -985,11 +1077,277 @@
         loadSettings();
         loadAdminPlans();
         loadAdminServices();
+        loadAdminBanners();
       } else {
         document.getElementById("login-screen").style.display="flex";
       }
     });
   });
+
+  // ===== FATURAMENTO / RECEITA =====
+  let currentRevPeriod = 'day';
+  let revenueChartInstance = null;
+
+  function getServicePriceMap(){
+    const map = {};
+    adminServices.forEach(s=>{
+      const val = parseFloat((s.price||'0').replace(',','.')) || 0;
+      map[s.name] = val;
+    });
+    return map;
+  }
+
+  function calcRevenue(data, priceMap){
+    return data.reduce((sum, a)=>{
+      if(a.status==='Bloqueado') return sum;
+      return sum + (priceMap[a.service]||0);
+    }, 0);
+  }
+
+  function formatBRL(val){
+    return 'R$ ' + val.toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+  }
+
+  function updateRevenueCards(){
+    const priceMap = getServicePriceMap();
+    const today = getTodayStr();
+    const nowDate = new Date();
+    const thisMonth = today.slice(0,7);
+    const thisYear = today.slice(0,4);
+
+    const dayData    = allData.filter(a=>a.date===today);
+    const monthData  = allData.filter(a=>a.date.startsWith(thisMonth));
+    const yearData   = allData.filter(a=>a.date.startsWith(thisYear));
+
+    const revDay   = calcRevenue(dayData,   priceMap);
+    const revMonth = calcRevenue(monthData, priceMap);
+    const revYear  = calcRevenue(yearData,  priceMap);
+
+    const countDay   = dayData.filter(a=>a.status!=='Bloqueado').length;
+    const countMonth = monthData.filter(a=>a.status!=='Bloqueado').length;
+    const countYear  = yearData.filter(a=>a.status!=='Bloqueado').length;
+
+    document.getElementById('rev-day-val').textContent   = formatBRL(revDay);
+    document.getElementById('rev-month-val').textContent = formatBRL(revMonth);
+    document.getElementById('rev-year-val').textContent  = formatBRL(revYear);
+    document.getElementById('rev-day-count').textContent   = countDay   + (countDay===1?' atendimento':' atendimentos');
+    document.getElementById('rev-month-count').textContent = countMonth + (countMonth===1?' atendimento':' atendimentos');
+    document.getElementById('rev-year-count').textContent  = countYear  + (countYear===1?' atendimento':' atendimentos');
+
+    drawRevenueChart(currentRevPeriod);
+  }
+
+  window.setRevPeriod = function(period){
+    currentRevPeriod = period;
+    ['day','month','year'].forEach(p=>{
+      const btn = document.getElementById('rev-btn-'+p);
+      if(!btn) return;
+      if(p===period){
+        btn.style.background='var(--gold-dim)';
+        btn.style.borderColor='var(--gold-border)';
+        btn.style.color='var(--gold)';
+      } else {
+        btn.style.background='none';
+        btn.style.borderColor='rgba(255,255,255,0.08)';
+        btn.style.color='var(--text-muted)';
+      }
+    });
+    drawRevenueChart(period);
+  };
+
+  function drawRevenueChart(period){
+    const priceMap = getServicePriceMap();
+    const today = getTodayStr();
+    const thisMonth = today.slice(0,7);
+    const thisYear = today.slice(0,4);
+
+    let filteredData, labels, labelText;
+
+    if(period==='day'){
+      // Por serviço hoje
+      const dayData = allData.filter(a=>a.date===today && a.status!=='Bloqueado');
+      const svcNames = [...new Set(dayData.map(a=>a.service))];
+      labels = svcNames;
+      filteredData = svcNames.map(svc=>{
+        const items = dayData.filter(a=>a.service===svc);
+        return calcRevenue(items, priceMap);
+      });
+      labelText = 'Faturamento por serviço — hoje';
+    } else if(period==='month'){
+      // Por dia do mês
+      const monthData = allData.filter(a=>a.date.startsWith(thisMonth) && a.status!=='Bloqueado');
+      const daysInMonth = new Date(parseInt(thisYear), parseInt(thisMonth.slice(5)), 0).getDate();
+      labels = Array.from({length:daysInMonth},(_,i)=>String(i+1).padStart(2,'0')+'/'+thisMonth.slice(5));
+      filteredData = labels.map((_,i)=>{
+        const dayStr = thisMonth+'-'+String(i+1).padStart(2,'0');
+        const items = monthData.filter(a=>a.date===dayStr);
+        return calcRevenue(items, priceMap);
+      });
+      labelText = 'Faturamento por dia — '+thisMonth.slice(5)+'/'+thisYear;
+    } else {
+      // Por mês do ano
+      const yearData = allData.filter(a=>a.date.startsWith(thisYear) && a.status!=='Bloqueado');
+      const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+      labels = meses;
+      filteredData = meses.map((_,i)=>{
+        const m = String(i+1).padStart(2,'0');
+        const items = yearData.filter(a=>a.date.startsWith(thisYear+'-'+m));
+        return calcRevenue(items, priceMap);
+      });
+      labelText = 'Faturamento por mês — '+thisYear;
+    }
+
+    document.getElementById('rev-chart-label').textContent = labelText;
+
+    const canvas = document.getElementById('revenue-chart');
+    if(!canvas) return;
+    const ctx = canvas.getContext('2d');
+
+    if(revenueChartInstance){ revenueChartInstance.destroy(); revenueChartInstance=null; }
+
+    if(typeof Chart === 'undefined'){
+      // Fallback: desenha barras manualmente em SVG
+      drawFallbackBars(canvas, labels, filteredData);
+      return;
+    }
+
+    revenueChartInstance = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets:[{
+          label: 'Faturamento (R$)',
+          data: filteredData,
+          backgroundColor: 'rgba(201,168,76,0.55)',
+          borderColor: '#c9a84c',
+          borderWidth: 1,
+          borderRadius: 5,
+        }]
+      },
+      options:{
+        responsive:true,
+        plugins:{ legend:{display:false}, tooltip:{
+          callbacks:{ label: ctx => formatBRL(ctx.parsed.y) }
+        }},
+        scales:{
+          x:{ ticks:{color:'#666',font:{size:10}}, grid:{color:'rgba(255,255,255,0.04)'} },
+          y:{ ticks:{color:'#666',font:{size:10}, callback: v=>formatBRL(v)}, grid:{color:'rgba(255,255,255,0.04)'} }
+        }
+      }
+    });
+  }
+
+  function drawFallbackBars(canvas, labels, data){
+    const max = Math.max(...data, 1);
+    const W = canvas.offsetWidth || 600;
+    const H = 180;
+    canvas.width = W; canvas.height = H;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0,0,W,H);
+    const n = labels.length;
+    if(n===0) return;
+    const barW = Math.max(4, (W - 40) / n - 4);
+    const gap  = (W - 40) / n;
+    ctx.fillStyle = '#333';
+    ctx.fillRect(40,0,W-40,H-20);
+
+    data.forEach((val,i)=>{
+      const h = ((val/max)*(H-40));
+      const x = 40 + i*gap + gap/2 - barW/2;
+      const y = H-20-h;
+      ctx.fillStyle='rgba(201,168,76,0.65)';
+      ctx.beginPath();
+      ctx.roundRect(x,y,barW,h,3);
+      ctx.fill();
+
+      if(n<=14){
+        ctx.fillStyle='#666';
+        ctx.font='9px DM Sans';
+        ctx.textAlign='center';
+        ctx.fillText(labels[i], x+barW/2, H-4);
+      }
+      if(val>0){
+        ctx.fillStyle='#c9a84c';
+        ctx.font='10px DM Sans';
+        ctx.textAlign='center';
+        ctx.fillText(formatBRL(val).replace('R$ ',''), x+barW/2, y-4);
+      }
+    });
+  }
+
+  // ===== BANNERS / AVISOS =====
+  let adminBanners = [];
+
+  async function loadAdminBanners(){
+    try {
+      const snap = await getDoc(doc(db,'config','banners'));
+      if(snap.exists() && snap.data().list) adminBanners = snap.data().list;
+    } catch(e){ console.error('loadAdminBanners',e); }
+    renderAdminBannersUI();
+  }
+
+  function renderAdminBannersUI(){
+    const container = document.getElementById('banners-admin-list');
+    if(!container) return;
+    if(adminBanners.length===0){
+      container.innerHTML='<p style="color:var(--text-dim);font-size:13px;padding:8px 0 4px;">Nenhum aviso cadastrado.</p>';
+      return;
+    }
+    container.innerHTML = adminBanners.map((b,i)=>`
+      <div style="background:var(--bg3);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:14px;margin-bottom:10px;">
+        <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;align-items:center;">
+          <select id="ban-type-${i}" class="plan-admin-input" style="width:130px;">
+            <option value="info"  ${(b.type||'info')==='info'  ?'selected':''}>ℹ️ Informação</option>
+            <option value="promo" ${(b.type||'')==='promo'?'selected':''}>🏷️ Promoção</option>
+            <option value="warn"  ${(b.type||'')==='warn' ?'selected':''}>⚠️ Aviso</option>
+          </select>
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-muted);cursor:pointer;">
+            <input type="checkbox" id="ban-active-${i}" ${b.active!==false?'checked':''} style="accent-color:var(--gold);width:15px;height:15px;">
+            Ativo
+          </label>
+          <button onclick="removeBanner(${i})" class="cfg-rm-btn" style="margin-left:auto;">Remover</button>
+        </div>
+        <input class="plan-admin-input" id="ban-text-${i}" value="${esc(b.text||'')}" placeholder="Texto do aviso, promoção ou oferta..." style="margin-bottom:6px;">
+        <input class="plan-admin-input" id="ban-link-${i}" value="${esc(b.link||'')}" placeholder="Link (opcional)" style="margin-top:6px;">
+      </div>`).join('');
+  }
+
+  window.addBanner = function(){
+    adminBanners.push({type:'info', text:'', link:'', active:true});
+    renderAdminBannersUI();
+    setTimeout(()=>{ const el=document.getElementById('ban-text-'+(adminBanners.length-1)); if(el){el.focus();} },50);
+  };
+
+  window.removeBanner = function(i){
+    adminBanners.splice(i,1);
+    renderAdminBannersUI();
+  };
+
+  function collectAdminBanners(){
+    return adminBanners.map((_,i)=>({
+      type:   document.getElementById('ban-type-'+i)?.value||'info',
+      text:   (document.getElementById('ban-text-'+i)?.value||'').trim(),
+      link:   (document.getElementById('ban-link-'+i)?.value||'').trim(),
+      active: document.getElementById('ban-active-'+i)?.checked!==false,
+    })).filter(b=>b.text);
+  }
+
+  window.saveBanners = async function(){
+    const banners = collectAdminBanners();
+    try {
+      await setDoc(doc(db,'config','banners'), { list: banners });
+      adminBanners = banners;
+      showToast('Avisos salvos!','green');
+    } catch(e){
+      console.error(e);
+      showToast('Erro ao salvar avisos','red');
+    }
+  };
+
+  // ===== SERVICE FEATURES (descrições dos serviços) =====
+  // Agora o renderServicesAdminUI já inclui campo features; precisamos ajustar collectAdminServices
+  // para incluir features e renderServicesAdminUI para exibi-las
+
 </script>
 </body>
 </html>
