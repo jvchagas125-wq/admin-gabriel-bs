@@ -99,6 +99,15 @@
     .cfg-svc-row:last-child{border-bottom:none}
     .cfg-save-btn{width:100%;padding:14px;border-radius:10px;border:none;background:var(--gold);color:#111;font-weight:700;font-size:16px;cursor:pointer;font-family:"DM Sans",sans-serif;transition:opacity .2s;margin-top:4px}
     .cfg-save-btn:hover{opacity:.88}
+    .plan-admin-card{background:var(--bg3);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:18px;margin-bottom:14px;}
+    .plan-admin-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px;}
+    .plan-admin-label{font-size:11px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;display:block;}
+    .plan-admin-input{padding:9px 12px;border-radius:8px;background:var(--bg2);border:1px solid rgba(255,255,255,0.08);color:var(--text);font-size:13px;font-family:"DM Sans",sans-serif;transition:border-color .2s;width:100%;}
+    .plan-admin-input:focus{outline:none;border-color:var(--gold);}
+    .plan-admin-benefits{display:flex;flex-direction:column;gap:6px;margin-bottom:8px;}
+    .plan-admin-benefit-row{display:flex;gap:6px;align-items:center;}
+    .plan-admin-toggle{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-muted);cursor:pointer;}
+    .plan-admin-toggle input{accent-color:var(--gold);width:16px;height:16px;}
 
 
     /* ════ MOBILE — apenas configurações ════ */
@@ -370,6 +379,16 @@
       </div>
 
       <button class="cfg-save-btn" onclick="saveSettings()">💾 Salvar Configuracoes</button>
+
+      <!-- PLANOS -->
+      <div class="cfg-card" style="margin-top:24px;">
+        <div class="cfg-title">💎 Planos de Assinatura</div>
+        <div class="cfg-hint">Adicione, edite ou remova os planos exibidos no site. As alteracoes sao refletidas imediatamente para os clientes.</div>
+        <div id="plans-admin-list"></div>
+        <button class="cfg-add-btn" onclick="addPlan()" style="margin-top:12px;">+ Adicionar plano</button>
+      </div>
+
+      <button class="cfg-save-btn" onclick="savePlans()" style="background:#1a6634;margin-top:8px;">💎 Salvar Planos</button>
     </div>
   </div>
 </main>
@@ -378,7 +397,7 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getFirestore, collection, deleteDoc, doc, onSnapshot, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { getFirestore, collection, deleteDoc, doc, onSnapshot, setDoc, getDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
   import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
   const firebaseConfig = {
@@ -685,6 +704,153 @@
     }
   };
 
+  // ===== PLANOS =====
+  let adminPlans = [];
+
+  async function loadAdminPlans(){
+    try {
+      const snap = await getDocs(query(collection(db,'plans'), orderBy('order')));
+      adminPlans = snap.docs.map(d=>({id:d.id,...d.data()}));
+    } catch(e){
+      console.error('loadAdminPlans',e);
+      adminPlans = [];
+    }
+    renderAdminPlans();
+  }
+
+  function renderAdminPlans(){
+    const container = document.getElementById('plans-admin-list');
+    if(!container) return;
+    if(adminPlans.length===0){
+      container.innerHTML='<p style="color:var(--text-dim);font-size:13px;padding:12px 0;">Nenhum plano cadastrado ainda.</p>';
+      return;
+    }
+    container.innerHTML = adminPlans.map((p,i)=>`
+      <div class="plan-admin-card" id="plan-card-${i}">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+          <span style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--gold);">Plano ${i+1}</span>
+          <div style="display:flex;gap:6px;">
+            ${i>0?'<button onclick="movePlan('+i+',-1)" style="padding:4px 10px;border-radius:6px;border:1px solid rgba(255,255,255,0.1);background:none;color:var(--text-muted);font-size:12px;cursor:pointer;" title="Mover para cima">↑</button>':''}
+            ${i<adminPlans.length-1?'<button onclick="movePlan('+i+',1)" style="padding:4px 10px;border-radius:6px;border:1px solid rgba(255,255,255,0.1);background:none;color:var(--text-muted);font-size:12px;cursor:pointer;" title="Mover para baixo">↓</button>':''}
+            <button onclick="removePlan(${i})" class="cfg-rm-btn">Remover</button>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:60px 1fr 1fr;gap:10px;margin-bottom:10px;">
+          <div><span class="plan-admin-label">Emoji</span><input class="plan-admin-input" id="p-emoji-${i}" value="${esc(p.emoji||'')}" placeholder="🪓" maxlength="4"></div>
+          <div><span class="plan-admin-label">Nome do plano</span><input class="plan-admin-input" id="p-name-${i}" value="${esc(p.name||'')}" placeholder="Ex: Lumberjack"></div>
+          <div><span class="plan-admin-label">Preco (R$)</span><input class="plan-admin-input" id="p-price-${i}" value="${esc(p.price||'')}" placeholder="Ex: 80,00"></div>
+        </div>
+
+        <div style="margin-bottom:10px;">
+          <span class="plan-admin-label">Link do Mercado Pago</span>
+          <input class="plan-admin-input" id="p-link-${i}" value="${esc(p.mpLink||'')}" placeholder="https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=...">
+        </div>
+
+        <div style="margin-bottom:10px;">
+          <label class="plan-admin-toggle">
+            <input type="checkbox" id="p-featured-${i}" ${p.featured?'checked':''}>
+            Destacar como "Mais Popular"
+          </label>
+        </div>
+
+        <div>
+          <span class="plan-admin-label">Beneficios (um por linha)</span>
+          <div class="plan-admin-benefits" id="p-benefits-${i}">
+            ${(p.benefits||[]).map((b,j)=>`
+              <div class="plan-admin-benefit-row">
+                <input class="plan-admin-input" id="p-b-${i}-${j}" value="${esc(b)}" placeholder="Ex: 1 Corte/mes" style="flex:1;">
+                <button onclick="removeBenefit(${i},${j})" class="cfg-rm-btn" style="white-space:nowrap;padding:6px 10px;">✕</button>
+              </div>`).join('')}
+          </div>
+          <button onclick="addBenefit(${i})" class="cfg-add-btn" style="margin-top:6px;font-size:11px;">+ Beneficio</button>
+        </div>
+      </div>`).join('');
+  }
+
+  window.addPlan = function(){
+    adminPlans.push({ id:'plan_'+Date.now(), order:adminPlans.length+1, emoji:'✂️', name:'Novo Plano', price:'0,00', featured:false, mpLink:'', benefits:['Beneficio 1'] });
+    renderAdminPlans();
+  };
+
+  window.removePlan = function(i){
+    if(!confirm('Remover este plano?')) return;
+    adminPlans.splice(i,1);
+    renderAdminPlans();
+  };
+
+  window.movePlan = function(i, dir){
+    const j = i+dir;
+    if(j<0||j>=adminPlans.length) return;
+    [adminPlans[i],adminPlans[j]]=[adminPlans[j],adminPlans[i]];
+    renderAdminPlans();
+  };
+
+  window.addBenefit = function(i){
+    // Lê benefícios atuais do DOM antes de adicionar
+    const existing = collectBenefits(i);
+    adminPlans[i].benefits = existing;
+    adminPlans[i].benefits.push('');
+    renderAdminPlans();
+    // Foca no último campo
+    setTimeout(()=>{
+      const inputs = document.querySelectorAll(`[id^="p-b-${i}-"]`);
+      if(inputs.length) inputs[inputs.length-1].focus();
+    },50);
+  };
+
+  window.removeBenefit = function(i, j){
+    adminPlans[i].benefits = collectBenefits(i);
+    adminPlans[i].benefits.splice(j,1);
+    renderAdminPlans();
+  };
+
+  function collectBenefits(i){
+    const benefits = [];
+    let j=0;
+    while(document.getElementById('p-b-'+i+'-'+j)){
+      benefits.push(document.getElementById('p-b-'+i+'-'+j).value.trim());
+      j++;
+    }
+    return benefits.filter(b=>b);
+  }
+
+  function collectAllPlans(){
+    return adminPlans.map((p,i)=>({
+      id: p.id||'plan_'+i,
+      order: i+1,
+      emoji:    (document.getElementById('p-emoji-'+i)?.value||'').trim(),
+      name:     (document.getElementById('p-name-'+i)?.value||'').trim(),
+      price:    (document.getElementById('p-price-'+i)?.value||'').trim(),
+      mpLink:   (document.getElementById('p-link-'+i)?.value||'').trim(),
+      featured: document.getElementById('p-featured-'+i)?.checked||false,
+      benefits: collectBenefits(i),
+    }));
+  }
+
+  window.savePlans = async function(){
+    const plans = collectAllPlans();
+    if(plans.some(p=>!p.name)){ showToast('Preencha o nome de todos os planos','red'); return; }
+    try {
+      // Apaga planos removidos
+      const existingSnap = await getDocs(collection(db,'plans'));
+      const existingIds = existingSnap.docs.map(d=>d.id);
+      const newIds = plans.map(p=>p.id);
+      for(const oldId of existingIds){
+        if(!newIds.includes(oldId)) await deleteDoc(doc(db,'plans',oldId));
+      }
+      // Salva/atualiza os planos atuais
+      for(const p of plans){
+        await setDoc(doc(db,'plans',p.id), p);
+      }
+      adminPlans = plans;
+      showToast('Planos salvos com sucesso!','green');
+    } catch(e){
+      console.error(e);
+      showToast('Erro ao salvar planos','red');
+    }
+  };
+
   window.switchTab = function(tab){
     document.getElementById('tab-appointments').style.display = tab==='appointments'?'block':'none';
     document.getElementById('tab-settings').style.display     = tab==='settings'?'block':'none';
@@ -714,6 +880,7 @@
         document.getElementById("login-screen").style.display="none";
         subscribeData();
         loadSettings();
+        loadAdminPlans();
       } else {
         document.getElementById("login-screen").style.display="flex";
       }
