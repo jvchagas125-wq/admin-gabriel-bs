@@ -299,7 +299,7 @@
   </div>
   <div style="max-width:1100px;margin:0 auto;padding:0 20px;display:flex;gap:4px;border-top:1px solid rgba(255,255,255,0.05);">
     <button class="tab-btn active" onclick="switchTab('appointments')">📋 Agendamentos</button>
-    <button class="tab-btn" onclick="switchTab('settings')">⚙️ Configuracoes</button>
+    <button class="tab-btn" onclick="switchTab('settings')">⚙️ Configurações</button>
   </div>
 </header>
 
@@ -309,8 +309,8 @@
   <div class="stats-grid">
     <div class="stat-card"><div class="stat-label">Total de Agendamentos</div><div class="stat-value" id="stat-total">0</div><div class="stat-sub">todos os registros</div></div>
     <div class="stat-card"><div class="stat-label">Hoje</div><div class="stat-value" id="stat-today">0</div><div class="stat-sub" id="stat-today-date">-</div></div>
-    <div class="stat-card"><div class="stat-label">Esta Semana</div><div class="stat-value" id="stat-week">0</div><div class="stat-sub">proximos 7 dias</div></div>
-    <div class="stat-card"><div class="stat-label">Clientes Unicos</div><div class="stat-value" id="stat-clients">0</div><div class="stat-sub">telefones distintos</div></div>
+    <div class="stat-card"><div class="stat-label">Esta Semana</div><div class="stat-value" id="stat-week">0</div><div class="stat-sub">próximos 7 dias</div></div>
+    <div class="stat-card"><div class="stat-label">Clientes únicos</div><div class="stat-value" id="stat-clients">0</div><div class="stat-sub">telefones distintos</div></div>
   </div>
   <div class="toolbar">
     <div class="toolbar-title">Agendamentos</div>
@@ -322,12 +322,12 @@
       <option value="passado">Realizados</option>
     </select>
     <select class="filter-select" id="filter-service" onchange="renderTable()">
-      <option value="">Todos os servicos</option>
+      <option value="">Todos os serviços</option>
       <option>Cabelo</option>
       <option>Barba</option>
       <option>Pezinho</option>
       <option>Cabelo & Barba</option>
-      <option>Raspar Cabeca</option>
+      <option>Raspar Cabeça</option>
       <option>Sobrancelha</option>
     </select>
     <button class="export-btn" onclick="exportCSV()">Exportar CSV</button>
@@ -339,12 +339,12 @@
         <tr>
           <th onclick="sortBy('name')">Cliente <span id="sort-name"></span></th>
           <th onclick="sortBy('phone')">Telefone <span id="sort-phone"></span></th>
-          <th onclick="sortBy('service')">Servico <span id="sort-service"></span></th>
+          <th onclick="sortBy('service')">Serviço <span id="sort-service"></span></th>
           <th onclick="sortBy('date')">Data <span id="sort-date"></span></th>
-          <th onclick="sortBy('time')">Horario <span id="sort-time"></span></th>
+          <th onclick="sortBy('time')">Horário <span id="sort-time"></span></th>
           <th>Status</th>
           <th>Justificativa</th>
-          <th>Acao</th>
+          <th>Ação</th>
         </tr>
       </thead>
       <tbody id="apt-tbody"></tbody>
@@ -369,27 +369,27 @@
       </div>
 
       <div class="cfg-card">
-        <div class="cfg-title">✂️ Servicos</div>
-        <div class="cfg-hint">Adicione, edite ou remova os servicos. Nome, valor e duracao sao atualizados no site e no agendamento automaticamente.</div>
+        <div class="cfg-title">✂️ Serviços</div>
+        <div class="cfg-hint">Adicione, edite ou remova os serviços. Nome, valor e duração são atualizados no site e no agendamento automaticamente.</div>
         <div id="services-admin-list"></div>
-        <button class="cfg-add-btn" onclick="addService()" style="margin-top:8px;">+ Adicionar servico</button>
+        <button class="cfg-add-btn" onclick="addService()" style="margin-top:8px;">+ Adicionar serviço</button>
       </div>
 
       <div class="cfg-card">
         <div class="cfg-title">⏱️ Intervalo entre Atendimentos</div>
-        <div class="cfg-hint">Tempo de descanso aplicado automaticamente apos cada servico (em minutos).</div>
+        <div class="cfg-hint">Tempo de descanso aplicado automaticamente apos cada serviço (em minutos).</div>
         <div style="display:flex;align-items:center;gap:10px;">
           <input type="number" id="cfg-buffer" min="0" max="30" step="5" value="5" class="cfg-input" style="width:100px;">
           <span style="font-size:13px;color:var(--text-muted)">minutos</span>
         </div>
       </div>
 
-      <button class="cfg-save-btn" onclick="saveSettings()">💾 Salvar Configuracoes</button>
+      <button class="cfg-save-btn" onclick="saveSettings()">💾 Salvar Configurações</button>
 
       <!-- PLANOS -->
       <div class="cfg-card" style="margin-top:24px;">
         <div class="cfg-title">💎 Planos de Assinatura</div>
-        <div class="cfg-hint">Adicione, edite ou remova os planos exibidos no site. As alteracoes sao refletidas imediatamente para os clientes.</div>
+        <div class="cfg-hint">Adicione, edite ou remova os planos exibidos no site. As alterações sao refletidas imediatamente para os clientes.</div>
         <div id="plans-admin-list"></div>
         <button class="cfg-add-btn" onclick="addPlan()" style="margin-top:12px;">+ Adicionar plano</button>
       </div>
