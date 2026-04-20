@@ -458,6 +458,13 @@
       <div class="cfg-hint">Clientes que iniciaram o processo de assinatura. Apos confirmar o pagamento no Mercado Pago, clique em "Ativar VIP".</div>
       <div id="pending-subs-list"><div style="text-align:center;padding:32px 0;"><div class="spinner" style="margin:0 auto;"></div></div></div>
     </div>
+    <!-- Solicitações de Cancelamento -->
+    <div class="cfg-card" style="margin-bottom:20px;border-color:rgba(220,38,38,0.3);">
+      <div class="cfg-title" style="color:#f87171;">⚠️ Solicitações de Cancelamento</div>
+      <div class="cfg-hint">Clientes que solicitaram o cancelamento da assinatura. Cancele o plano no Mercado Pago e clique em "Revogar VIP" para confirmar.</div>
+      <div id="cancel-requests-list"><div style="text-align:center;padding:24px 0;"><div class="spinner" style="margin:0 auto;"></div></div></div>
+    </div>
+
     <div class="cfg-card">
       <div class="cfg-title">&#9989; Assinantes Ativos</div>
       <div class="cfg-hint">Clientes com acesso VIP ativo. Clique em "Revogar" para cancelar o acesso.</div>
@@ -1301,6 +1308,7 @@
   window.loadSubscriptions = async function(){
     await loadPendingSubs();
     await loadActiveSubs();
+    await loadCancelRequests();
   };
 
   async function loadPendingSubs(){
@@ -1385,6 +1393,67 @@
       showToast('Pedido removido','red');
       loadPendingSubs();
     }catch(e){ showToast('Erro ao remover','red'); }
+  };
+
+
+  // ═══════════════════════════════════════
+  // SOLICITAÇÕES DE CANCELAMENTO
+  // ═══════════════════════════════════════
+  async function loadCancelRequests(){
+    const el=document.getElementById('cancel-requests-list');
+    if(!el) return;
+    try{
+      const snap=await getDocs(collection(db,'cancellation_requests'));
+      const items=snap.docs.map(d=>({id:d.id,...d.data()}))
+        .filter(r=>r.status==='pending')
+        .sort((a,b)=>b.requestedAt>a.requestedAt?1:-1);
+      if(!items.length){
+        el.innerHTML='<p style="color:var(--text-dim);font-size:13px;padding:10px 0;">Nenhuma solicitação pendente.</p>';
+        return;
+      }
+      el.innerHTML=items.map(r=>{
+        const date=r.requestedAt?new Date(r.requestedAt).toLocaleString('pt-BR'):'—';
+        const details=r.details?'<div style="font-size:12px;color:#888;margin-top:3px;font-style:italic;">"'+esc(r.details)+'"</div>':'';
+        return '<div style="background:rgba(220,38,38,0.06);border:1px solid rgba(220,38,38,0.2);border-radius:10px;padding:14px;margin-bottom:10px;">'
+          +'<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">'
+          +'<div>'
+          +'<div style="font-weight:700;font-size:14px;color:#f87171;">'+esc(r.phone||'—')+'</div>'
+          +'<div style="font-size:12px;color:var(--text-muted);margin-top:2px;">Plano: <span style="color:var(--gold);font-weight:700;">'+esc(r.planName||'—')+'</span> • '+date+'</div>'
+          +'<div style="font-size:13px;color:#ccc;margin-top:4px;">Motivo: <strong>'+esc(r.reason||'—')+'</strong></div>'
+          +details
+          +'</div>'
+          +'<div style="display:flex;gap:8px;flex-wrap:wrap;">'
+          +'<button onclick="dismissCancelRequest(''+esc(r.id)+'')" style="padding:7px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:none;color:var(--text-muted);font-size:12px;font-weight:700;cursor:pointer;">&#10003; Visto</button>'
+          +'<button onclick="revokeVipFromCancel(''+esc(r.id)+'',''+esc(r.phone||'')+'',''+esc(r.planName||'')+'')" style="padding:7px 14px;border-radius:8px;border:1px solid rgba(220,38,38,.35);background:rgba(220,38,38,.1);color:#f87171;font-size:12px;font-weight:700;cursor:pointer;">&#128683; Revogar VIP</button>'
+          +'</div>'
+          +'</div>'
+          +'</div>';
+      }).join('');
+    }catch(e){
+      console.error(e);
+      el.innerHTML='<p style="color:#f87171;font-size:13px;">Erro ao carregar solicitações.</p>';
+    }
+  }
+
+  window.dismissCancelRequest=async function(id){
+    try{
+      await setDoc(doc(db,'cancellation_requests',id),{status:'seen'},{merge:true});
+      showToast('Marcado como visto','green');
+      loadCancelRequests();
+    }catch(e){ showToast('Erro','red'); }
+  };
+
+  window.revokeVipFromCancel=async function(cancelId,phone,planName){
+    if(!confirm('Revogar VIP de '+phone+' e confirmar cancelamento?')) return;
+    try{
+      // Revogar VIP
+      const subId=phone.replace(/\D/g,'');
+      await deleteDoc(doc(db,'subscriptions',subId));
+      // Marcar solicitação como resolvida
+      await setDoc(doc(db,'cancellation_requests',cancelId),{status:'resolved'},{merge:true});
+      showToast('VIP revogado e cancelamento confirmado','red');
+      loadSubscriptions();
+    }catch(e){ showToast('Erro ao revogar VIP','red'); }
   };
 
 </script>
