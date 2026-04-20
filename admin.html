@@ -99,24 +99,6 @@
     .cfg-svc-row:last-child{border-bottom:none}
     .cfg-save-btn{width:100%;padding:14px;border-radius:10px;border:none;background:var(--gold);color:#111;font-weight:700;font-size:16px;cursor:pointer;font-family:"DM Sans",sans-serif;transition:opacity .2s;margin-top:4px}
     .cfg-save-btn:hover{opacity:.88}
-    /* Plans admin */
-    .plan-admin-card{background:var(--bg2);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:20px 22px;margin-bottom:16px;}
-    .plan-admin-card.featured-card{border-color:var(--gold-border);background:linear-gradient(145deg,#1e1a10,#1a1a1a);}
-    .plan-admin-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px;}
-    .plan-admin-name{font-family:"Bebas Neue",sans-serif;font-size:20px;color:var(--gold);}
-    .plan-admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;}
-    @media(max-width:500px){.plan-admin-grid{grid-template-columns:1fr;}}
-    .plan-admin-field label{display:block;font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;}
-    .plan-admin-field input,.plan-admin-field textarea{width:100%;padding:8px 12px;border-radius:8px;background:var(--bg3);border:1px solid rgba(255,255,255,0.08);color:var(--text);font-size:13px;font-family:"DM Sans",sans-serif;transition:border-color .2s;}
-    .plan-admin-field input:focus,.plan-admin-field textarea:focus{outline:none;border-color:var(--gold);}
-    .plan-admin-field textarea{resize:vertical;min-height:70px;line-height:1.5;}
-    .plan-admin-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;}
-    .plan-save-btn{padding:8px 18px;border-radius:8px;border:none;background:var(--gold);color:#111;font-weight:700;font-size:12px;cursor:pointer;font-family:"DM Sans",sans-serif;}
-    .plan-save-btn:hover{opacity:.88;}
-    .plan-del-btn{padding:8px 14px;border-radius:8px;border:1px solid rgba(220,38,38,.3);background:none;color:#f87171;font-size:12px;font-weight:600;cursor:pointer;transition:background .15s;}
-    .plan-del-btn:hover{background:var(--red-dim);}
-    .plan-featured-toggle{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--text-muted);cursor:pointer;}
-    .plan-featured-toggle input{accent-color:var(--gold);width:15px;height:15px;}
 
 
     /* ════ MOBILE — apenas configurações ════ */
@@ -309,7 +291,6 @@
   <div style="max-width:1100px;margin:0 auto;padding:0 20px;display:flex;gap:4px;border-top:1px solid rgba(255,255,255,0.05);">
     <button class="tab-btn active" onclick="switchTab('appointments')">📋 Agendamentos</button>
     <button class="tab-btn" onclick="switchTab('settings')">⚙️ Configuracoes</button>
-    <button class="tab-btn" onclick="switchTab('plans')">💳 Planos</button>
   </div>
 </header>
 
@@ -391,24 +372,13 @@
       <button class="cfg-save-btn" onclick="saveSettings()">💾 Salvar Configuracoes</button>
     </div>
   </div>
-
-  <!-- ABA PLANOS -->
-  <div id="tab-plans" style="display:none;">
-    <div style="max-width:800px;">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;background:linear-gradient(135deg,#c9a84c,#f0d78c,#c9a84c);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">Gerenciar Planos</div>
-        <button class="cfg-add-btn" onclick="addNewPlan()" style="font-size:13px;padding:8px 18px;">+ Adicionar Plano</button>
-      </div>
-      <div id="plans-admin-list"></div>
-    </div>
-  </div>
 </main>
 
 <div id="toast"><div class="toast-box" id="toast-box"></div></div>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getFirestore, collection, deleteDoc, doc, onSnapshot, setDoc, getDoc, getDocs, addDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { getFirestore, collection, deleteDoc, doc, onSnapshot, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
   import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
   const firebaseConfig = {
@@ -718,127 +688,25 @@
   window.switchTab = function(tab){
     document.getElementById('tab-appointments').style.display = tab==='appointments'?'block':'none';
     document.getElementById('tab-settings').style.display     = tab==='settings'?'block':'none';
-    document.getElementById('tab-plans').style.display        = tab==='plans'?'block':'none';
-    document.querySelectorAll('.tab-btn').forEach(b=>{
-      const t = b.textContent.toLowerCase();
-      b.classList.toggle('active',
-        (tab==='appointments' && t.includes('agenda')) ||
-        (tab==='settings'     && t.includes('config')) ||
-        (tab==='plans'        && t.includes('plano'))
-      );
-    });
-    if(tab==='plans') loadPlansAdmin();
-  };
-
-  // ===== GERENCIAR PLANOS =====
-  let plansData = [];
-
-  const DEFAULT_PLANS_ADMIN = [
-    { id:'lumberjack', order:1, emoji:'🪓', name:'Lumberjack', price:'59,90', featured:false, mpLink:'',
-      benefits:['1 Corte/mes','1 Barba/mes','1 Limpeza de Sobrancelha/mes'] },
-    { id:'swift',      order:2, emoji:'⚡', name:'Swift',      price:'69,90', featured:true,  mpLink:'',
-      benefits:['1 Corte/cada 10 dias'] },
-    { id:'ontheruler', order:3, emoji:'📏', name:'Ontheruler', price:'79,90', featured:false, mpLink:'',
-      benefits:['1 Corte/cada 10 dias','1 Limpeza de Sobrancelha/cada 10 dias'] },
-    { id:'linedup',    order:4, emoji:'📐', name:'Linedup',    price:'109,90', featured:false, mpLink:'',
-      benefits:['1 Corte/semana','1 Sobrancelha/semana'] },
-    { id:'gentleman',  order:5, emoji:'🎩', name:'Gentleman',  price:'179,90', featured:false, mpLink:'',
-      benefits:['1 Corte/semana','1 Sobrancelha/semana','1 Limpeza de Pele/mes - Gratis'] },
-  ];
-
-  async function loadPlansAdmin(){
-    const container = document.getElementById('plans-admin-list');
-    container.innerHTML = '<div style="text-align:center;padding:30px;"><div class="spinner" style="margin:0 auto;"></div></div>';
-    try {
-      const snap = await getDocs(query(collection(db,'plans'), orderBy('order')));
-      if(!snap.empty){
-        plansData = snap.docs.map(d=>({id:d.id,...d.data()}));
-      } else {
-        plansData = JSON.parse(JSON.stringify(DEFAULT_PLANS_ADMIN));
-        for(const p of plansData) await setDoc(doc(db,'plans',p.id), p);
-      }
-    } catch(e){
-      console.error(e);
-      plansData = JSON.parse(JSON.stringify(DEFAULT_PLANS_ADMIN));
-    }
-    renderPlansAdmin();
-  }
-
-  function renderPlansAdmin(){
-    const container = document.getElementById('plans-admin-list');
-    if(plansData.length===0){
-      container.innerHTML='<div style="text-align:center;color:var(--text-muted);padding:40px;">Nenhum plano cadastrado. Clique em "+ Adicionar Plano".</div>';
-      return;
-    }
-    container.innerHTML = plansData.map((p,i)=>{
-      const featClass = p.featured?' featured-card':'';
-      const benefitsText = (p.benefits||[]).join('\n');
-      return '<div class="plan-admin-card'+featClass+'" id="plan-card-'+p.id+'">'
-        +'<div class="plan-admin-header">'
-        +'<div class="plan-admin-name">'+(p.emoji||'✦')+' '+p.name+'</div>'
-        +'<label class="plan-featured-toggle"><input type="checkbox" id="feat-'+p.id+'" '+(p.featured?'checked':'')+'> Mais popular</label>'
-        +'</div>'
-        +'<div class="plan-admin-grid">'
-        +'<div class="plan-admin-field"><label>Emoji</label><input type="text" id="emoji-'+p.id+'" value="'+esc(p.emoji||'')+'" placeholder="🎩" maxlength="4"></div>'
-        +'<div class="plan-admin-field"><label>Nome do Plano</label><input type="text" id="name-'+p.id+'" value="'+esc(p.name||'')+'" placeholder="Ex: Lumberjack"></div>'
-        +'<div class="plan-admin-field"><label>Preço (R$)</label><input type="text" id="price-'+p.id+'" value="'+esc(p.price||'')+'" placeholder="Ex: 59,90"></div>'
-        +'<div class="plan-admin-field"><label>Ordem de exibição</label><input type="number" id="order-'+p.id+'" value="'+(p.order||i+1)+'" min="1" max="20"></div>'
-        +'</div>'
-        +'<div class="plan-admin-field" style="margin-bottom:12px;"><label>Benefícios (um por linha)</label>'
-        +'<textarea id="benefits-'+p.id+'" placeholder="1 Corte/mes&#10;1 Barba/mes">'+esc(benefitsText)+'</textarea></div>'
-        +'<div class="plan-admin-field"><label>Link Mercado Pago (URL completa)</label>'
-        +'<input type="url" id="mplink-'+p.id+'" value="'+esc(p.mpLink||'')+'" placeholder="https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=..."></div>'
-        +'<div class="plan-admin-actions">'
-        +'<button class="plan-save-btn" onclick="savePlan(''+p.id+'')">💾 Salvar</button>'
-        +'<button class="plan-del-btn" onclick="deletePlan(''+p.id+'')">🗑 Excluir</button>'
-        +'</div>'
-        +'</div>';
-    }).join('');
-  }
-
-  window.savePlan = async function(id){
-    const name  = document.getElementById('name-'+id).value.trim();
-    const price = document.getElementById('price-'+id).value.trim();
-    const emoji = document.getElementById('emoji-'+id).value.trim();
-    const order = parseInt(document.getElementById('order-'+id).value)||1;
-    const mpLink= document.getElementById('mplink-'+id).value.trim();
-    const feat  = document.getElementById('feat-'+id).checked;
-    const bText = document.getElementById('benefits-'+id).value;
-    const benefits = bText.split('\n').map(b=>b.trim()).filter(Boolean);
-    if(!name){ showToast('Informe o nome do plano','red'); return; }
-    if(!price){ showToast('Informe o preco','red'); return; }
-    const data = { id, name, price, emoji, order, featured:feat, mpLink, benefits };
-    try {
-      await setDoc(doc(db,'plans',id), data);
-      const idx = plansData.findIndex(p=>p.id===id);
-      if(idx>=0) plansData[idx]=data; else plansData.push(data);
-      showToast('Plano "'+name+'" salvo!','green');
-      renderPlansAdmin();
-    } catch(e){ console.error(e); showToast('Erro ao salvar plano','red'); }
-  };
-
-  window.deletePlan = async function(id){
-    const p = plansData.find(x=>x.id===id);
-    if(!confirm('Excluir o plano "+'+(p?p.name:id)+'"?')) return;
-    try {
-      await deleteDoc(doc(db,'plans',id));
-      plansData = plansData.filter(x=>x.id!==id);
-      showToast('Plano excluido','red');
-      renderPlansAdmin();
-    } catch(e){ showToast('Erro ao excluir','red'); }
-  };
-
-  window.addNewPlan = function(){
-    const newId = 'plan_'+Date.now();
-    const newPlan = { id:newId, order:plansData.length+1, emoji:'✦', name:'Novo Plano', price:'0,00', featured:false, mpLink:'', benefits:[] };
-    plansData.push(newPlan);
-    renderPlansAdmin();
-    // Scroll para o novo card
-    setTimeout(()=>{ const el=document.getElementById('plan-card-'+newId); if(el) el.scrollIntoView({behavior:'smooth',block:'start'}); },100);
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active', b.textContent.toLowerCase().includes(tab==='appointments'?'agenda':'config')));
   };
 
   window.addEventListener("DOMContentLoaded",()=>{
+    let authResolved = false;
+
+    // Timeout de segurança: se o Firebase demorar mais de 6s, mostra o login
+    const authTimeout = setTimeout(()=>{
+      if(!authResolved){
+        authResolved = true;
+        document.getElementById("app-loading").style.display="none";
+        document.getElementById("login-screen").style.display="flex";
+      }
+    }, 6000);
+
     onAuthStateChanged(auth, user => {
+      if(authResolved) return;
+      authResolved = true;
+      clearTimeout(authTimeout);
       document.getElementById("app-loading").style.display="none";
       if(user){
         currentAdmin = user.email;
