@@ -306,6 +306,7 @@
   </div>
   <div style="max-width:1100px;margin:0 auto;padding:0 20px;display:flex;gap:4px;border-top:1px solid rgba(255,255,255,0.05);">
     <button class="tab-btn active" onclick="switchTab('appointments')">📋 Agendamentos</button>
+    <button class="tab-btn" onclick="switchTab('subscriptions')">👑 Assinaturas</button>
     <button class="tab-btn" onclick="switchTab('settings')">⚙️ Configurações</button>
   </div>
 </header>
@@ -445,13 +446,32 @@
       <button class="cfg-save-btn" onclick="savePlans()" style="background:#1a6634;margin-top:8px;">💎 Salvar Planos</button>
     </div>
   </div>
+
+  <!-- ABA ASSINATURAS -->
+  <div id="tab-subscriptions" style="display:none;">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;background:linear-gradient(135deg,#c9a84c,#f0d78c,#c9a84c);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">&#128081; Assinaturas VIP</div>
+      <button onclick="loadSubscriptions()" style="padding:8px 16px;border-radius:8px;border:1px solid var(--gold-border);background:var(--gold-dim);color:var(--gold);font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">&#8635; Atualizar</button>
+    </div>
+    <div class="cfg-card" style="margin-bottom:20px;">
+      <div class="cfg-title">&#9203; Pagamentos Pendentes</div>
+      <div class="cfg-hint">Clientes que iniciaram o processo de assinatura. Apos confirmar o pagamento no Mercado Pago, clique em "Ativar VIP".</div>
+      <div id="pending-subs-list"><div style="text-align:center;padding:32px 0;"><div class="spinner" style="margin:0 auto;"></div></div></div>
+    </div>
+    <div class="cfg-card">
+      <div class="cfg-title">&#9989; Assinantes Ativos</div>
+      <div class="cfg-hint">Clientes com acesso VIP ativo. Clique em "Revogar" para cancelar o acesso.</div>
+      <div id="active-subs-list"><div style="text-align:center;padding:32px 0;"><div class="spinner" style="margin:0 auto;"></div></div></div>
+    </div>
+  </div>
+
 </main>
 
 <div id="toast"><div class="toast-box" id="toast-box"></div></div>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getFirestore, collection, deleteDoc, doc, onSnapshot, setDoc, getDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { getFirestore, collection, deleteDoc, doc, onSnapshot, setDoc, getDoc, getDocs, query, orderBy, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
   import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
   const firebaseConfig = {
@@ -1058,9 +1078,16 @@
   };
 
   window.switchTab = function(tab){
-    document.getElementById('tab-appointments').style.display = tab==='appointments'?'block':'none';
-    document.getElementById('tab-settings').style.display     = tab==='settings'?'block':'none';
-    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active', b.textContent.toLowerCase().includes(tab==='appointments'?'agenda':'config')));
+    ['appointments','subscriptions','settings'].forEach(t=>{
+      const el=document.getElementById('tab-'+t);
+      if(el) el.style.display=t===tab?'block':'none';
+    });
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    const labels={'appointments':'agendamentos','subscriptions':'assinaturas','settings':'config'};
+    document.querySelectorAll('.tab-btn').forEach(b=>{
+      if(b.textContent.toLowerCase().includes(labels[tab]||'')) b.classList.add('active');
+    });
+    if(tab==='subscriptions') loadSubscriptions();
   };
 
   window.addEventListener("DOMContentLoaded",()=>{
@@ -1265,6 +1292,99 @@
       adminBanners=banners;
       showToast('Avisos salvos!','green');
     }catch(e){showToast('Erro ao salvar avisos','red');}
+  };
+
+
+  // ═══════════════════════════════════════
+  // ASSINATURAS VIP
+  // ═══════════════════════════════════════
+  window.loadSubscriptions = async function(){
+    await loadPendingSubs();
+    await loadActiveSubs();
+  };
+
+  async function loadPendingSubs(){
+    const el=document.getElementById('pending-subs-list');
+    if(!el) return;
+    try{
+      const snap=await getDocs(collection(db,'pending_subscriptions'));
+      const items=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>b.createdAt>a.createdAt?1:-1);
+      if(!items.length){ el.innerHTML='<p style="color:var(--text-dim);font-size:13px;padding:12px 0;">Nenhum pedido pendente.</p>'; return; }
+      el.innerHTML=items.map(p=>{
+        const date=p.createdAt?new Date(p.createdAt).toLocaleString('pt-BR'):'—';
+        const pid=esc(p.id), pph=esc(p.phone||''), ppn=esc(p.planName||''), pem=esc(p.email||''), pml=esc(p.mpLink||'');
+        return '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;padding:14px 0;border-bottom:1px solid rgba(255,255,255,0.05);">'
+          +'<div>'
+          +'<div style="font-weight:700;font-size:14px;">'+pph+'</div>'
+          +'<div style="font-size:12px;color:var(--text-muted);margin-top:2px;">Email: '+pem+'</div>'
+          +'<div style="font-size:12px;color:var(--text-muted);">Plano: <span style="color:var(--gold);font-weight:700;">'+ppn+'</span> &bull; '+date+'</div>'
+          +'</div>'
+          +'<div style="display:flex;gap:8px;flex-wrap:wrap;">'
+          +'<button onclick="activateVip(\''+pid+'\',\''+pph+'\',\''+ppn+'\',\''+pem+'\',\''+pml+'\')" style="padding:8px 16px;border-radius:8px;border:none;background:#16a34a;color:#fff;font-size:12px;font-weight:700;cursor:pointer;">&#9989; Ativar VIP</button>'
+          +'<button onclick="deletePending(\''+pid+'\')" style="padding:8px 14px;border-radius:8px;border:1px solid rgba(220,38,38,.3);background:none;color:#f87171;font-size:12px;font-weight:700;cursor:pointer;">&#10005; Remover</button>'
+          +'</div></div>';
+      }).join('');
+    }catch(e){ console.error(e); el.innerHTML='<p style="color:#f87171;font-size:13px;">Erro ao carregar pedidos.</p>'; }
+  }
+
+  async function loadActiveSubs(){
+    const el=document.getElementById('active-subs-list');
+    if(!el) return;
+    try{
+      const snap=await getDocs(query(collection(db,'subscriptions'),where('status','==','active')));
+      const items=snap.docs.map(d=>({id:d.id,...d.data()}));
+      if(!items.length){ el.innerHTML='<p style="color:var(--text-dim);font-size:13px;padding:12px 0;">Nenhum assinante ativo no momento.</p>'; return; }
+      el.innerHTML=items.map(s=>{
+        const since=s.activatedAt?new Date(s.activatedAt).toLocaleDateString('pt-BR'):'—';
+        const sid=esc(s.id), sph=esc(s.phone||''), spn=esc(s.planName||''), sem=esc(s.email||'');
+        return '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;padding:14px 0;border-bottom:1px solid rgba(255,255,255,0.05);">'
+          +'<div>'
+          +'<div style="font-weight:700;font-size:14px;">'+sph+'</div>'
+          +'<div style="font-size:12px;color:var(--text-muted);margin-top:2px;">Email: '+sem+'</div>'
+          +'<div style="font-size:12px;color:var(--text-muted);">Plano: <span style="color:var(--gold);font-weight:700;">'+spn+'</span> &bull; Ativo desde '+since+'</div>'
+          +'</div>'
+          +'<button onclick="revokeVip(\''+sid+'\',\''+sph+'\',\''+spn+'\')" style="padding:8px 14px;border-radius:8px;border:1px solid rgba(220,38,38,.3);background:none;color:#f87171;font-size:12px;font-weight:700;cursor:pointer;">&#128683; Revogar VIP</button>'
+          +'</div>';
+      }).join('');
+    }catch(e){ console.error(e); el.innerHTML='<p style="color:#f87171;font-size:13px;">Erro ao carregar assinantes.</p>'; }
+  }
+
+  window.activateVip=async function(pendingId,phone,planName,email,mpLink){
+    if(!confirm('Ativar VIP para '+phone+' — Plano '+planName+'?')) return;
+    try{
+      const planSnap=await getDocs(collection(db,'plans'));
+      const planDoc=planSnap.docs.map(d=>d.data()).find(p=>p.name===planName);
+      const benefits=planDoc?planDoc.benefits:[];
+      const subRef=doc(db,'subscriptions',phone.replace(/\D/g,''));
+      await setDoc(subRef,{
+        phone, email, planName,
+        planPrice: planDoc?'R$'+(planDoc.price||'0')+'/mês':'',
+        benefits, mpLink:mpLink||'',
+        status:'active',
+        activatedAt:new Date().toISOString(),
+      });
+      await deleteDoc(doc(db,'pending_subscriptions',pendingId));
+      showToast('VIP ativado para '+phone+'!','green');
+      loadSubscriptions();
+    }catch(e){ console.error(e); showToast('Erro ao ativar VIP','red'); }
+  };
+
+  window.revokeVip=async function(subId,phone,planName){
+    if(!confirm('Revogar VIP de '+phone+' — Plano '+planName+'?')) return;
+    try{
+      await deleteDoc(doc(db,'subscriptions',subId));
+      showToast('VIP revogado para '+phone,'red');
+      loadSubscriptions();
+    }catch(e){ showToast('Erro ao revogar VIP','red'); }
+  };
+
+  window.deletePending=async function(id){
+    if(!confirm('Remover este pedido pendente?')) return;
+    try{
+      await deleteDoc(doc(db,'pending_subscriptions',id));
+      showToast('Pedido removido','red');
+      loadPendingSubs();
+    }catch(e){ showToast('Erro ao remover','red'); }
   };
 
 </script>
