@@ -13,10 +13,10 @@
     #app-loading{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
     #app-loading img{width:90px;height:90px;object-fit:contain;opacity:.8}
     .spinner{width:32px;height:32px;border-radius:50%;border:3px solid rgba(201,168,76,.2);border-top-color:var(--gold);animation:spin .7s linear infinite}
-    @keyframes spin{to{transform:rotate(360deg)}}
+    @keyframes spin{to{transform:rotaté(360deg)}}
     #login-screen{position:fixed;inset:0;z-index:200;background:rgba(8,8,8,0.98);display:flex;align-items:center;justify-content:center}
     .login-wrap{width:100%;max-width:380px;margin:16px;animation:slideUp .45s ease-out}
-    @keyframes slideUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes slideUp{from{opacity:0;transform:translatéY(22px)}to{opacity:1;transform:translatéY(0)}}
     .login-badge{text-align:center;margin-bottom:24px}.login-badge img{width:90px;height:90px;object-fit:contain}
     .login-card{background:var(--bg2);border:1px solid var(--gold-border);border-radius:16px;padding:36px 28px;box-shadow:0 32px 80px rgba(0,0,0,.8)}
     .login-tag{display:inline-block;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);background:var(--gold-dim);border:1px solid var(--gold-border);padding:3px 10px;border-radius:20px;margin-bottom:14px}
@@ -40,8 +40,8 @@
     .logout-btn{padding:6px 14px;border-radius:7px;border:1px solid rgba(220,38,38,.3);background:none;color:#f87171;font-size:12px;font-weight:600;cursor:pointer;transition:background .15s}
     .logout-btn:hover{background:var(--red-dim)}
     main{max-width:1100px;margin:0 auto;padding:32px 20px 60px}
-    .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px}
-    @media(max-width:700px){.stats-grid{grid-template-columns:1fr 1fr}}
+    .stats-grid{display:grid;grid-templaté-columns:repeat(4,1fr);gap:14px;margin-bottom:28px}
+    @media(max-width:700px){.stats-grid{grid-templaté-columns:1fr 1fr}}
     .stat-card{background:var(--bg2);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:18px 20px}
     .stat-label{font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px}
     .stat-value{font-family:"Bebas Neue",sans-serif;font-size:36px;color:var(--gold);line-height:1}
@@ -71,9 +71,9 @@
     .del-btn{padding:4px 10px;border-radius:6px;border:1px solid rgba(220,38,38,.25);background:none;color:#f87171;font-size:11px;font-weight:600;cursor:pointer;transition:background .15s}
     .del-btn:hover{background:var(--red-dim)}
     .empty{text-align:center;padding:60px 0;color:var(--text-muted)}.empty-icon{font-size:36px;margin-bottom:12px}
-    #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:300;display:none;pointer-events:none}
+    #toast{position:fixed;bottom:24px;left:50%;transform:translatéX(-50%);z-index:300;display:none;pointer-events:none}
     .toast-box{padding:11px 22px;border-radius:10px;font-weight:600;font-size:13px;color:#fff;animation:toastUp .3s ease-out;box-shadow:0 8px 28px rgba(0,0,0,.6)}
-    @keyframes toastUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes toastUp{from{opacity:0;transform:translatéY(10px)}to{opacity:1;transform:translatéY(0)}}
     @keyframes fadeIn{from{opacity:0}to{opacity:1}}
     .fade-in{animation:fadeIn .35s ease-out}
     .tab-btn{padding:10px 18px;border:none;background:none;color:var(--text-muted);font-size:13px;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;font-family:"DM Sans",sans-serif;}
@@ -86,7 +86,7 @@
     .cfg-label{display:block;font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
     .cfg-input{padding:8px 12px;border-radius:8px;background:var(--bg3);border:1px solid rgba(255,255,255,0.08);color:var(--text);font-size:14px;font-family:"DM Sans",sans-serif;transition:border-color .2s}
     .cfg-input:focus{outline:none;border-color:var(--gold)}
-    .cfg-row{display:grid;grid-template-columns:120px 1fr 1fr;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.04)}
+    .cfg-row{display:grid;grid-templaté-columns:120px 1fr 1fr;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.04)}
     .cfg-row:last-child{border-bottom:none}
     .cfg-toggle{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600}
     .cfg-toggle input[type=checkbox]{width:18px;height:18px;accent-color:var(--gold);cursor:pointer}
@@ -95,7 +95,7 @@
     .cfg-add-btn:hover{background:var(--gold-dim)}
     .cfg-rm-btn{background:none;border:1px solid rgba(220,38,38,.25);color:#f87171;font-size:11px;padding:4px 10px;border-radius:6px;cursor:pointer;transition:background .15s;font-family:"DM Sans",sans-serif}
     .cfg-rm-btn:hover{background:var(--red-dim)}
-    .cfg-svc-row{display:grid;grid-template-columns:1fr 120px;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.04)}
+    .cfg-svc-row{display:grid;grid-templaté-columns:1fr 120px;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.04)}
     .cfg-svc-row:last-child{border-bottom:none}
     .cfg-save-btn{width:100%;padding:14px;border-radius:10px;border:none;background:var(--gold);color:#111;font-weight:700;font-size:16px;cursor:pointer;font-family:"DM Sans",sans-serif;transition:opacity .2s;margin-top:4px}
     .cfg-save-btn:hover{opacity:.88}
@@ -126,7 +126,7 @@
       main { padding: 16px 12px 60px; }
 
       /* Stats 2 colunas */
-      .stats-grid { grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px; }
+      .stats-grid { grid-templaté-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px; }
       .stat-card { padding: 14px; }
       .stat-value { font-size: 28px; }
       .stat-label { font-size: 10px; }
@@ -198,7 +198,7 @@
       /* Checkboxes de dias em grade 3 colunas */
       .cfg-break-row-days {
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
+        grid-templaté-columns: repeat(3, 1fr);
         gap: 6px;
       }
       .cfg-break-row-days label {
@@ -242,7 +242,7 @@
 
       /* Serviços */
       .cfg-svc-row {
-        grid-template-columns: 1fr auto;
+        grid-templaté-columns: 1fr auto;
         gap: 10px;
         padding: 12px 0;
       }
@@ -275,12 +275,12 @@
     <div class="login-card">
       <div class="login-tag">Acesso Restrito</div>
       <div class="login-title">Painel Admin</div>
-      <div class="login-sub">Gabriel Barber Studio - so para administradores</div>
-      <div class="login-err" id="login-err">Usuario ou senha incorretos.</div>
+      <div class="login-sub">Gabriel Barber Studio - só para administradores</div>
+      <div class="login-err" id="login-err">Usuário ou senha incorretos.</div>
       <div class="field"><label>Email</label><input type="email" id="inp-user" placeholder="admin@email.com" autocomplete="username"></div>
       <div class="field"><label>Senha</label><input type="password" id="inp-pass" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" autocomplete="current-password"></div>
       <button class="login-btn" onclick="doLogin()">Entrar no Painel</button>
-      <p class="login-notice">Acesso restrito - nao compartilhe suas credenciais</p>
+      <p class="login-notice">Acesso restrito — não compartilhe suas credenciais</p>
     </div>
   </div>
 </div>
@@ -299,7 +299,7 @@
   </div>
   <div style="max-width:1100px;margin:0 auto;padding:0 20px;display:flex;gap:4px;border-top:1px solid rgba(255,255,255,0.05);">
     <button class="tab-btn active" onclick="switchTab('appointments')">📋 Agendamentos</button>
-    <button class="tab-btn" onclick="switchTab('settings')">⚙️ Configuracoes</button>
+    <button class="tab-btn" onclick="switchTab('settings')">⚙️ Configurações</button>
   </div>
 </header>
 
@@ -308,9 +308,9 @@
   <div id="tab-appointments">
   <div class="stats-grid">
     <div class="stat-card"><div class="stat-label">Total de Agendamentos</div><div class="stat-value" id="stat-total">0</div><div class="stat-sub">todos os registros</div></div>
-    <div class="stat-card"><div class="stat-label">Hoje</div><div class="stat-value" id="stat-today">0</div><div class="stat-sub" id="stat-today-date">-</div></div>
-    <div class="stat-card"><div class="stat-label">Esta Semana</div><div class="stat-value" id="stat-week">0</div><div class="stat-sub">proximos 7 dias</div></div>
-    <div class="stat-card"><div class="stat-label">Clientes Unicos</div><div class="stat-value" id="stat-clients">0</div><div class="stat-sub">telefones distintos</div></div>
+    <div class="stat-card"><div class="stat-label">Hoje</div><div class="stat-value" id="stat-today">0</div><div class="stat-sub" id="stat-today-daté">-</div></div>
+    <div class="stat-card"><div class="stat-label">Esta Semana</div><div class="stat-value" id="stat-week">0</div><div class="stat-sub">próximos 7 dias</div></div>
+    <div class="stat-card"><div class="stat-label">Clientes Únicos</div><div class="stat-value" id="stat-clients">0</div><div class="stat-sub">telefones distintos</div></div>
   </div>
   <div class="toolbar">
     <div class="toolbar-title">Agendamentos</div>
@@ -322,12 +322,12 @@
       <option value="passado">Realizados</option>
     </select>
     <select class="filter-select" id="filter-service" onchange="renderTable()">
-      <option value="">Todos os servicos</option>
+      <option value="">Todos os serviços</option>
       <option>Cabelo</option>
       <option>Barba</option>
       <option>Pezinho</option>
       <option>Cabelo & Barba</option>
-      <option>Raspar Cabeca</option>
+      <option>Raspar Cabeça</option>
       <option>Sobrancelha</option>
     </select>
     <button class="export-btn" onclick="exportCSV()">Exportar CSV</button>
@@ -339,9 +339,9 @@
         <tr>
           <th onclick="sortBy('name')">Cliente <span id="sort-name"></span></th>
           <th onclick="sortBy('phone')">Telefone <span id="sort-phone"></span></th>
-          <th onclick="sortBy('service')">Servico <span id="sort-service"></span></th>
-          <th onclick="sortBy('date')">Data <span id="sort-date"></span></th>
-          <th onclick="sortBy('time')">Horario <span id="sort-time"></span></th>
+          <th onclick="sortBy('service')">Serviço <span id="sort-service"></span></th>
+          <th onclick="sortBy('daté')">Data <span id="sort-daté"></span></th>
+          <th onclick="sortBy('time')">Horário <span id="sort-time"></span></th>
           <th>Status</th>
           <th>Justificativa</th>
           <th>Acao</th>
@@ -349,7 +349,7 @@
       </thead>
       <tbody id="apt-tbody"></tbody>
     </table>
-    <div class="empty" id="empty-state" style="display:none;"><div class="empty-icon">no data</div><p>Nenhum agendamento encontrado.</p></div>
+    <div class="empty" id="empty-staté" style="display:none;"><div class="empty-icon">no data</div><p>Nenhum agendamento encontrado.</p></div>
   </div>
   </div>
 
@@ -358,8 +358,8 @@
     <div style="max-width:720px;">
 
       <div class="cfg-card">
-        <div class="cfg-title">📅 Dias e Horarios de Funcionamento</div>
-        <div class="cfg-hint">Defina quais dias funcionam e os horarios de cada um.</div>
+        <div class="cfg-title">📅 Dias e Horários de Funcionamento</div>
+        <div class="cfg-hint">Defina quais dias funcionam e os horários de cada um.</div>
         <div id="days-config"></div>
         <div style="margin-top:20px;">
           <div class="cfg-subtitle">⚠️ Intervalos especiais (ex: sexta 12–18)</div>
@@ -369,22 +369,22 @@
       </div>
 
       <div class="cfg-card">
-        <div class="cfg-title">✂️ Servicos</div>
+        <div class="cfg-title">✂️ Serviços</div>
         <div class="cfg-hint">Adicione, edite ou remova os servicos. Nome, valor e duracao sao atualizados no site e no agendamento automaticamente.</div>
         <div id="services-admin-list"></div>
-        <button class="cfg-add-btn" onclick="addService()" style="margin-top:8px;">+ Adicionar servico</button>
+        <button class="cfg-add-btn" onclick="addService()" style="margin-top:8px;">+ Adicionar serviço</button>
       </div>
 
       <div class="cfg-card">
-        <div class="cfg-title">⏱️ Intervalo entre Atendimentos</div>
-        <div class="cfg-hint">Tempo de descanso aplicado automaticamente apos cada servico (em minutos).</div>
+        <div class="cfg-title">⏱️ Intervalo entre Aténdimentos</div>
+        <div class="cfg-hint">Tempo de descanso aplicado automaticamente após cada serviço (em minutos).</div>
         <div style="display:flex;align-items:center;gap:10px;">
           <input type="number" id="cfg-buffer" min="0" max="30" step="5" value="5" class="cfg-input" style="width:100px;">
           <span style="font-size:13px;color:var(--text-muted)">minutos</span>
         </div>
       </div>
 
-      <button class="cfg-save-btn" onclick="saveSettings()">💾 Salvar Configuracoes</button>
+      <button class="cfg-save-btn" onclick="saveSettings()">💾 Salvar Configurações</button>
 
       <!-- PLANOS -->
       <div class="cfg-card" style="margin-top:24px;">
@@ -404,7 +404,7 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getFirestore, collection, deleteDoc, doc, onSnapshot, setDoc, getDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-  import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getAuth, signInWithEmailAndPassword, signOut, onAuthStatéChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyBuqPBQocq7gFFnbtD8VoMB6kTu1I3R_9w",
@@ -422,12 +422,12 @@
 
   let currentAdmin = null;
   let allData = [];
-  let sortKey = "date";
+  let sortKey = "daté";
   let sortDir = 1;
 
   function pad(n){ return String(n).padStart(2,"0"); }
-  function getTodayStr(){ const t=new Date(); return t.getFullYear()+"-"+pad(t.getMonth()+1)+"-"+pad(t.getDate()); }
-  function getWeekEnd(){ const t=new Date(); t.setDate(t.getDate()+7); return t.getFullYear()+"-"+pad(t.getMonth()+1)+"-"+pad(t.getDate()); }
+  function getTodayStr(){ const t=new Daté(); return t.getFullYear()+"-"+pad(t.getMonth()+1)+"-"+pad(t.getDaté()); }
+  function getWeekEnd(){ const t=new Daté(); t.setDaté(t.getDaté()+7); return t.getFullYear()+"-"+pad(t.getMonth()+1)+"-"+pad(t.getDaté()); }
   function esc(s){ return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 
   let toastTimer;
@@ -466,20 +466,20 @@
   function subscribeData(){
     onSnapshot(collection(db,COL),snap=>{
       allData=snap.docs.map(d=>({id:d.id,...d.data()}));
-      updateStats(); renderTable();
+      updatéStats(); renderTable();
     });
   }
 
-  function updateStats(){
+  function updatéStats(){
     const today=getTodayStr(); const weekEnd=getWeekEnd();
     document.getElementById("stat-total").textContent=allData.length;
-    document.getElementById("stat-today").textContent=allData.filter(a=>a.date===today).length;
-    document.getElementById("stat-week").textContent=allData.filter(a=>a.date>=today&&a.date<=weekEnd).length;
+    document.getElementById("stat-today").textContent=allData.filter(a=>a.daté===today).length;
+    document.getElementById("stat-week").textContent=allData.filter(a=>a.daté>=today&&a.daté<=weekEnd).length;
     document.getElementById("stat-clients").textContent=new Set(allData.map(a=>a.phone)).size;
-    document.getElementById("stat-today-date").textContent=new Date().toLocaleDateString("pt-BR",{weekday:"long",day:"numeric",month:"short"});
+    document.getElementById("stat-today-daté").textContent=new Daté().toLocaleDatéString("pt-BR",{weekday:"long",day:"numeric",month:"short"});
   }
 
-  function getStatusType(apt){ const today=getTodayStr(); if(apt.date<today) return "passado"; if(apt.date===today) return "hoje"; return "futuro"; }
+  function getStatusType(apt){ const today=getTodayStr(); if(apt.daté<today) return "passado"; if(apt.daté===today) return "hoje"; return "futuro"; }
 
   window.sortBy = function(key){
     if(sortKey===key) sortDir*=-1; else{ sortKey=key; sortDir=1; }
@@ -500,23 +500,23 @@
     data.sort((a,b)=>{
       let va=(a[sortKey]||"").toString().toLowerCase();
       let vb=(b[sortKey]||"").toString().toLowerCase();
-      if(sortKey==="date"){ va=a.date+a.time; vb=b.date+b.time; }
+      if(sortKey==="daté"){ va=a.daté+a.time; vb=b.daté+b.time; }
       return va<vb?-sortDir:va>vb?sortDir:0;
     });
     const tbody=document.getElementById("apt-tbody");
-    const empty=document.getElementById("empty-state");
+    const empty=document.getElementById("empty-staté");
     if(data.length===0){ tbody.innerHTML=""; empty.style.display="block"; return; }
     empty.style.display="none";
     const today=getTodayStr();
     tbody.innerHTML=data.map(apt=>{
       const st=getStatusType(apt);
-      const fmtDate=new Date(apt.date+"T12:00:00").toLocaleDateString("pt-BR",{weekday:"short",day:"2-digit",month:"short"});
+      const fmtDaté=new Daté(apt.daté+"T12:00:00").toLocaleDatéString("pt-BR",{weekday:"short",day:"2-digit",month:"short"});
       const badgeClass=st==="passado"?"badge-past":st==="hoje"?"badge-today":"badge-ok";
       const badgeLabel=st==="passado"?"Realizado":st==="hoje"?"Hoje":"Confirmado";
       const justifyCell = apt.justification
         ? '<td style="max-width:200px;"><span style="display:inline-block;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.25);border-radius:6px;padding:3px 8px;font-size:11px;color:#f0d78c;" title="'+esc(apt.justification)+'">'+esc(apt.justification.length>40?apt.justification.slice(0,40)+'...':apt.justification)+'</span></td>'
         : '<td style="color:var(--text-dim);font-size:12px;">—</td>';
-      return '<tr><td><strong>'+esc(apt.name)+'</strong></td><td style="color:var(--text-muted)">'+esc(apt.phone)+'</td><td>'+esc(apt.service)+'</td><td>'+fmtDate+'</td><td style="font-family:Bebas Neue,sans-serif;font-size:15px;color:var(--gold)">'+esc(apt.time)+'</td><td><span class="badge '+badgeClass+'">'+badgeLabel+'</span></td>'+justifyCell+'<td><button class="del-btn" onclick="deleteApt(\''+apt.id+'\')">Cancelar</button></td></tr>';
+      return '<tr><td><strong>'+esc(apt.name)+'</strong></td><td style="color:var(--text-muted)">'+esc(apt.phone)+'</td><td>'+esc(apt.service)+'</td><td>'+fmtDaté+'</td><td style="font-family:Bebas Neue,sans-serif;font-size:15px;color:var(--gold)">'+esc(apt.time)+'</td><td><span class="badge '+badgeClass+'">'+badgeLabel+'</span></td>'+justifyCell+'<td><button class="del-btn" onclick="deleteApt(\''+apt.id+'\')">Cancelar</button></td></tr>';
     }).join("");
   };
 
@@ -536,23 +536,23 @@
   };
 
   window.exportCSV = function(){
-    const rows=[["Nome","Telefone","Servico","Data","Horario","Status"]];
-    allData.forEach(a=>rows.push([a.name,a.phone,a.service,a.date,a.time,getStatusType(a)]));
+    const rows=[["Nome","Telefone","Serviço","Data","Horário","Status"]];
+    allData.forEach(a=>rows.push([a.name,a.phone,a.service,a.daté,a.time,getStatusType(a)]));
     const csv=rows.map(r=>r.map(v=>'"'+v+'"').join(",")).join("\n");
     const blob=new Blob(["\uFEFF"+csv],{type:"text/csv;charset=utf-8;"});
-    const url=URL.createObjectURL(blob);
-    const a=document.createElement("a"); a.href=url; a.download="agendamentos_gbs_"+getTodayStr()+".csv"; a.click(); URL.revokeObjectURL(url);
+    const url=URL.creatéObjectURL(blob);
+    const a=document.creatéElement("a"); a.href=url; a.download="agendamentos_gbs_"+getTodayStr()+".csv"; a.click(); URL.revokeObjectURL(url);
     showToast("CSV exportado!","green");
   };
 
   // ===== CONFIGURAÇÕES =====
   const DAYS = [
     {key:'mon', label:'Segunda-feira'},
-    {key:'tue', label:'Terca-feira'},
+    {key:'tue', label:'Terça-feira'},
     {key:'wed', label:'Quarta-feira'},
     {key:'thu', label:'Quinta-feira'},
     {key:'fri', label:'Sexta-feira'},
-    {key:'sat', label:'Sabado'},
+    {key:'sat', label:'Sábado'},
     {key:'sun', label:'Domingo'},
   ];
 
@@ -562,7 +562,7 @@
     {name:'Barba',         price:'25,00', duration:15},
     {name:'Pezinho',       price:'15,00', duration:15},
     {name:'Cabelo & Barba',price:'50,00', duration:70},
-    {name:'Raspar Cabeca', price:'20,00', duration:15},
+    {name:'Raspar Cabeça', price:'20,00', duration:15},
     {name:'Sobrancelha',   price:'15,00', duration:15},
   ];
 
@@ -580,16 +580,16 @@
     container.innerHTML = adminServices.map((svc,i)=>`
       <div class="plan-admin-card" id="svc-row-${i}" style="margin-bottom:10px;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-          <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--gold);">Servico ${i+1}</span>
+          <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--gold);">Serviço ${i+1}</span>
           <div style="display:flex;gap:6px;">
             ${i>0?`<button onclick="moveSvc(${i},-1)" style="padding:4px 10px;border-radius:6px;border:1px solid rgba(255,255,255,0.1);background:none;color:var(--text-muted);font-size:12px;cursor:pointer;">↑</button>`:''}
             ${i<adminServices.length-1?`<button onclick="moveSvc(${i},1)" style="padding:4px 10px;border-radius:6px;border:1px solid rgba(255,255,255,0.1);background:none;color:var(--text-muted);font-size:12px;cursor:pointer;">↓</button>`:''}
             <button onclick="removeSvc(${i})" class="cfg-rm-btn">Remover</button>
           </div>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px;">
+        <div style="display:grid;grid-templaté-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px;">
           <div>
-            <span class="plan-admin-label">Nome do servico</span>
+            <span class="plan-admin-label">Nome do serviço</span>
             <input class="plan-admin-input" id="svc-name-${i}" value="${esc(svc.name||'')}" placeholder="Ex: Cabelo">
           </div>
           <div>
@@ -625,14 +625,14 @@
   };
 
   window.addService = function(){
-    adminServices.push({name:'Novo Servico', price:'0,00', duration:15});
+    adminServices.push({name:'Novo Serviço', price:'0,00', duration:15});
     renderServicesAdminUI();
     // Foca no nome do novo serviço
     setTimeout(()=>{ const el=document.getElementById('svc-name-'+(adminServices.length-1)); if(el){el.focus();el.select();} },50);
   };
 
   window.removeSvc = function(i){
-    if(!confirm('Remover o servico "'+adminServices[i].name+'"?')) return;
+    if(!confirm('Remover o serviço "'+adminServices[i].name+'"?')) return;
     adminServices.splice(i,1);
     renderServicesAdminUI();
   };
@@ -666,7 +666,7 @@
       sun: {open:false, start:'10:00', end:'21:00'},
     },
     breaks: [
-      {days:['tue','thu','sat'], start:'12:00', end:'14:00', label:'Almoco'},
+      {days:['tue','thu','sat'], start:'12:00', end:'14:00', label:'Almoço'},
       {days:['fri'],             start:'12:00', end:'18:00', label:'Intervalo sexta'},
     ],
     services: {
@@ -674,7 +674,7 @@
       'Barba':         {duration:15},
       'Pezinho':       {duration:15},
       'Cabelo & Barba':{duration:70},
-      'Raspar Cabeca': {duration:15},
+      'Raspar Cabeça': {duration:15},
       'Sobrancelha':   {duration:15},
     },
     buffer: 5,
@@ -702,7 +702,7 @@
           <label for="day-open-${d.key}">${d.label}</label>
         </div>
         <div style="display:flex;align-items:center;gap:6px;">
-          <span style="font-size:12px;color:var(--text-dim)">Inicio</span>
+          <span style="font-size:12px;color:var(--text-dim)">Início</span>
           <input type="time" class="cfg-input" id="day-start-${d.key}" value="${cfg.start}" style="width:110px;">
         </div>
         <div style="display:flex;align-items:center;gap:6px;">
@@ -731,9 +731,9 @@
           </label>`).join('')}
         </div>
         <div class="cfg-break-row-times">
-          <span style="font-size:12px;color:var(--text-dim);min-width:32px;">Inicio</span>
+          <span style="font-size:12px;color:var(--text-dim);min-width:32px;">Início</span>
           <input type="time" class="cfg-input" id="break-start-${i}" value="${b.start}" style="flex:1;">
-          <span style="font-size:12px;color:var(--text-dim);min-width:20px;">ate</span>
+          <span style="font-size:12px;color:var(--text-dim);min-width:20px;">até</span>
           <input type="time" class="cfg-input" id="break-end-${i}" value="${b.end}" style="flex:1;">
         </div>
         <button class="cfg-rm-btn" onclick="removeBreak(${i})">Remover</button>
@@ -780,7 +780,7 @@
 
     // Lê serviços do novo UI dinâmico
     const services = collectAdminServices();
-    if(services.length===0){ showToast('Adicione ao menos um servico','red'); return; }
+    if(services.length===0){ showToast('Adicione ao menos um serviço','red'); return; }
     services.forEach(svc=>{ s.services[svc.name] = {duration: svc.duration}; });
 
     try {
@@ -791,19 +791,19 @@
       currentSettings = s;
       adminServices = services;
       // Atualiza filtro de serviços na tabela de agendamentos
-      updateServicesFilter(services);
-      showToast('Configuracoes salvas!','green');
+      updatéServicesFilter(services);
+      showToast('Configurações salvas!','green');
     } catch(e){
       console.error(e);
-      showToast('Erro ao salvar configuracoes','red');
+      showToast('Erro ao salvar configurações','red');
     }
   };
 
-  function updateServicesFilter(services){
+  function updatéServicesFilter(services){
     const sel = document.getElementById('filter-service');
     if(!sel) return;
     const current = sel.value;
-    sel.innerHTML = '<option value="">Todos os servicos</option>' +
+    sel.innerHTML = '<option value="">Todos os serviços</option>' +
       services.map(s=>`<option${s.name===current?' selected':''}>${s.name}</option>`).join('');
   }
 
@@ -839,7 +839,7 @@
           </div>
         </div>
 
-        <div style="display:grid;grid-template-columns:60px 1fr 1fr;gap:10px;margin-bottom:10px;">
+        <div style="display:grid;grid-templaté-columns:60px 1fr 1fr;gap:10px;margin-bottom:10px;">
           <div><span class="plan-admin-label">Emoji</span><input class="plan-admin-input" id="p-emoji-${i}" value="${esc(p.emoji||'')}" placeholder="🪓" maxlength="4"></div>
           <div><span class="plan-admin-label">Nome do plano</span><input class="plan-admin-input" id="p-name-${i}" value="${esc(p.name||'')}" placeholder="Ex: Lumberjack"></div>
           <div><span class="plan-admin-label">Preco (R$)</span><input class="plan-admin-input" id="p-price-${i}" value="${esc(p.price||'')}" placeholder="Ex: 80,00"></div>
@@ -866,13 +866,13 @@
                 <button onclick="removeBenefit(${i},${j})" class="cfg-rm-btn" style="white-space:nowrap;padding:6px 10px;">✕</button>
               </div>`).join('')}
           </div>
-          <button onclick="addBenefit(${i})" class="cfg-add-btn" style="margin-top:6px;font-size:11px;">+ Beneficio</button>
+          <button onclick="addBenefit(${i})" class="cfg-add-btn" style="margin-top:6px;font-size:11px;">+ Benefício</button>
         </div>
       </div>`).join('');
   }
 
   window.addPlan = function(){
-    adminPlans.push({ id:'plan_'+Date.now(), order:adminPlans.length+1, emoji:'✂️', name:'Novo Plano', price:'0,00', featured:false, mpLink:'', benefits:['Beneficio 1'] });
+    adminPlans.push({ id:'plan_'+Daté.now(), order:adminPlans.length+1, emoji:'✂️', name:'Novo Plano', price:'0,00', featured:false, mpLink:'', benefits:['Benefício 1'] });
     renderAdminPlans();
   };
 
@@ -972,7 +972,7 @@
       }
     }, 6000);
 
-    onAuthStateChanged(auth, user => {
+    onAuthStatéChanged(auth, user => {
       if(authResolved) return;
       authResolved = true;
       clearTimeout(authTimeout);
