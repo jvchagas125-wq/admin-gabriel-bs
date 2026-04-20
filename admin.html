@@ -369,13 +369,19 @@
       </div>
 
       <div class="cfg-card">
-        <div class="cfg-title">⏱️ Duracao dos Servicos</div>
-        <div class="cfg-hint">Tempo de atendimento de cada servico (em minutos). O intervalo entre clientes sera aplicado automaticamente.</div>
-        <div style="margin-bottom:14px;">
-          <label class="cfg-label">Intervalo entre atendimentos (min)</label>
+        <div class="cfg-title">✂️ Servicos</div>
+        <div class="cfg-hint">Adicione, edite ou remova os servicos. Nome, valor e duracao sao atualizados no site e no agendamento automaticamente.</div>
+        <div id="services-admin-list"></div>
+        <button class="cfg-add-btn" onclick="addService()" style="margin-top:8px;">+ Adicionar servico</button>
+      </div>
+
+      <div class="cfg-card">
+        <div class="cfg-title">⏱️ Intervalo entre Atendimentos</div>
+        <div class="cfg-hint">Tempo de descanso aplicado automaticamente apos cada servico (em minutos).</div>
+        <div style="display:flex;align-items:center;gap:10px;">
           <input type="number" id="cfg-buffer" min="0" max="30" step="5" value="5" class="cfg-input" style="width:100px;">
+          <span style="font-size:13px;color:var(--text-muted)">minutos</span>
         </div>
-        <div id="services-config"></div>
       </div>
 
       <button class="cfg-save-btn" onclick="saveSettings()">💾 Salvar Configuracoes</button>
@@ -550,7 +556,83 @@
     {key:'sun', label:'Domingo'},
   ];
 
-  const SERVICES = ['Cabelo','Barba','Pezinho','Cabelo & Barba','Raspar Cabeca','Sobrancelha'];
+  // ===== SERVIÇOS DINÂMICOS =====
+  let adminServices = [
+    {name:'Cabelo',        price:'30,00', duration:45},
+    {name:'Barba',         price:'25,00', duration:15},
+    {name:'Pezinho',       price:'15,00', duration:15},
+    {name:'Cabelo & Barba',price:'50,00', duration:70},
+    {name:'Raspar Cabeca', price:'20,00', duration:15},
+    {name:'Sobrancelha',   price:'15,00', duration:15},
+  ];
+
+  async function loadAdminServices(){
+    try {
+      const snap = await getDoc(doc(db,'config','services'));
+      if(snap.exists() && snap.data().list) adminServices = snap.data().list;
+    } catch(e){ console.error('loadAdminServices',e); }
+    renderServicesAdminUI();
+  }
+
+  function renderServicesAdminUI(){
+    const container = document.getElementById('services-admin-list');
+    if(!container) return;
+    container.innerHTML = adminServices.map((svc,i)=>`
+      <div class="plan-admin-card" id="svc-row-${i}" style="margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--gold);">Servico ${i+1}</span>
+          <div style="display:flex;gap:6px;">
+            ${i>0?`<button onclick="moveSvc(${i},-1)" style="padding:4px 10px;border-radius:6px;border:1px solid rgba(255,255,255,0.1);background:none;color:var(--text-muted);font-size:12px;cursor:pointer;">↑</button>`:''}
+            ${i<adminServices.length-1?`<button onclick="moveSvc(${i},1)" style="padding:4px 10px;border-radius:6px;border:1px solid rgba(255,255,255,0.1);background:none;color:var(--text-muted);font-size:12px;cursor:pointer;">↓</button>`:''}
+            <button onclick="removeSvc(${i})" class="cfg-rm-btn">Remover</button>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+          <div>
+            <span class="plan-admin-label">Nome do servico</span>
+            <input class="plan-admin-input" id="svc-name-${i}" value="${esc(svc.name||'')}" placeholder="Ex: Cabelo">
+          </div>
+          <div>
+            <span class="plan-admin-label">Valor (R$)</span>
+            <input class="plan-admin-input" id="svc-price-${i}" value="${esc(svc.price||'0,00')}" placeholder="Ex: 30,00">
+          </div>
+          <div>
+            <span class="plan-admin-label">Duracao (min)</span>
+            <input type="number" class="plan-admin-input" id="svc-dur-${i}" value="${svc.duration||15}" min="5" max="240" step="5">
+          </div>
+        </div>
+      </div>`).join('');
+  }
+
+  window.addService = function(){
+    adminServices.push({name:'Novo Servico', price:'0,00', duration:15});
+    renderServicesAdminUI();
+    // Foca no nome do novo serviço
+    setTimeout(()=>{ const el=document.getElementById('svc-name-'+(adminServices.length-1)); if(el){el.focus();el.select();} },50);
+  };
+
+  window.removeSvc = function(i){
+    if(!confirm('Remover o servico "'+adminServices[i].name+'"?')) return;
+    adminServices.splice(i,1);
+    renderServicesAdminUI();
+  };
+
+  window.moveSvc = function(i, dir){
+    const j=i+dir;
+    if(j<0||j>=adminServices.length) return;
+    [adminServices[i],adminServices[j]]=[adminServices[j],adminServices[i]];
+    renderServicesAdminUI();
+  };
+
+  function collectAdminServices(){
+    return adminServices.map((_,i)=>({
+      name:     (document.getElementById('svc-name-'+i)?.value||'').trim(),
+      price:    (document.getElementById('svc-price-'+i)?.value||'0,00').trim(),
+      duration: parseInt(document.getElementById('svc-dur-'+i)?.value)||15,
+    })).filter(s=>s.name);
+  }
+
+  const SERVICES = adminServices.map(s=>s.name); // fallback compatibilidade
 
   const DEFAULT_SETTINGS = {
     days: {
@@ -614,19 +696,6 @@
 
     // Buffer
     document.getElementById('cfg-buffer').value = s.buffer||5;
-
-    // Serviços
-    document.getElementById('services-config').innerHTML = SERVICES.map(svc=>{
-      const dur = (s.services&&s.services[svc])?s.services[svc].duration:15;
-      const id = svc.replace(/[^a-z0-9]/gi,'_');
-      return `<div class="cfg-svc-row">
-        <div style="font-size:14px;font-weight:600;">${svc}</div>
-        <div style="display:flex;align-items:center;gap:6px;">
-          <input type="number" class="cfg-input" id="svc-dur-${id}" value="${dur}" min="5" max="180" step="5" style="width:80px;">
-          <span style="font-size:12px;color:var(--text-dim)">min</span>
-        </div>
-      </div>`;
-    }).join('');
   }
 
   function renderBreaksUI(){
@@ -688,21 +757,34 @@
     // Lê buffer
     s.buffer = parseInt(document.getElementById('cfg-buffer').value)||5;
 
-    // Lê serviços
-    SERVICES.forEach(svc=>{
-      const id = svc.replace(/[^a-z0-9]/gi,'_');
-      s.services[svc] = { duration: parseInt(document.getElementById('svc-dur-'+id).value)||15 };
-    });
+    // Lê serviços do novo UI dinâmico
+    const services = collectAdminServices();
+    if(services.length===0){ showToast('Adicione ao menos um servico','red'); return; }
+    services.forEach(svc=>{ s.services[svc.name] = {duration: svc.duration}; });
 
     try {
+      // Salva horários/buffer/serviços duração
       await setDoc(doc(db,'config','schedule'), s);
+      // Salva lista completa de serviços (nome + valor + duração)
+      await setDoc(doc(db,'config','services'), { list: services });
       currentSettings = s;
+      adminServices = services;
+      // Atualiza filtro de serviços na tabela de agendamentos
+      updateServicesFilter(services);
       showToast('Configuracoes salvas!','green');
     } catch(e){
       console.error(e);
       showToast('Erro ao salvar configuracoes','red');
     }
   };
+
+  function updateServicesFilter(services){
+    const sel = document.getElementById('filter-service');
+    if(!sel) return;
+    const current = sel.value;
+    sel.innerHTML = '<option value="">Todos os servicos</option>' +
+      services.map(s=>`<option${s.name===current?' selected':''}>${s.name}</option>`).join('');
+  }
 
   // ===== PLANOS =====
   let adminPlans = [];
@@ -881,6 +963,7 @@
         subscribeData();
         loadSettings();
         loadAdminPlans();
+        loadAdminServices();
       } else {
         document.getElementById("login-screen").style.display="flex";
       }
