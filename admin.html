@@ -306,6 +306,7 @@
   </div>
   <div style="max-width:1100px;margin:0 auto;padding:0 20px;display:flex;gap:4px;border-top:1px solid rgba(255,255,255,0.05);">
     <button class="tab-btn active" onclick="switchTab('appointments')">📋 Agendamentos</button>
+    <button class="tab-btn" onclick="switchTab('sessions')">👥 Sessões</button>
     <button class="tab-btn" onclick="switchTab('subscriptions')">👑 Assinaturas</button>
     <button class="tab-btn" onclick="switchTab('settings')">⚙️ Configurações</button>
   </div>
@@ -469,6 +470,55 @@
       <div class="cfg-title">&#9989; Assinantes Ativos</div>
       <div class="cfg-hint">Clientes com acesso VIP ativo. Clique em "Revogar" para cancelar o acesso.</div>
       <div id="active-subs-list"><div style="text-align:center;padding:32px 0;"><div class="spinner" style="margin:0 auto;"></div></div></div>
+    </div>
+  </div>
+
+
+  <!-- ABA SESSÕES -->
+  <div id="tab-sessions" style="display:none;">
+    <!-- TOP 3 -->
+    <div style="margin-bottom:24px;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;background:linear-gradient(135deg,#c9a84c,#f0d78c,#c9a84c);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:14px;">🏆 TOP 3 Clientes</div>
+      <div id="top3-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px;">
+        <div style="text-align:center;padding:20px 16px;background:var(--bg2);border-radius:12px;border:1px solid rgba(255,215,0,0.3);">
+          <div style="font-size:36px;margin-bottom:8px;">🥇</div>
+          <div id="top1-name" style="font-weight:700;font-size:14px;color:#FFD700;">—</div>
+          <div id="top1-count" style="font-size:12px;color:var(--text-muted);margin-top:4px;">0 agendamentos</div>
+          <div id="top1-phone" style="font-size:11px;color:var(--text-dim);margin-top:2px;">—</div>
+        </div>
+        <div style="text-align:center;padding:20px 16px;background:var(--bg2);border-radius:12px;border:1px solid rgba(192,192,192,0.3);">
+          <div style="font-size:36px;margin-bottom:8px;">🥈</div>
+          <div id="top2-name" style="font-weight:700;font-size:14px;color:#C0C0C0;">—</div>
+          <div id="top2-count" style="font-size:12px;color:var(--text-muted);margin-top:4px;">0 agendamentos</div>
+          <div id="top2-phone" style="font-size:11px;color:var(--text-dim);margin-top:2px;">—</div>
+        </div>
+        <div style="text-align:center;padding:20px 16px;background:var(--bg2);border-radius:12px;border:1px solid rgba(205,127,50,0.3);">
+          <div style="font-size:36px;margin-bottom:8px;">🥉</div>
+          <div id="top3-name" style="font-weight:700;font-size:14px;color:#CD7F32;">—</div>
+          <div id="top3-count" style="font-size:12px;color:var(--text-muted);margin-top:4px;">0 agendamentos</div>
+          <div id="top3-phone" style="font-size:11px;color:var(--text-dim);margin-top:2px;">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lista de clientes -->
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;background:linear-gradient(135deg,#c9a84c,#f0d78c,#c9a84c);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">👥 Todos os Clientes</div>
+      <input class="search-input" type="search" id="sessions-search" placeholder="Buscar cliente..." oninput="filterSessions()" style="width:220px;">
+    </div>
+    <div id="sessions-list" class="table-wrap fade-in">
+      <div style="text-align:center;padding:40px 0;"><div class="spinner" style="margin:0 auto;"></div></div>
+    </div>
+
+    <!-- Modal detalhe do cliente -->
+    <div id="client-modal" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.8);align-items:center;justify-content:center;">
+      <div style="width:100%;max-width:500px;margin:16px;background:#1a1a1a;border:1px solid var(--gold-border);border-radius:16px;padding:28px;box-shadow:0 24px 80px rgba(0,0,0,.8);animation:slideUp .3s ease-out;max-height:80vh;overflow-y:auto;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--gold);" id="modal-client-name">—</div>
+          <button onclick="closeClientModal()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer;padding:4px;">✕</button>
+        </div>
+        <div id="modal-client-info"></div>
+      </div>
     </div>
   </div>
 
@@ -1085,16 +1135,17 @@
   };
 
   window.switchTab = function(tab){
-    ['appointments','subscriptions','settings'].forEach(t=>{
+    ['appointments','sessions','subscriptions','settings'].forEach(t=>{
       const el=document.getElementById('tab-'+t);
       if(el) el.style.display=t===tab?'block':'none';
     });
     document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-    const labels={'appointments':'agendamentos','subscriptions':'assinaturas','settings':'config'};
+    const labels={'appointments':'agendamentos','sessions':'sessões','subscriptions':'assinaturas','settings':'config'};
     document.querySelectorAll('.tab-btn').forEach(b=>{
       if(b.textContent.toLowerCase().includes(labels[tab]||'')) b.classList.add('active');
     });
     if(tab==='subscriptions') loadSubscriptions();
+    if(tab==='sessions') loadSessions();
   };
 
   window.addEventListener("DOMContentLoaded",()=>{
@@ -1460,6 +1511,136 @@
       showToast('VIP revogado e cancelamento confirmado','red');
       loadSubscriptions();
     }catch(e){ showToast('Erro ao revogar VIP','red'); }
+  };
+
+
+  // ═══════════════════════════════════════
+  // SESSÕES / CLIENTES
+  // ═══════════════════════════════════════
+  let allClients = [];
+
+  window.loadSessions = function(){
+    const el = document.getElementById('sessions-list');
+    if(!el) return;
+    // Escutar coleção clients em tempo real
+    onSnapshot(collection(db,'clients'), snap=>{
+      allClients = snap.docs.map(d=>({id:d.id,...d.data()}))
+        .sort((a,b)=>(a.name||'').localeCompare(b.name||'','pt-BR'));
+      renderSessionsList(allClients);
+      renderTop3();
+    }, err=>{ console.error('loadSessions',err); });
+  };
+
+  function renderTop3(){
+    // Contar agendamentos por telefone (excluindo Bloqueado)
+    const counts = {};
+    const names  = {};
+    const phones = {};
+    allData.filter(a=>a.status!=='Bloqueado').forEach(a=>{
+      const d = (a.phone||'').replace(/\D/g,'');
+      counts[d] = (counts[d]||0) + 1;
+      if(!names[d]) names[d] = a.name||'—';
+      if(!phones[d]) phones[d] = a.phone||'—';
+    });
+    // Mesclar com nomes da coleção clients
+    allClients.forEach(c=>{
+      if(c.digits && c.name){ names[c.digits]=c.name; phones[c.digits]=c.phone||'—'; }
+    });
+    const sorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,3);
+    const medals = ['top1','top2','top3'];
+    medals.forEach((id,i)=>{
+      const [digits, count] = sorted[i]||['',0];
+      document.getElementById(id+'-name').textContent  = digits ? (names[digits]||'—') : '—';
+      document.getElementById(id+'-count').textContent = count ? count+(count===1?' agendamento':' agendamentos') : '—';
+      document.getElementById(id+'-phone').textContent = digits ? (phones[digits]||'—') : '—';
+    });
+  }
+
+  function renderSessionsList(clients){
+    const el = document.getElementById('sessions-list');
+    if(!el) return;
+    if(!clients.length){
+      el.innerHTML='<div style="text-align:center;padding:40px 0;color:var(--text-muted);">Nenhum cliente cadastrado ainda.</div>';
+      return;
+    }
+    // Contar agendamentos por digits
+    const counts={};
+    allData.filter(a=>a.status!=='Bloqueado').forEach(a=>{
+      const d=(a.phone||'').replace(/\D/g,'');
+      counts[d]=(counts[d]||0)+1;
+    });
+    el.innerHTML='<table style="width:100%;border-collapse:collapse;">'
+      +'<thead><tr style="background:var(--bg2);">'
+      +'<th style="padding:12px 16px;text-align:left;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);">Cliente</th>'
+      +'<th style="padding:12px 16px;text-align:left;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);">Telefone</th>'
+      +'<th style="padding:12px 16px;text-align:center;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);">Agendamentos</th>'
+      +'<th style="padding:12px 16px;text-align:left;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);">Último acesso</th>'
+      +'<th style="padding:12px 16px;"></th>'
+      +'</tr></thead><tbody>'
+      +clients.map(c=>{
+        const cnt = counts[c.digits||'']||0;
+        const last = c.lastSeen ? new Date(c.lastSeen).toLocaleDateString('pt-BR') : '—';
+        return '<tr style="border-bottom:1px solid rgba(255,255,255,0.04);" onmouseenter="this.style.background='rgba(255,255,255,0.02)'" onmouseleave="this.style.background=''">'
+          +'<td style="padding:13px 16px;font-weight:700;font-size:13px;">'+esc(c.name||'—')+'</td>'
+          +'<td style="padding:13px 16px;font-size:13px;color:var(--text-muted);">'+esc(c.phone||'—')+'</td>'
+          +'<td style="padding:13px 16px;text-align:center;font-family:Bebas Neue,sans-serif;font-size:20px;color:var(--gold);">'+cnt+'</td>'
+          +'<td style="padding:13px 16px;font-size:12px;color:var(--text-dim);">'+last+'</td>'
+          +'<td style="padding:13px 16px;"><button data-digits="'+esc(c.digits||'')+'" data-name="'+esc(c.name||'')+'" data-phone="'+esc(c.phone||'')+'" onclick="openClientModal(this.dataset.digits,this.dataset.name,this.dataset.phone)" style="padding:5px 12px;border-radius:6px;border:1px solid var(--gold-border);background:var(--gold-dim);color:var(--gold);font-size:11px;font-weight:700;cursor:pointer;">Ver detalhes</button></td>'
+          +'</tr>';
+      }).join('')
+      +'</tbody></table>';
+  }
+
+  window.filterSessions = function(){
+    const q = document.getElementById('sessions-search').value.toLowerCase().trim();
+    const filtered = q
+      ? allClients.filter(c=>(c.name||'').toLowerCase().includes(q)||(c.phone||'').includes(q))
+      : allClients;
+    renderSessionsList(filtered);
+  };
+
+  window.openClientModal = function(digits, name, phone){
+    document.getElementById('modal-client-name').textContent = name||'—';
+    const info = document.getElementById('modal-client-info');
+    info.innerHTML='<div class="spinner" style="margin:0 auto;width:24px;height:24px;"></div>';
+    document.getElementById('client-modal').style.display='flex';
+
+    // Buscar agendamentos deste cliente
+    const apts = allData.filter(a=>a.status!=='Bloqueado'&&(a.phone||'').replace(/\D/g,'')===(digits||''));
+    const today = getTodayStr();
+    const done  = apts.filter(a=>a.date<today).length;
+    const upcoming = apts.filter(a=>a.date>=today);
+    const total = apts.length;
+
+    // Serviço favorito
+    const svcCount={};
+    apts.forEach(a=>{ svcCount[a.service]=(svcCount[a.service]||0)+1; });
+    const favSvc = Object.entries(svcCount).sort((a,b)=>b[1]-a[1])[0];
+
+    info.innerHTML=
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;">'
+      +'<div style="background:var(--bg3);border-radius:10px;padding:14px;text-align:center;">'
+      +'<div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:4px;">Total</div>'
+      +'<div style="font-family:Bebas Neue,sans-serif;font-size:32px;color:var(--gold);">'+total+'</div>'
+      +'</div>'
+      +'<div style="background:var(--bg3);border-radius:10px;padding:14px;text-align:center;">'
+      +'<div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:4px;">Realizados</div>'
+      +'<div style="font-family:Bebas Neue,sans-serif;font-size:32px;color:#4ade80;">'+done+'</div>'
+      +'</div>'
+      +'</div>'
+      +'<div style="background:var(--bg3);border-radius:10px;padding:14px;margin-bottom:12px;">'
+      +'<div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:6px;">Informações</div>'
+      +'<div style="font-size:13px;margin-bottom:4px;"><span style="color:var(--text-muted);">Telefone:</span> <strong>'+esc(phone||'—')+'</strong></div>'
+      +(favSvc?'<div style="font-size:13px;"><span style="color:var(--text-muted);">Serviço favorito:</span> <strong>'+esc(favSvc[0])+'</strong> ('+favSvc[1]+'x)</div>':'')
+      +'</div>'
+      +(upcoming.length?'<div style="background:var(--bg3);border-radius:10px;padding:14px;">'
+        +'<div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:8px;">Próximos agendamentos</div>'
+        +upcoming.slice(0,3).map(a=>'<div style="font-size:13px;color:var(--text);padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.05);">'+a.service+' — '+new Date(a.date+'T12:00:00').toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'short'})+' às '+a.time+'</div>').join('')
+        +'</div>':'');
+  };
+
+  window.closeClientModal = function(){
+    document.getElementById('client-modal').style.display='none';
   };
 
 </script>
