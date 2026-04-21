@@ -966,6 +966,7 @@
       // Atualiza filtro de serviços na tabela de agendamentos
       updateServicesFilter(services);
       showToast('Configurações salvas!','green');
+      await sendPushNotification('Gabriel Barber Studio 📢','Os horários de funcionamento e serviços foram atualizados. Confira!');
     } catch(e){
       console.error(e);
       showToast('Erro ao salvar configurações','red');
@@ -1128,6 +1129,7 @@
       }
       adminPlans = plans;
       showToast('Planos salvos com sucesso!','green');
+      await sendPushNotification('Gabriel Barber Studio 💎','Os planos de assinatura foram atualizados. Confira as novidades!');
     } catch(e){
       console.error(e);
       showToast('Erro ao salvar planos','red');
@@ -1349,6 +1351,7 @@
       await setDoc(doc(db,'config','banners'),{list:banners});
       adminBanners=banners;
       showToast('Avisos salvos!','green');
+      if(banners.length>0){ const firstActive=banners.find(b=>b.active); if(firstActive) await sendPushNotification('Gabriel Barber Studio 🎉',firstActive.text); }
     }catch(e){showToast('Erro ao salvar avisos','red');}
   };
 
@@ -1645,6 +1648,25 @@
   window.closeClientModal = function(){
     document.getElementById('client-modal').style.display='none';
   };
+
+
+  // ═══════════════════════════════════════
+  // ENVIAR NOTIFICAÇÃO PUSH PARA CLIENTES
+  // ═══════════════════════════════════════
+  async function sendPushNotification(title, body){
+    try {
+      await setDoc(doc(db,'push_notifications','notif_'+Date.now()),{
+        title,
+        body,
+        icon: 'https://i.imgur.com/vcPQoRh.png',
+        createdAt: new Date().toISOString(),
+        sentBy: currentAdmin||'admin',
+      });
+      showToast('Notificação enviada aos clientes! 🔔','green');
+    } catch(e){
+      console.error('sendPushNotification:',e);
+    }
+  }
 
 </script>
 </body>
