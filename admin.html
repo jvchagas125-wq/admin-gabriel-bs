@@ -265,31 +265,37 @@
         width: 70px !important;
         font-size: 14px;
       }
-      /* Características dos serviços no mobile */
-      [id^="svc-features-"] > div {
+      /* Serviços mobile — empilha o grid de 3 colunas */
+      .plan-admin-card [style*="grid-template-columns:1fr 1fr 1fr"],
+      .plan-admin-card [style*="grid-template-columns: 1fr 1fr 1fr"] {
+        grid-template-columns: 1fr !important;
+      }
+      /* Inputs de features — garantir que ocupa toda a largura */
+      .plan-admin-input {
+        font-size: 16px !important;
+        padding: 12px !important;
+        -webkit-appearance: none;
+        appearance: none;
+      }
+      /* Container de cada linha de feature */
+      [id^="svc-features-"] > div,
+      .plan-admin-benefits > div {
         display: flex !important;
-        gap: 6px !important;
-        align-items: center !important;
         width: 100% !important;
+        box-sizing: border-box !important;
       }
-      [id^="svc-ft-"] {
-        flex: 1 !important;
+      [id^="svc-features-"] > div > input,
+      .plan-admin-benefits > div > input {
+        flex: 1 1 auto !important;
         min-width: 0 !important;
-        width: auto !important;
-        font-size: 14px !important;
-        padding: 10px 12px !important;
+        max-width: calc(100% - 50px) !important;
+        font-size: 16px !important;
       }
-      [id^="svc-features-"] .cfg-rm-btn {
-        flex-shrink: 0 !important;
-        padding: 8px 12px !important;
-        min-width: 40px !important;
-      }
-      /* Grid de info do serviço no mobile */
-      [id^="svc-row-"] > div:nth-child(2) {
-        grid-template-columns: 1fr 1fr !important;
-      }
-      [id^="svc-row-"] > div:nth-child(2) > div:last-child {
-        grid-column: 1 / -1 !important;
+      [id^="svc-features-"] > div > button,
+      .plan-admin-benefits > div > button {
+        flex: 0 0 auto !important;
+        width: 40px !important;
+        padding: 8px !important;
       }
 
       /* Buffer */
@@ -300,6 +306,10 @@
 
       /* Botão adicionar intervalo */
       .cfg-add-btn { width: 100%; padding: 10px; text-align: center; font-size: 13px; margin-top: 12px; }
+      /* Grid info serviço mobile */
+      .svc-info-grid {
+        grid-template-columns: 1fr !important;
+      }
     }
   </style>
 </head>
@@ -771,7 +781,7 @@
             <button onclick="removeSvc(${i})" class="cfg-rm-btn">Remover</button>
           </div>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px;">
+        <div class="svc-info-grid" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px;">
           <div>
             <span class="plan-admin-label">Nome do serviço</span>
             <input class="plan-admin-input" id="svc-name-${i}" value="${esc(svc.name||'')}" placeholder="Ex: Cabelo">
