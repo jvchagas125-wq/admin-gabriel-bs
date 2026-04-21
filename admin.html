@@ -1766,16 +1766,39 @@
   // ═══════════════════════════════════════
   async function sendPushNotification(title, body){
     try {
-      await setDoc(doc(db,'push_notifications','notif_'+Date.now()),{
-        title,
-        body,
-        icon: 'https://i.imgur.com/vcPQoRh.png',
+      // 1. Salvar no Firestore — clientes com app aberto recebem via onMessage
+      const notifId = 'notif_' + Date.now();
+      await setDoc(doc(db,'push_notifications', notifId),{
+        title, body,
+        icon: 'https://i.postimg.cc/FFpNdnLT/Design-sem-nome.png',
         createdAt: new Date().toISOString(),
         sentBy: currentAdmin||'admin',
       });
-      showToast('Notificação enviada aos clientes! 🔔','green');
+
+      // 2. Chamar a API do Vercel para enviar FCM a todos os tokens
+      //    (funciona mesmo com app fechado)
+      const resp = await fetch('https://gabriel-barber-studio.vercel.app/api/notify', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-notify-secret': 'gbs-notify-2026',
+        },
+        body: JSON.stringify({
+          title,
+          body,
+          icon: 'https://i.postimg.cc/FFpNdnLT/Design-sem-nome.png',
+        }),
+      });
+
+      if(resp.ok){
+        const data = await resp.json();
+        showToast('Notificação enviada para '+data.sent+' cliente(s)! 🔔','green');
+      } else {
+        showToast('Notificação salva (FCM indisponível)','green');
+      }
     } catch(e){
       console.error('sendPushNotification:',e);
+      showToast('Notificação salva localmente 🔔','green');
     }
   }
 
