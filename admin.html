@@ -406,6 +406,23 @@
     <div style="max-width:720px;">
 
 
+
+      <!-- PLANO DE FUNDO -->
+      <div class="cfg-card">
+        <div class="cfg-title">🖼️ Plano de Fundo do Site</div>
+        <div class="cfg-hint">Cole o link do Imgur da imagem que deseja usar como plano de fundo do site dos clientes. Recomendado: 1080x1920px, formato .jpg ou .png.</div>
+        <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;">
+          <div style="flex:1;min-width:200px;">
+            <label class="cfg-label">Link da imagem (Imgur)</label>
+            <input class="cfg-input" id="cfg-bg-image" placeholder="https://i.imgur.com/XXXXXXX.png" style="width:100%;" oninput="previewBgImage()">
+          </div>
+          <div id="cfg-bg-preview" style="width:60px;height:60px;border-radius:8px;border:1px solid rgba(255,255,255,0.08);overflow:hidden;flex-shrink:0;background:var(--bg3);display:flex;align-items:center;justify-content:center;">
+            <span style="font-size:10px;color:var(--text-dim);text-align:center;padding:4px;">sem img</span>
+          </div>
+        </div>
+        <button class="cfg-save-btn" onclick="saveBgImage()" style="margin-top:14px;">💾 Salvar Plano de Fundo</button>
+      </div>
+
       <!-- AVISOS / PROMOÇÕES DO SITE -->
       <div class="cfg-card">
         <div class="cfg-title">📢 Avisos, Promoções e Ofertas</div>
@@ -1675,6 +1692,41 @@
       console.error('sendPushNotification:',e);
     }
   }
+
+
+  // ═══════════════════════════════════════
+  // PLANO DE FUNDO
+  // ═══════════════════════════════════════
+  async function loadBgImage(){
+    try {
+      const snap = await getDoc(doc(db,'config','appearance'));
+      if(snap.exists() && snap.data().bgImage){
+        const input = document.getElementById('cfg-bg-image');
+        if(input) input.value = snap.data().bgImage;
+        previewBgImage();
+      }
+    } catch(e){ console.warn('loadBgImage:',e); }
+  }
+
+  window.previewBgImage = function(){
+    const url = document.getElementById('cfg-bg-image')?.value?.trim();
+    const box = document.getElementById('cfg-bg-preview');
+    if(!box) return;
+    box.innerHTML = url
+      ? '<img src="'+url+'" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.innerHTML='<span style=font-size:10px;color:#f87171;padding:4px>erro</span>'">'
+      : '<span style="font-size:10px;color:var(--text-dim);text-align:center;padding:4px;">sem img</span>';
+  };
+
+  window.saveBgImage = async function(){
+    const url = document.getElementById('cfg-bg-image')?.value?.trim();
+    try {
+      await setDoc(doc(db,'config','appearance'),{ bgImage: url||'' },{merge:true});
+      showToast('Plano de fundo salvo!','green');
+    } catch(e){
+      console.error(e);
+      showToast('Erro ao salvar plano de fundo','red');
+    }
+  };
 
 </script>
 
