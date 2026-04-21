@@ -1712,9 +1712,16 @@
     const url = document.getElementById('cfg-bg-image')?.value?.trim();
     const box = document.getElementById('cfg-bg-preview');
     if(!box) return;
-    box.innerHTML = url
-      ? '<img src="'+url+'" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.innerHTML='<span style=font-size:10px;color:#f87171;padding:4px>erro</span>'">'
-      : '<span style="font-size:10px;color:var(--text-dim);text-align:center;padding:4px;">sem img</span>';
+    if(url){
+      const img = document.createElement('img');
+      img.src = url;
+      img.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+      img.onerror = function(){ box.innerHTML='<span style="font-size:10px;color:#f87171;padding:4px;">erro</span>'; };
+      box.innerHTML='';
+      box.appendChild(img);
+    } else {
+      box.innerHTML='<span style="font-size:10px;color:var(--text-dim);text-align:center;padding:4px;">sem img</span>';
+    }
   };
 
   window.saveBgImage = async function(){
