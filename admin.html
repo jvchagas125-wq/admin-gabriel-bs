@@ -443,6 +443,56 @@
 
 
 
+
+      <!-- CONFIGURAÇÕES DO SITE -->
+      <div class="cfg-card">
+        <div class="cfg-title">🌐 Informações do Site</div>
+        <div class="cfg-hint">Edite o logo, contatos e endereço exibidos no site dos clientes.</div>
+
+        <!-- Logo hero -->
+        <div class="cfg-subtitle">🖼️ Logo principal (acima dos serviços)</div>
+        <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:16px;">
+          <div style="flex:1;min-width:180px;">
+            <label class="cfg-label">Link do Imgur</label>
+            <input class="cfg-input" id="cfg-hero-logo" placeholder="https://i.imgur.com/XXXXXXX.png" style="width:100%;" oninput="previewHeroLogo()">
+          </div>
+          <div id="cfg-hero-logo-preview" style="width:60px;height:60px;border-radius:8px;border:1px solid rgba(255,255,255,0.08);overflow:hidden;flex-shrink:0;background:var(--bg3);display:flex;align-items:center;justify-content:center;">
+            <span style="font-size:10px;color:var(--text-dim);padding:4px;text-align:center;">sem img</span>
+          </div>
+        </div>
+
+        <!-- WhatsApp -->
+        <div class="cfg-subtitle">📱 WhatsApp</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
+          <div>
+            <label class="cfg-label">Número (com DDD)</label>
+            <input class="cfg-input" id="cfg-whatsapp-num" placeholder="(22) 99703-5391" style="width:100%;">
+          </div>
+        </div>
+
+        <!-- Instagram -->
+        <div class="cfg-subtitle">📸 Instagram</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
+          <div>
+            <label class="cfg-label">@ do perfil</label>
+            <input class="cfg-input" id="cfg-instagram-handle" placeholder="@gabriel.bstudio" style="width:100%;">
+          </div>
+        </div>
+
+        <!-- Endereço -->
+        <div class="cfg-subtitle">📍 Endereço</div>
+        <div style="margin-bottom:10px;">
+          <label class="cfg-label">Texto do endereço (use Enter para quebrar linha)</label>
+          <textarea class="cfg-input" id="cfg-address-text" rows="3" placeholder="R. Luis Isaltino de Oliveira, 65&#10;Pq Flamboyant - Campos dos Goytacazes&#10;28015-170 (Loja 2)" style="width:100%;resize:vertical;font-family:'DM Sans',sans-serif;"></textarea>
+        </div>
+        <div style="margin-bottom:16px;">
+          <label class="cfg-label">Link do Google Maps</label>
+          <input class="cfg-input" id="cfg-maps-link" placeholder="https://maps.app.goo.gl/..." style="width:100%;">
+        </div>
+
+        <button class="cfg-save-btn" onclick="saveSiteConfig()">💾 Salvar Informações do Site</button>
+      </div>
+
       <!-- PLANO DE FUNDO -->
       <div class="cfg-card">
         <div class="cfg-title">🖼️ Plano de Fundo do Site</div>
@@ -1768,6 +1818,55 @@
     } catch(e){
       console.error(e);
       showToast('Erro ao salvar plano de fundo','red');
+    }
+  };
+
+
+  // ═══════════════════════════════════════
+  // CONFIGURAÇÕES DO SITE
+  // ═══════════════════════════════════════
+  async function loadSiteConfigAdmin(){
+    try {
+      const snap = await getDoc(doc(db,'config','site'));
+      if(!snap.exists()) return;
+      const d = snap.data();
+      if(d.heroLogo)         { document.getElementById('cfg-hero-logo').value = d.heroLogo; previewHeroLogo(); }
+      if(d.whatsappNum)       document.getElementById('cfg-whatsapp-num').value = d.whatsappNum;
+      if(d.instagramHandle)   document.getElementById('cfg-instagram-handle').value = d.instagramHandle;
+      if(d.addressText)       document.getElementById('cfg-address-text').value = d.addressText;
+      if(d.mapsLink)          document.getElementById('cfg-maps-link').value = d.mapsLink;
+    } catch(e){ console.warn('loadSiteConfigAdmin:',e); }
+  }
+
+  window.previewHeroLogo = function(){
+    const url = document.getElementById('cfg-hero-logo')?.value?.trim();
+    const box = document.getElementById('cfg-hero-logo-preview');
+    if(!box) return;
+    if(url){
+      const img = document.createElement('img');
+      img.src = url;
+      img.style.cssText = 'width:100%;height:100%;object-fit:contain;';
+      img.onerror = function(){ box.innerHTML='<span style="font-size:10px;color:#f87171;padding:4px;">erro</span>'; };
+      box.innerHTML=''; box.appendChild(img);
+    } else {
+      box.innerHTML='<span style="font-size:10px;color:var(--text-dim);text-align:center;padding:4px;">sem img</span>';
+    }
+  };
+
+  window.saveSiteConfig = async function(){
+    const data = {
+      heroLogo:        (document.getElementById('cfg-hero-logo')?.value||'').trim(),
+      whatsappNum:     (document.getElementById('cfg-whatsapp-num')?.value||'').trim(),
+      instagramHandle: (document.getElementById('cfg-instagram-handle')?.value||'').trim(),
+      addressText:     (document.getElementById('cfg-address-text')?.value||'').trim(),
+      mapsLink:        (document.getElementById('cfg-maps-link')?.value||'').trim(),
+    };
+    try {
+      await setDoc(doc(db,'config','site'), data, {merge:true});
+      showToast('Informações do site salvas!','green');
+    } catch(e){
+      console.error(e);
+      showToast('Erro ao salvar informações','red');
     }
   };
 
