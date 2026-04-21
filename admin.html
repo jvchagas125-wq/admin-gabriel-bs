@@ -265,6 +265,32 @@
         width: 70px !important;
         font-size: 14px;
       }
+      /* Características dos serviços no mobile */
+      [id^="svc-features-"] > div {
+        display: flex !important;
+        gap: 6px !important;
+        align-items: center !important;
+        width: 100% !important;
+      }
+      [id^="svc-ft-"] {
+        flex: 1 !important;
+        min-width: 0 !important;
+        width: auto !important;
+        font-size: 14px !important;
+        padding: 10px 12px !important;
+      }
+      [id^="svc-features-"] .cfg-rm-btn {
+        flex-shrink: 0 !important;
+        padding: 8px 12px !important;
+        min-width: 40px !important;
+      }
+      /* Grid de info do serviço no mobile */
+      [id^="svc-row-"] > div:nth-child(2) {
+        grid-template-columns: 1fr 1fr !important;
+      }
+      [id^="svc-row-"] > div:nth-child(2) > div:last-child {
+        grid-column: 1 / -1 !important;
+      }
 
       /* Buffer */
       #cfg-buffer { width: 100% !important; font-size: 15px; padding: 9px 12px; }
@@ -772,10 +798,10 @@
         </div>
         <div style="margin-top:10px;">
           <span class="plan-admin-label" style="margin-bottom:6px;display:block;">Descrição / Características (aparecem no card do site)</span>
-          <div id="svc-features-${i}" style="display:flex;flex-direction:column;gap:5px;margin-bottom:6px;">
+          <div id="svc-features-${i}" style="display:flex;flex-direction:column;gap:5px;margin-bottom:6px;width:100%;">
             ${(svc.features||[]).map((ft,fi)=>`
-              <div style="display:flex;gap:6px;align-items:center;">
-                <input class="plan-admin-input" id="svc-ft-${i}-${fi}" value="${esc(ft)}" placeholder="Ex: Cortes com Máquina" style="flex:1;">
+              <div style="display:flex;gap:6px;align-items:center;width:100%;">
+                <input class="plan-admin-input" id="svc-ft-${i}-${fi}" value="${esc(ft)}" placeholder="Ex: Cortes com Máquina" style="flex:1;min-width:0;width:100%;">
                 <button onclick="removeSvcFeature(${i},${fi})" class="cfg-rm-btn" style="padding:5px 9px;">✕</button>
               </div>`).join('')}
           </div>
