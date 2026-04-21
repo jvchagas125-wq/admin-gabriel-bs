@@ -314,7 +314,7 @@
   </div>
   <div style="max-width:1100px;margin:0 auto;padding:0 20px;display:flex;gap:4px;border-top:1px solid rgba(255,255,255,0.05);">
     <button class="tab-btn active" onclick="switchTab('appointments')">📋 Agendamentos</button>
-    <button class="tab-btn" onclick="switchTab('sessions')">👥 Sessões</button>
+    <button class="tab-btn" onclick="switchTab('sessions')">👥 Clientes</button>
     <button class="tab-btn" onclick="switchTab('subscriptions')">👑 Assinaturas</button>
     <button class="tab-btn" onclick="switchTab('settings')">⚙️ Configurações</button>
   </div>
@@ -1167,7 +1167,7 @@
       if(el) el.style.display=t===tab?'block':'none';
     });
     document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-    const labels={'appointments':'agendamentos','sessions':'sessões','subscriptions':'assinaturas','settings':'config'};
+    const labels={'appointments':'agendamentos','sessions':'clientes','subscriptions':'assinaturas','settings':'config'};
     document.querySelectorAll('.tab-btn').forEach(b=>{
       if(b.textContent.toLowerCase().includes(labels[tab]||'')) b.classList.add('active');
     });
