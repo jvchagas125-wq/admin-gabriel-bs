@@ -1792,13 +1792,16 @@
 
       if(resp.ok){
         const data = await resp.json();
+        console.log('FCM response:', data);
         showToast('Notificação enviada para '+data.sent+' cliente(s)! 🔔','green');
       } else {
-        showToast('Notificação salva (FCM indisponível)','green');
+        const errText = await resp.text();
+        console.error('FCM API error:', resp.status, errText);
+        showToast('Erro FCM '+resp.status+': '+errText.slice(0,60),'red');
       }
     } catch(e){
-      console.error('sendPushNotification:',e);
-      showToast('Notificação salva localmente 🔔','green');
+      console.error('sendPushNotification fetch error:',e);
+      showToast('Erro ao chamar API: '+e.message,'red');
     }
   }
 
