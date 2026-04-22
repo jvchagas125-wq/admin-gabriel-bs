@@ -2031,8 +2031,20 @@
     cancelledUnsubscribe = onSnapshot(
       collection(db,'cancelled_appointments'),
       snap => {
-        allCancelled = snap.docs.map(d=>({id:d.id,...d.data()}))
-          .sort((a,b)=> (b.cancelledAt||'').localeCompare(a.cancelledAt||''));
+        // Usa docChanges para detectar apenas remoções reais do Firestore
+        // Evita recriar itens que foram removidos localmente
+        snap.docChanges().forEach(change => {
+          if(change.type === 'removed'){
+            allCancelled = allCancelled.filter(c => c.id !== change.doc.id);
+          } else if(change.type === 'added'){
+            const exists = allCancelled.find(c => c.id === change.doc.id);
+            if(!exists) allCancelled.push({id:change.doc.id,...change.doc.data()});
+          } else if(change.type === 'modified'){
+            const idx = allCancelled.findIndex(c => c.id === change.doc.id);
+            if(idx>=0) allCancelled[idx] = {id:change.doc.id,...change.doc.data()};
+          }
+        });
+        allCancelled.sort((a,b)=>(b.cancelledAt||'').localeCompare(a.cancelledAt||''));
         updateCancelledBadge();
         renderCancelledList(allCancelled);
       },
@@ -2099,19 +2111,19 @@
     if(!id){ showToast('ID inválido','red'); return; }
     if(!confirm('Remover este registro da lista de cancelados?')) return;
     try {
-      // Remove do Firestore PRIMEIRO — se falhar, não remove da tela
-      const ref = doc(db,'cancelled_appointments', id);
-      console.log('Deletando documento:', id, 'ref path:', ref.path);
-      await deleteDoc(ref);
-      console.log('Deletado com sucesso:', id);
-      showToast('Registro removido!','green');
-      // Remoção local após confirmação do Firestore
+      // Remove localmente IMEDIATAMENTE para feedback instantâneo
       allCancelled = allCancelled.filter(c => c.id !== id);
       updateCancelledBadge();
       renderCancelledList(allCancelled);
+      // Depois remove do Firestore (o onSnapshot NÃO vai recriar pois já removemos do array)
+      await deleteDoc(doc(db,'cancelled_appointments', id));
+      showToast('Registro removido!','green');
     } catch(e){
       console.error('removeCancelledEntry ERRO:', e.code, e.message);
       showToast('Erro: ' + (e.code||e.message),'red');
+      // Recarrega em caso de erro para manter sincronizado
+      if(cancelledUnsubscribe){ cancelledUnsubscribe(); cancelledUnsubscribe=null; }
+      loadCancelledTab();
     }
   };
 
@@ -2119,13 +2131,21 @@
     if(!allCancelled.length){ showToast('Lista já está vazia!','green'); return; }
     if(!confirm('Limpar TODOS os '+allCancelled.length+' registros de cancelados? Esta ação não pode ser desfeita.')) return;
     try {
-      const batch = [];
-      for(const c of allCancelled) batch.push(deleteDoc(doc(db,'cancelled_appointments',c.id)));
-      await Promise.all(batch);
+      // Snapshot local dos IDs antes de limpar
+      const toDelete = [...allCancelled];
+      // Limpa localmente IMEDIATAMENTE
+      allCancelled = [];
+      updateCancelledBadge();
+      renderCancelledList([]);
+      // Deleta todos do Firestore
+      await Promise.all(toDelete.map(c => deleteDoc(doc(db,'cancelled_appointments',c.id))));
       showToast('Lista de cancelados limpa!','green');
     } catch(e){
-      console.error(e);
-      showToast('Erro ao limpar lista','red');
+      console.error('clearAllCancelled ERRO:', e);
+      showToast('Erro ao limpar: ' + e.message,'red');
+      // Recarrega em caso de erro
+      if(cancelledUnsubscribe){ cancelledUnsubscribe(); cancelledUnsubscribe=null; }
+      loadCancelledTab();
     }
   };
 </script>
