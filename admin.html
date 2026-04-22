@@ -351,6 +351,7 @@
   <div style="max-width:1100px;margin:0 auto;padding:0 20px;display:flex;gap:4px;border-top:1px solid rgba(255,255,255,0.05);">
     <button class="tab-btn active" onclick="switchTab('appointments')">📋 Agendamentos</button>
     <button class="tab-btn" onclick="switchTab('sessions')">👥 Clientes</button>
+    <button class="tab-btn" onclick="switchTab('cancelled')">🚫 Cancelados <span id="cancelled-badge" style="display:none;background:#dc2626;color:#fff;border-radius:10px;font-size:10px;padding:1px 6px;margin-left:4px;font-weight:700;"></span></button>
     <button class="tab-btn" onclick="switchTab('subscriptions')">👑 Assinaturas</button>
     <button class="tab-btn" onclick="switchTab('settings')">⚙️ Configurações</button>
   </div>
@@ -435,6 +436,21 @@
     </table>
     <div class="empty" id="empty-state" style="display:none;"><div class="empty-icon">🗓️</div><p>Nenhum agendamento encontrado.</p></div>
   </div>
+  </div>
+
+  <!-- ABA CANCELADOS -->
+  <div id="tab-cancelled" style="display:none;">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:18px;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;background:linear-gradient(135deg,#dc2626,#f87171);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">🚫 Agendamentos Cancelados</div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <input class="search-input" type="search" id="cancelled-search" placeholder="Buscar nome ou telefone..." oninput="filterCancelled()" style="width:220px;">
+        <button class="clear-btn" onclick="clearAllCancelled()" title="Limpar toda a lista de cancelados" style="white-space:nowrap;">🗑️ Limpar tudo</button>
+      </div>
+    </div>
+    <div style="font-size:12px;color:var(--text-dim);margin-bottom:14px;">Lista de agendamentos cancelados (pelo cliente ou pelo admin). Clique em 🗑️ para remover da lista.</div>
+    <div id="cancelled-list" class="table-wrap fade-in">
+      <div style="text-align:center;padding:40px 0;"><div class="spinner" style="margin:0 auto;"></div></div>
+    </div>
   </div>
 
   <!-- ABA CONFIGURAÇÕES -->
@@ -587,35 +603,36 @@
 
   <!-- ABA SESSÕES -->
   <div id="tab-sessions" style="display:none;">
-    <!-- TOP 3 -->
-        <!-- TOP 30 LISTA -->
-    <div style="margin-bottom:24px;">
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--gold);margin-bottom:10px;">📊 Ranking Completo — Top 30</div>
-      <div id="top30-list" style="background:var(--bg2);border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,0.06);"></div>
-    </div>
 
+    <!-- TOP 3 EM DESTAQUE -->
     <div style="margin-bottom:24px;">
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;background:linear-gradient(135deg,#c9a84c,#f0d78c,#c9a84c);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:14px;">🏆 TOP 30 Clientes</div>
-      <div id="top3-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;background:linear-gradient(135deg,#c9a84c,#f0d78c,#c9a84c);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:14px;">🏆 Top 3 em Destaque</div>
+      <div id="top3-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;">
         <div style="text-align:center;padding:20px 16px;background:var(--bg2);border-radius:12px;border:1px solid rgba(255,215,0,0.3);">
           <div style="font-size:36px;margin-bottom:8px;">🥇</div>
           <div id="top1-name" style="font-weight:700;font-size:14px;color:#FFD700;">—</div>
-          <div id="top1-count" style="font-size:12px;color:var(--text-muted);margin-top:4px;">0 agendamentos</div>
+          <div id="top1-count" style="font-size:12px;color:var(--text-muted);margin-top:4px;">—</div>
           <div id="top1-phone" style="font-size:11px;color:var(--text-dim);margin-top:2px;">—</div>
         </div>
         <div style="text-align:center;padding:20px 16px;background:var(--bg2);border-radius:12px;border:1px solid rgba(192,192,192,0.3);">
           <div style="font-size:36px;margin-bottom:8px;">🥈</div>
           <div id="top2-name" style="font-weight:700;font-size:14px;color:#C0C0C0;">—</div>
-          <div id="top2-count" style="font-size:12px;color:var(--text-muted);margin-top:4px;">0 agendamentos</div>
+          <div id="top2-count" style="font-size:12px;color:var(--text-muted);margin-top:4px;">—</div>
           <div id="top2-phone" style="font-size:11px;color:var(--text-dim);margin-top:2px;">—</div>
         </div>
         <div style="text-align:center;padding:20px 16px;background:var(--bg2);border-radius:12px;border:1px solid rgba(205,127,50,0.3);">
           <div style="font-size:36px;margin-bottom:8px;">🥉</div>
           <div id="top3-name" style="font-weight:700;font-size:14px;color:#CD7F32;">—</div>
-          <div id="top3-count" style="font-size:12px;color:var(--text-muted);margin-top:4px;">0 agendamentos</div>
+          <div id="top3-count" style="font-size:12px;color:var(--text-muted);margin-top:4px;">—</div>
           <div id="top3-phone" style="font-size:11px;color:var(--text-dim);margin-top:2px;">—</div>
         </div>
       </div>
+    </div>
+
+    <!-- TOP 30 LISTA COMPLETA -->
+    <div style="margin-bottom:28px;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--gold);margin-bottom:10px;">📊 Ranking Completo — Top 30</div>
+      <div id="top30-list" style="background:var(--bg2);border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,0.06);"></div>
     </div>
 
     <!-- Lista de clientes -->
@@ -769,6 +786,14 @@
     if(!apt) return;
     if(!confirm("Cancelar agendamento de "+apt.name+"?")) return;
     try{
+      // Salvar no histórico de cancelados antes de deletar
+      const cancelId = 'cancel_' + id + '_' + Date.now();
+      await setDoc(doc(db,'cancelled_appointments', cancelId),{
+        ...apt,
+        cancelledAt: new Date().toISOString(),
+        cancelledBy: 'admin',
+        originalId: id,
+      });
       await deleteDoc(doc(db,COL,id));
       // Cancela slots bloqueados vinculados a este agendamento
       const blocked=allData.filter(a=>a.status==='Bloqueado'&&a.date===apt.date&&a.phone===apt.phone&&a.blockedBy===apt.time);
@@ -1254,17 +1279,22 @@
   };
 
   window.switchTab = function(tab){
-    ['appointments','sessions','subscriptions','settings'].forEach(t=>{
+    ['appointments','sessions','cancelled','subscriptions','settings'].forEach(t=>{
       const el=document.getElementById('tab-'+t);
       if(el) el.style.display=t===tab?'block':'none';
     });
     document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-    const labels={'appointments':'agendamentos','sessions':'clientes','subscriptions':'assinaturas','settings':'config'};
     document.querySelectorAll('.tab-btn').forEach(b=>{
-      if(b.textContent.toLowerCase().includes(labels[tab]||'')) b.classList.add('active');
+      const txt = b.textContent.trim().toLowerCase();
+      if(tab==='appointments' && txt.startsWith('📋')) b.classList.add('active');
+      else if(tab==='sessions' && txt.startsWith('👥')) b.classList.add('active');
+      else if(tab==='cancelled' && txt.startsWith('🚫')) b.classList.add('active');
+      else if(tab==='subscriptions' && txt.startsWith('👑')) b.classList.add('active');
+      else if(tab==='settings' && txt.startsWith('⚙️')) b.classList.add('active');
     });
     if(tab==='subscriptions') loadSubscriptions();
     if(tab==='sessions') loadSessions();
+    if(tab==='cancelled') loadCancelledTab();
   };
 
   window.addEventListener("DOMContentLoaded",()=>{
@@ -1952,6 +1982,113 @@
     } catch(e){
       console.error(e);
       showToast('Erro ao excluir cliente','red');
+    }
+  };
+
+  // Alias para o botão "Ver detalhes" na lista de clientes
+  window.viewClientDetails = function(digits){
+    const client = allClients.find(c=>c.digits===digits);
+    if(client) window.openClientModal(digits, client.name, client.phone);
+  };
+
+  // ═══════════════════════════════════════
+  // ABA CANCELADOS
+  // ═══════════════════════════════════════
+  let allCancelled = [];
+  let cancelledUnsubscribe = null;
+
+  function loadCancelledTab(){
+    const el = document.getElementById('cancelled-list');
+    if(cancelledUnsubscribe) return; // já está ouvindo
+    el.innerHTML = '<div style="text-align:center;padding:40px 0;"><div class="spinner" style="margin:0 auto;"></div></div>';
+    cancelledUnsubscribe = onSnapshot(
+      query(collection(db,'cancelled_appointments'), orderBy('cancelledAt','desc')),
+      snap => {
+        allCancelled = snap.docs.map(d=>({id:d.id,...d.data()}));
+        updateCancelledBadge();
+        renderCancelledList(allCancelled);
+      },
+      err => {
+        console.error('loadCancelled', err);
+        el.innerHTML = '<div style="text-align:center;padding:32px;color:#f87171;">Erro ao carregar cancelados.</div>';
+      }
+    );
+  }
+
+  function updateCancelledBadge(){
+    const badge = document.getElementById('cancelled-badge');
+    if(!badge) return;
+    if(allCancelled.length > 0){
+      badge.textContent = allCancelled.length;
+      badge.style.display = 'inline';
+    } else {
+      badge.style.display = 'none';
+    }
+  }
+
+  function renderCancelledList(list){
+    const el = document.getElementById('cancelled-list');
+    if(!el) return;
+    if(!list.length){
+      el.innerHTML = '<div style="text-align:center;padding:52px 0;"><div style="font-size:36px;margin-bottom:12px;">✅</div><div style="color:var(--text-muted);font-size:14px;">Nenhum agendamento cancelado.</div></div>';
+      return;
+    }
+    const rows = list.map(c=>{
+      const dateStr = c.date ? new Date(c.date+'T12:00:00').toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'short',year:'numeric'}) : '—';
+      const cancelledAtStr = c.cancelledAt ? new Date(c.cancelledAt).toLocaleString('pt-BR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : '—';
+      const byLabel = c.cancelledBy==='admin' ? '<span style="color:#f0d78c;font-size:10px;background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.25);border-radius:10px;padding:2px 7px;">Admin</span>' : '<span style="color:#93c5fd;font-size:10px;background:rgba(96,165,250,0.1);border:1px solid rgba(96,165,250,0.25);border-radius:10px;padding:2px 7px;">Cliente</span>';
+      return '<tr style="border-bottom:1px solid rgba(255,255,255,0.04);">'
+        +'<td style="padding:12px 14px;font-weight:700;font-size:13px;">'+esc(c.name||'—')+'</td>'
+        +'<td style="padding:12px 14px;font-size:12px;color:var(--text-muted);">'+esc(c.phone||'—')+'</td>'
+        +'<td style="padding:12px 14px;font-size:13px;">'+esc(c.service||'—')+'</td>'
+        +'<td style="padding:12px 14px;font-size:12px;color:var(--text-muted);">'+dateStr+' às '+esc(c.time||'—')+'</td>'
+        +'<td style="padding:12px 14px;font-size:12px;color:var(--text-dim);">'+cancelledAtStr+'</td>'
+        +'<td style="padding:12px 14px;">'+byLabel+'</td>'
+        +'<td style="padding:12px 14px;"><button onclick="removeCancelledEntry(\''+c.id+'\')" style="padding:4px 10px;border-radius:6px;border:1px solid rgba(220,38,38,.25);background:none;color:#f87171;font-size:11px;font-weight:600;cursor:pointer;transition:background .15s;" onmouseover="this.style.background=\'rgba(220,38,38,0.1)\'" onmouseout="this.style.background=\'none\'">🗑️</button></td>'
+        +'</tr>';
+    }).join('');
+    el.innerHTML = '<table style="width:100%;border-collapse:collapse;">'
+      +'<thead><tr style="background:var(--bg2);">'
+      +'<th style="padding:11px 14px;text-align:left;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);">Cliente</th>'
+      +'<th style="padding:11px 14px;text-align:left;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);">Telefone</th>'
+      +'<th style="padding:11px 14px;text-align:left;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);">Serviço</th>'
+      +'<th style="padding:11px 14px;text-align:left;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);">Horário</th>'
+      +'<th style="padding:11px 14px;text-align:left;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);">Cancelado em</th>'
+      +'<th style="padding:11px 14px;text-align:left;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);">Por</th>'
+      +'<th style="padding:11px 14px;"></th>'
+      +'</tr></thead><tbody>'+rows+'</tbody></table>';
+  }
+
+  window.filterCancelled = function(){
+    const q = document.getElementById('cancelled-search').value.toLowerCase().trim();
+    const filtered = q
+      ? allCancelled.filter(c=>(c.name||'').toLowerCase().includes(q)||(c.phone||'').includes(q)||(c.service||'').toLowerCase().includes(q))
+      : allCancelled;
+    renderCancelledList(filtered);
+  };
+
+  window.removeCancelledEntry = async function(id){
+    if(!confirm('Remover este registro da lista de cancelados?')) return;
+    try {
+      await deleteDoc(doc(db,'cancelled_appointments', id));
+      showToast('Registro removido!','green');
+    } catch(e){
+      console.error(e);
+      showToast('Erro ao remover','red');
+    }
+  };
+
+  window.clearAllCancelled = async function(){
+    if(!allCancelled.length){ showToast('Lista já está vazia!','green'); return; }
+    if(!confirm('Limpar TODOS os '+allCancelled.length+' registros de cancelados? Esta ação não pode ser desfeita.')) return;
+    try {
+      const batch = [];
+      for(const c of allCancelled) batch.push(deleteDoc(doc(db,'cancelled_appointments',c.id)));
+      await Promise.all(batch);
+      showToast('Lista de cancelados limpa!','green');
+    } catch(e){
+      console.error(e);
+      showToast('Erro ao limpar lista','red');
     }
   };
 </script>
