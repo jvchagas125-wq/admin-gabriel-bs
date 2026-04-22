@@ -2052,7 +2052,7 @@
         +'<td style="padding:12px 14px;font-size:12px;color:var(--text-muted);">'+dateStr+' às '+esc(c.time||'—')+'</td>'
         +'<td style="padding:12px 14px;font-size:12px;color:var(--text-dim);">'+cancelledAtStr+'</td>'
         +'<td style="padding:12px 14px;">'+byLabel+'</td>'
-        +'<td style="padding:12px 14px;"><button onclick="removeCancelledEntry(\''+c.id+'\')" style="padding:4px 10px;border-radius:6px;border:1px solid rgba(220,38,38,.25);background:none;color:#f87171;font-size:11px;font-weight:600;cursor:pointer;transition:background .15s;" onmouseover="this.style.background=\'rgba(220,38,38,0.1)\'" onmouseout="this.style.background=\'none\'">🗑️</button></td>'
+        +'<td style="padding:12px 14px;"><button data-cid="'+c.id+'" onclick="removeCancelledEntry(this.dataset.cid)" style="padding:4px 10px;border-radius:6px;border:1px solid rgba(220,38,38,.25);background:none;color:#f87171;font-size:11px;font-weight:600;cursor:pointer;transition:background .15s;" onmouseover="this.style.background=\'rgba(220,38,38,0.1)\'" onmouseout="this.style.background=\'none\'">🗑️</button></td>'
         +'</tr>';
     }).join('');
     el.innerHTML = '<table style="width:100%;border-collapse:collapse;">'
@@ -2076,13 +2076,19 @@
   };
 
   window.removeCancelledEntry = async function(id){
+    if(!id){ showToast('ID inválido','red'); return; }
     if(!confirm('Remover este registro da lista de cancelados?')) return;
     try {
+      // Remoção otimista: remove da lista local imediatamente
+      allCancelled = allCancelled.filter(c => c.id !== id);
+      updateCancelledBadge();
+      renderCancelledList(allCancelled);
+      // Remove do Firestore
       await deleteDoc(doc(db,'cancelled_appointments', id));
       showToast('Registro removido!','green');
     } catch(e){
-      console.error(e);
-      showToast('Erro ao remover','red');
+      console.error('removeCancelledEntry error:', e);
+      showToast('Erro ao remover: ' + e.message,'red');
     }
   };
 
