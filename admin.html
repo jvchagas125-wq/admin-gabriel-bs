@@ -1165,7 +1165,17 @@
         <div style="display:grid;grid-template-columns:60px 1fr 1fr;gap:10px;margin-bottom:10px;">
           <div><span class="plan-admin-label">Emoji</span><input class="plan-admin-input" id="p-emoji-${i}" value="${esc(p.emoji||'')}" placeholder="🪓" maxlength="4"></div>
           <div><span class="plan-admin-label">Nome do plano</span><input class="plan-admin-input" id="p-name-${i}" value="${esc(p.name||'')}" placeholder="Ex: Lumberjack"></div>
-          <div><span class="plan-admin-label">Preço (R$)</span><input class="plan-admin-input" id="p-price-${i}" value="${esc(p.price||'')}" placeholder="Ex: 80,00"></div>
+          <div><span class="plan-admin-label">Preço atual (R$)</span><input class="plan-admin-input" id="p-price-${i}" value="${esc(p.price||'')}" placeholder="Ex: 59,90"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+          <div>
+            <span class="plan-admin-label">Preço cortado (R$) <span style="color:var(--text-dim);font-weight:400;font-size:10px;">— aparece riscado</span></span>
+            <input class="plan-admin-input" id="p-original-${i}" value="${esc(p.originalPrice||'')}" placeholder="Ex: 70,00">
+          </div>
+          <div>
+            <span class="plan-admin-label">% Desconto <span style="color:var(--text-dim);font-weight:400;font-size:10px;">— ex: 15% OFF</span></span>
+            <input class="plan-admin-input" id="p-discount-${i}" value="${esc(p.discount||'')}" placeholder="Ex: 14">
+          </div>
         </div>
 
         <div style="margin-bottom:10px;">
@@ -1201,7 +1211,7 @@
   }
 
   window.addPlan = function(){
-    adminPlans.push({ id:'plan_'+Date.now(), order:adminPlans.length+1, emoji:'✂️', name:'Novo Plano', price:'0,00', featured:false, mpLink:'', benefits:['Benefício 1'] });
+    adminPlans.push({ id:'plan_'+Date.now(), order:adminPlans.length+1, emoji:'✂️', name:'Novo Plano', price:'0,00', originalPrice:'', discount:'', featured:false, mpLink:'', benefits:['Benefício 1'] });
     renderAdminPlans();
   };
 
@@ -1251,13 +1261,15 @@
     return adminPlans.map((p,i)=>({
       id: p.id||'plan_'+i,
       order: i+1,
-      emoji:    (document.getElementById('p-emoji-'+i)?.value||'').trim(),
-      name:     (document.getElementById('p-name-'+i)?.value||'').trim(),
-      price:    (document.getElementById('p-price-'+i)?.value||'').trim(),
-      mpLink:   (document.getElementById('p-link-'+i)?.value||'').trim(),
-      featured: document.getElementById('p-featured-'+i)?.checked||false,
-      bestValue: document.getElementById('p-bestvalue-'+i)?.checked||false,
-      benefits: collectBenefits(i),
+      emoji:         (document.getElementById('p-emoji-'+i)?.value||'').trim(),
+      name:          (document.getElementById('p-name-'+i)?.value||'').trim(),
+      price:         (document.getElementById('p-price-'+i)?.value||'').trim(),
+      originalPrice: (document.getElementById('p-original-'+i)?.value||'').trim(),
+      discount:      (document.getElementById('p-discount-'+i)?.value||'').trim(),
+      mpLink:        (document.getElementById('p-link-'+i)?.value||'').trim(),
+      featured:      document.getElementById('p-featured-'+i)?.checked||false,
+      bestValue:     document.getElementById('p-bestvalue-'+i)?.checked||false,
+      benefits:      collectBenefits(i),
     }));
   }
 
