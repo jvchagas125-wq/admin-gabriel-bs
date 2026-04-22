@@ -1718,7 +1718,12 @@
     const top30 = sorted.slice(0, 30);
     const listEl = document.getElementById('top30-list');
     if(!listEl) return;
-    if(!top30.length){ listEl.innerHTML='<div style="color:var(--text-dim);font-size:13px;padding:12px 0;">Nenhum agendamento ainda.</div>'; return; }
+    if(!top30.length){
+      listEl.innerHTML='<div style="color:var(--text-dim);font-size:13px;padding:12px 0;">Nenhum agendamento realizado ainda.</div>';
+      // Limpar ranking no Firestore também
+      saveRankingToFirestore([]);
+      return;
+    }
     listEl.innerHTML = '<table style="width:100%;border-collapse:collapse;">'
       +'<thead><tr style="background:var(--bg2);">'
       +'<th style="padding:10px 14px;text-align:left;font-size:11px;color:var(--text-dim);font-weight:700;letter-spacing:1px;">#</th>'
