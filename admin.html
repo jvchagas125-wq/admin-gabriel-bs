@@ -2087,16 +2087,19 @@
     if(!id){ showToast('ID inválido','red'); return; }
     if(!confirm('Remover este registro da lista de cancelados?')) return;
     try {
-      // Remoção otimista: remove da lista local imediatamente
+      // Remove do Firestore PRIMEIRO — se falhar, não remove da tela
+      const ref = doc(db,'cancelled_appointments', id);
+      console.log('Deletando documento:', id, 'ref path:', ref.path);
+      await deleteDoc(ref);
+      console.log('Deletado com sucesso:', id);
+      showToast('Registro removido!','green');
+      // Remoção local após confirmação do Firestore
       allCancelled = allCancelled.filter(c => c.id !== id);
       updateCancelledBadge();
       renderCancelledList(allCancelled);
-      // Remove do Firestore
-      await deleteDoc(doc(db,'cancelled_appointments', id));
-      showToast('Registro removido!','green');
     } catch(e){
-      console.error('removeCancelledEntry error:', e);
-      showToast('Erro ao remover: ' + e.message,'red');
+      console.error('removeCancelledEntry ERRO:', e.code, e.message);
+      showToast('Erro: ' + (e.code||e.message),'red');
     }
   };
 
