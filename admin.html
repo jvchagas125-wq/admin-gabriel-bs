@@ -788,12 +788,19 @@
     try{
       // Salvar no histórico de cancelados antes de deletar
       const cancelId = 'cancel_' + id + '_' + Date.now();
-      await setDoc(doc(db,'cancelled_appointments', cancelId),{
-        ...apt,
-        cancelledAt: new Date().toISOString(),
-        cancelledBy: 'admin',
-        originalId: id,
-      });
+      const record = {
+        name:          apt.name          || '',
+        phone:         apt.phone         || '',
+        service:       apt.service       || '',
+        date:          apt.date          || '',
+        time:          apt.time          || '',
+        status:        apt.status        || '',
+        justification: apt.justification || '',
+        cancelledAt:   new Date().toISOString(),
+        cancelledBy:   'admin',
+        originalId:    id,
+      };
+      await setDoc(doc(db,'cancelled_appointments', cancelId), record);
       await deleteDoc(doc(db,COL,id));
       // Cancela slots bloqueados vinculados a este agendamento
       const blocked=allData.filter(a=>a.status==='Bloqueado'&&a.date===apt.date&&a.phone===apt.phone&&a.blockedBy===apt.time);
@@ -2002,9 +2009,10 @@
     if(cancelledUnsubscribe) return; // já está ouvindo
     el.innerHTML = '<div style="text-align:center;padding:40px 0;"><div class="spinner" style="margin:0 auto;"></div></div>';
     cancelledUnsubscribe = onSnapshot(
-      query(collection(db,'cancelled_appointments'), orderBy('cancelledAt','desc')),
+      collection(db,'cancelled_appointments'),
       snap => {
-        allCancelled = snap.docs.map(d=>({id:d.id,...d.data()}));
+        allCancelled = snap.docs.map(d=>({id:d.id,...d.data()}))
+          .sort((a,b)=> (b.cancelledAt||'').localeCompare(a.cancelledAt||''));
         updateCancelledBadge();
         renderCancelledList(allCancelled);
       },
