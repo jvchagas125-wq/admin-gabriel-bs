@@ -588,8 +588,14 @@
   <!-- ABA SESSÕES -->
   <div id="tab-sessions" style="display:none;">
     <!-- TOP 3 -->
+        <!-- TOP 30 LISTA -->
     <div style="margin-bottom:24px;">
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;background:linear-gradient(135deg,#c9a84c,#f0d78c,#c9a84c);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:14px;">🏆 TOP 3 Clientes</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--gold);margin-bottom:10px;">📊 Ranking Completo — Top 30</div>
+      <div id="top30-list" style="background:var(--bg2);border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,0.06);"></div>
+    </div>
+
+    <div style="margin-bottom:24px;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;background:linear-gradient(135deg,#c9a84c,#f0d78c,#c9a84c);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:14px;">🏆 TOP 30 Clientes</div>
       <div id="top3-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px;">
         <div style="text-align:center;padding:20px 16px;background:var(--bg2);border-radius:12px;border:1px solid rgba(255,215,0,0.3);">
           <div style="font-size:36px;margin-bottom:8px;">🥇</div>
@@ -1646,7 +1652,6 @@
   };
 
   function renderTop3(){
-    // Contar agendamentos por telefone (excluindo Bloqueado)
     const counts = {};
     const names  = {};
     const phones = {};
@@ -1656,18 +1661,59 @@
       if(!names[d]) names[d] = a.name||'—';
       if(!phones[d]) phones[d] = a.phone||'—';
     });
-    // Mesclar com nomes da coleção clients
     allClients.forEach(c=>{
       if(c.digits && c.name){ names[c.digits]=c.name; phones[c.digits]=c.phone||'—'; }
     });
-    const sorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,3);
+    const sorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+
+    // TOP 3 em destaque (cards)
     const medals = ['top1','top2','top3'];
     medals.forEach((id,i)=>{
       const [digits, count] = sorted[i]||['',0];
       document.getElementById(id+'-name').textContent  = digits ? (names[digits]||'—') : '—';
-      document.getElementById(id+'-count').textContent = count ? count+(count===1?' agendamento':' agendamentos') : '—';
+      document.getElementById(id+'-count').textContent = count ? count+(count===1?' agend.':' agend.') : '—';
       document.getElementById(id+'-phone').textContent = digits ? (phones[digits]||'—') : '—';
     });
+
+    // TOP 30 em lista abaixo dos cards
+    const top30 = sorted.slice(0, 30);
+    const listEl = document.getElementById('top30-list');
+    if(!listEl) return;
+    if(!top30.length){ listEl.innerHTML='<div style="color:var(--text-dim);font-size:13px;padding:12px 0;">Nenhum agendamento ainda.</div>'; return; }
+    listEl.innerHTML = '<table style="width:100%;border-collapse:collapse;">'
+      +'<thead><tr style="background:var(--bg2);">'
+      +'<th style="padding:10px 14px;text-align:left;font-size:11px;color:var(--text-dim);font-weight:700;letter-spacing:1px;">#</th>'
+      +'<th style="padding:10px 14px;text-align:left;font-size:11px;color:var(--text-dim);font-weight:700;letter-spacing:1px;">CLIENTE</th>'
+      +'<th style="padding:10px 14px;text-align:left;font-size:11px;color:var(--text-dim);font-weight:700;letter-spacing:1px;">TELEFONE</th>'
+      +'<th style="padding:10px 14px;text-align:center;font-size:11px;color:var(--text-dim);font-weight:700;letter-spacing:1px;">AGEND.</th>'
+      +'</tr></thead><tbody>'
+      + top30.map(([digits, count], i)=>{
+          const pos = i+1;
+          const medal = pos===1?'🥇':pos===2?'🥈':pos===3?'🥉':'';
+          const highlight = pos<=3 ? 'background:rgba(201,168,76,0.06);' : '';
+          return '<tr style="border-bottom:1px solid rgba(255,255,255,0.04);'+highlight+'">'
+            +'<td style="padding:10px 14px;font-size:13px;color:var(--text-muted);">'+medal+(medal?'':pos+'º')+'</td>'
+            +'<td style="padding:10px 14px;font-weight:700;font-size:13px;">'+esc(names[digits]||'—')+'</td>'
+            +'<td style="padding:10px 14px;font-size:12px;color:var(--text-muted);">'+esc(phones[digits]||'—')+'</td>'
+            +'<td style="padding:10px 14px;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--gold);">'+count+'</td>'
+            +'</tr>';
+        }).join('')
+      +'</tbody></table>';
+
+    // Salvar ranking no Firestore para o site do cliente ver
+    saveRankingToFirestore(top30.slice(0,30).map(([digits,count],i)=>({
+      pos: i+1,
+      name: names[digits]||'—',
+      phone: phones[digits]||'—',
+      digits,
+      count,
+    })));
+  }
+
+  async function saveRankingToFirestore(ranking){
+    try {
+      await setDoc(doc(db,'config','ranking'),{ top30: ranking, updatedAt: new Date().toISOString() },{merge:true});
+    } catch(e){ console.warn('saveRanking:',e); }
   }
 
   function renderSessionsList(clients){
@@ -1691,12 +1737,7 @@
         +'<td style="padding:13px 16px;font-size:13px;color:var(--text-muted);">'+esc(c.phone||'—')+'</td>'
         +'<td style="padding:13px 16px;text-align:center;font-family:Bebas Neue,sans-serif;font-size:20px;color:var(--gold);">'+cnt+'</td>'
         +'<td style="padding:13px 16px;font-size:12px;color:var(--text-dim);">'+last+'</td>'
-        +'<td style="padding:13px 16px;">'
-        +'<button data-digits="'+esc(c.digits||'')+'" data-name="'+esc(c.name||'')+'" data-phone="'+esc(c.phone||'')+'"'
-        +' onclick="openClientModal(this.dataset.digits,this.dataset.name,this.dataset.phone)"'
-        +' style="padding:5px 12px;border-radius:6px;border:1px solid var(--gold-border);background:var(--gold-dim);color:var(--gold);font-size:11px;font-weight:700;cursor:pointer;">'
-        +'Ver detalhes</button></td>'
-        +'</tr>';
+        +'<td style="padding:13px 16px;display:flex;gap:6px;">'        +'<button onclick="viewClientDetails(\''+c.digits+'\')" style="padding:5px 10px;border-radius:6px;border:1px solid var(--gold-border);background:var(--gold-dim);color:var(--gold);font-size:11px;font-weight:700;cursor:pointer;">'        +'Ver detalhes</button>'        +'<button onclick="deleteClient(\''+c.digits+'\',\''+esc(c.name||'')+'\')" style="padding:5px 10px;border-radius:6px;border:1px solid rgba(220,38,38,0.3);background:none;color:#f87171;font-size:11px;font-weight:700;cursor:pointer;">'        +'🗑️</button>'        +'</td>'        +'</tr>';
     });
     el.innerHTML='<table style="width:100%;border-collapse:collapse;">'
       +'<thead><tr style="background:var(--bg2);">'
@@ -1896,6 +1937,23 @@
     }
   };
 
+
+  window.deleteClient = async function(digits, name){
+    if(!confirm('Excluir o cliente "'+name+'"? Esta ação não pode ser desfeita.')) return;
+    try {
+      await deleteDoc(doc(db,'clients',digits));
+      // Desativar push_subscribers
+      await setDoc(doc(db,'push_subscribers',digits),{active:false},{merge:true});
+      showToast('Cliente "'+name+'" removido!','green');
+      // Recarregar lista
+      allClients = allClients.filter(c=>c.digits!==digits);
+      renderSessionsList(allClients);
+      renderTop3();
+    } catch(e){
+      console.error(e);
+      showToast('Erro ao excluir cliente','red');
+    }
+  };
 </script>
 
 <!-- Botão instalar PWA Admin -->
