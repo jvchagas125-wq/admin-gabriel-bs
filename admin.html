@@ -131,6 +131,9 @@
       /* Header compacto */
       .header-inner { padding: 10px 12px; }
       .header-logo img { height: 26px; }
+      .admin-hamburger { display: flex !important; }
+      /* Hide tab bar on mobile — use side menu instead */
+      header > div:nth-child(2) { display: none !important; }
       .header-divider { display: none; }
       .admin-user { font-size: 11px; max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
       .logout-btn { padding: 5px 10px; font-size: 11px; }
@@ -311,6 +314,32 @@
         grid-template-columns: 1fr !important;
       }
 
+      /* ── HAMBURGER ADMIN ── */
+      .admin-hamburger {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 5px;
+        width: 34px;
+        height: 34px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 4px;
+        flex-shrink: 0;
+      }
+      .admin-hamburger span {
+        display: block;
+        width: 20px;
+        height: 2px;
+        background: var(--text-muted);
+        border-radius: 2px;
+        transition: all .25s ease;
+      }
+      .admin-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); background: var(--gold); }
+      .admin-hamburger.open span:nth-child(2) { opacity: 0; }
+      .admin-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); background: var(--gold); }
+
       /* ── TABS — scroll horizontal no mobile ── */
       header > div:nth-child(2) {
         overflow-x: auto;
@@ -393,9 +422,42 @@
   </div>
 </div>
 
+<!-- Admin Menu Mobile -->
+<div id="admin-mob-overlay" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.6);backdrop-filter:blur(2px);" onclick="closeAdminMobMenu()"></div>
+<div id="admin-mob-menu" style="position:fixed;top:0;left:0;bottom:0;width:72vw;max-width:260px;z-index:201;background:#111;border-right:1px solid rgba(201,168,76,0.2);transform:translateX(-100%);transition:transform .28s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;overflow-y:auto;">
+  <div style="padding:18px 16px 14px;border-bottom:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;gap:10px;">
+    <img src="https://i.imgur.com/vcPQoRh.png" style="height:28px;object-fit:contain;" onerror="this.style.display='none'">
+    <span style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);background:var(--gold-dim);border:1px solid var(--gold-border);padding:3px 8px;border-radius:20px;">Admin</span>
+  </div>
+  <div style="display:flex;flex-direction:column;padding:8px 0;flex:1;">
+    <button class="admin-mob-item active" data-tab="appointments" onclick="adminMobNav('appointments')" style="display:flex;align-items:center;gap:12px;padding:14px 18px;background:none;border:none;color:var(--text-muted);font-size:14px;font-weight:600;cursor:pointer;text-align:left;font-family:'DM Sans',sans-serif;transition:background .15s,color .15s;">
+      <span style="font-size:18px;width:24px;text-align:center;">📋</span> Agendamentos
+    </button>
+    <button class="admin-mob-item" data-tab="sessions" onclick="adminMobNav('sessions')" style="display:flex;align-items:center;gap:12px;padding:14px 18px;background:none;border:none;color:var(--text-muted);font-size:14px;font-weight:600;cursor:pointer;text-align:left;font-family:'DM Sans',sans-serif;transition:background .15s,color .15s;">
+      <span style="font-size:18px;width:24px;text-align:center;">👥</span> Clientes
+    </button>
+    <button class="admin-mob-item" data-tab="cancelled" onclick="adminMobNav('cancelled')" style="display:flex;align-items:center;gap:12px;padding:14px 18px;background:none;border:none;color:var(--text-muted);font-size:14px;font-weight:600;cursor:pointer;text-align:left;font-family:'DM Sans',sans-serif;transition:background .15s,color .15s;">
+      <span style="font-size:18px;width:24px;text-align:center;">🚫</span> Cancelados <span id="mob-cancelled-badge" style="display:none;background:#dc2626;color:#fff;border-radius:10px;font-size:10px;padding:1px 6px;margin-left:4px;font-weight:700;"></span>
+    </button>
+    <button class="admin-mob-item" data-tab="subscriptions" onclick="adminMobNav('subscriptions')" style="display:flex;align-items:center;gap:12px;padding:14px 18px;background:none;border:none;color:var(--text-muted);font-size:14px;font-weight:600;cursor:pointer;text-align:left;font-family:'DM Sans',sans-serif;transition:background .15s,color .15s;">
+      <span style="font-size:18px;width:24px;text-align:center;">👑</span> Assinaturas
+    </button>
+    <button class="admin-mob-item" data-tab="store" onclick="adminMobNav('store')" style="display:flex;align-items:center;gap:12px;padding:14px 18px;background:none;border:none;color:var(--text-muted);font-size:14px;font-weight:600;cursor:pointer;text-align:left;font-family:'DM Sans',sans-serif;transition:background .15s,color .15s;">
+      <span style="font-size:18px;width:24px;text-align:center;">🛍️</span> Produtos <span id="mob-redemptions-badge" style="display:none;background:#dc2626;color:#fff;border-radius:10px;font-size:10px;padding:1px 6px;margin-left:4px;font-weight:700;"></span>
+    </button>
+    <button class="admin-mob-item" data-tab="settings" onclick="adminMobNav('settings')" style="display:flex;align-items:center;gap:12px;padding:14px 18px;background:none;border:none;color:var(--text-muted);font-size:14px;font-weight:600;cursor:pointer;text-align:left;font-family:'DM Sans',sans-serif;transition:background .15s,color .15s;">
+      <span style="font-size:18px;width:24px;text-align:center;">⚙️</span> Configurações
+    </button>
+  </div>
+</div>
+
+
 <header>
   <div class="header-inner">
     <div class="header-left">
+      <button class="admin-hamburger" id="admin-hamburger" onclick="toggleAdminMobMenu()" aria-label="Menu" style="display:none;">
+        <span></span><span></span><span></span>
+      </button>
       <div class="header-logo"><img src="https://i.imgur.com/vcPQoRh.png" alt="Gabriel Barber Studio" onerror="this.style.display='none'"></div>
       <div class="header-divider"></div>
       <div class="admin-badge">Painel Admin</div>
@@ -2562,6 +2624,66 @@
       showToast('Configurações GB$ salvas!','green');
     } catch(e){ showToast('Erro: '+e.message,'red'); }
   };
+
+
+  // ═══════════════════════════════════════
+  // MENU MÓVEL ADMIN
+  // ═══════════════════════════════════════
+  window.toggleAdminMobMenu = function(){
+    const menu = document.getElementById('admin-mob-menu');
+    const overlay = document.getElementById('admin-mob-overlay');
+    const btn = document.getElementById('admin-hamburger');
+    const isOpen = menu.style.transform === 'translateX(0px)' || menu.style.transform === 'translateX(0)';
+    menu.style.transform = isOpen ? 'translateX(-100%)' : 'translateX(0)';
+    overlay.style.display = isOpen ? 'none' : 'block';
+    if(btn) btn.classList.toggle('open', !isOpen);
+  };
+
+  window.closeAdminMobMenu = function(){
+    const menu = document.getElementById('admin-mob-menu');
+    const overlay = document.getElementById('admin-mob-overlay');
+    const btn = document.getElementById('admin-hamburger');
+    if(menu) menu.style.transform = 'translateX(-100%)';
+    if(overlay) overlay.style.display = 'none';
+    if(btn) btn.classList.remove('open');
+  };
+
+  window.adminMobNav = function(tab){
+    closeAdminMobMenu();
+    switchTab(tab);
+    // Atualizar item ativo no menu
+    document.querySelectorAll('.admin-mob-item').forEach(b=>{
+      const isActive = b.dataset.tab === tab;
+      b.style.color = isActive ? 'var(--gold)' : 'var(--text-muted)';
+      b.style.background = isActive ? 'rgba(201,168,76,0.08)' : 'none';
+    });
+  };
+
+  // Sincronizar badge de cancelados no menu móvel
+  const origUpdateBadge = window.updateCancelledBadge;
+  function syncMobBadges(){
+    const cb = document.getElementById('cancelled-badge');
+    const mobCb = document.getElementById('mob-cancelled-badge');
+    if(cb && mobCb){
+      mobCb.textContent = cb.textContent;
+      mobCb.style.display = cb.style.display;
+    }
+    const rb = document.getElementById('redemptions-badge');
+    const mobRb = document.getElementById('mob-redemptions-badge');
+    if(rb && mobRb){
+      mobRb.textContent = rb.textContent;
+      mobRb.style.display = rb.style.display;
+    }
+  }
+  // Observe badge changes
+  setTimeout(()=>{
+    const obs = new MutationObserver(syncMobBadges);
+    ['cancelled-badge','redemptions-badge'].forEach(id=>{
+      const el = document.getElementById(id);
+      if(el) obs.observe(el, {attributes:true, childList:true, characterData:true});
+    });
+  }, 2000);
+
 
 </script>
 
