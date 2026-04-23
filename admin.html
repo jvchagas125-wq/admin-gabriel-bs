@@ -2049,6 +2049,23 @@
     apts.forEach(a=>{ svcCount[a.service]=(svcCount[a.service]||0)+1; });
     const favSvc = Object.entries(svcCount).sort((a,b)=>b[1]-a[1])[0];
 
+    // Buscar data de nascimento do cliente
+    const clientData = allClients.find(c=>c.digits===digits);
+    let clientBirth = '';
+    if(clientData && clientData.birthdate){
+      try {
+        const [yr,mo,dy] = clientData.birthdate.split('-');
+        clientBirth = dy+'/'+mo+'/'+yr;
+        // Calcular idade
+        const today2 = new Date();
+        const born = new Date(clientData.birthdate);
+        let age = today2.getFullYear() - born.getFullYear();
+        const mDiff = today2.getMonth() - born.getMonth();
+        if(mDiff < 0 || (mDiff===0 && today2.getDate()<born.getDate())) age--;
+        clientBirth += ' ('+age+' anos)';
+      } catch(e){}
+    }
+
     // Buscar saldo GB$ e valor da moeda
     let gbBalance = 0;
     let coinValue = 0.25;
@@ -2081,6 +2098,7 @@
       +'<div style="background:var(--bg3);border-radius:10px;padding:14px;margin-bottom:12px;">'
       +'<div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:6px;">Informações</div>'
       +'<div style="font-size:13px;margin-bottom:4px;"><span style="color:var(--text-muted);">Telefone:</span> <strong>'+esc(phone||'—')+'</strong></div>'
+      +(clientBirth?'<div style="font-size:13px;margin-bottom:4px;"><span style="color:var(--text-muted);">Nascimento:</span> <strong>'+clientBirth+'</strong></div>':'')
       +(favSvc?'<div style="font-size:13px;"><span style="color:var(--text-muted);">Serviço favorito:</span> <strong>'+esc(favSvc[0])+'</strong> ('+favSvc[1]+'x)</div>':'')
       +'</div>'
       +(upcoming.length?'<div style="background:var(--bg3);border-radius:10px;padding:14px;">'
