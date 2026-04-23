@@ -353,6 +353,7 @@
     <button class="tab-btn" onclick="switchTab('sessions')">👥 Clientes</button>
     <button class="tab-btn" onclick="switchTab('cancelled')">🚫 Cancelados <span id="cancelled-badge" style="display:none;background:#dc2626;color:#fff;border-radius:10px;font-size:10px;padding:1px 6px;margin-left:4px;font-weight:700;"></span></button>
     <button class="tab-btn" onclick="switchTab('subscriptions')">👑 Assinaturas</button>
+    <button class="tab-btn" onclick="switchTab('store')">🛍️ Produtos <span id="redemptions-badge" style="display:none;background:#dc2626;color:#fff;border-radius:10px;font-size:10px;padding:1px 6px;margin-left:4px;font-weight:700;"></span></button>
     <button class="tab-btn" onclick="switchTab('settings')">⚙️ Configurações</button>
   </div>
 </header>
@@ -452,6 +453,33 @@
       <div style="text-align:center;padding:40px 0;"><div class="spinner" style="margin:0 auto;"></div></div>
     </div>
   </div>
+
+
+  <!-- ABA PRODUTOS / LOJA GB$ -->
+  <div id="tab-store" style="display:none;">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;background:linear-gradient(135deg,#c9a84c,#f0d78c,#c9a84c);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">🛍️ Produtos & Cupons</div>
+      <button onclick="addStoreProduct()" class="export-btn">+ Adicionar produto</button>
+    </div>
+
+    <!-- Resgates pendentes -->
+    <div id="redemptions-section" style="margin-bottom:28px;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#f87171;margin-bottom:10px;">🔔 Resgates de Clientes</div>
+      <div id="redemptions-list" style="background:var(--bg2);border-radius:12px;border:1px solid rgba(255,255,255,0.06);overflow:hidden;">
+        <div style="padding:20px;text-align:center;color:var(--text-dim);font-size:13px;">Nenhum resgate ainda.</div>
+      </div>
+    </div>
+
+    <!-- Produtos cadastrados -->
+    <div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--gold);margin-bottom:14px;">📦 Produtos Cadastrados</div>
+      <div id="store-products-admin" style="display:flex;flex-direction:column;gap:12px;">
+        <div style="text-align:center;padding:32px;color:var(--text-dim);">Carregando...</div>
+      </div>
+    </div>
+  </div>
+
+
 
   <!-- ABA CONFIGURAÇÕES -->
   <div id="tab-settings" style="display:none;">
@@ -1302,7 +1330,7 @@
   };
 
   window.switchTab = function(tab){
-    ['appointments','sessions','cancelled','subscriptions','settings'].forEach(t=>{
+    ['appointments','sessions','cancelled','subscriptions','gbstore','store','settings'].forEach(t=>{
       const el=document.getElementById('tab-'+t);
       if(el) el.style.display=t===tab?'block':'none';
     });
@@ -1313,11 +1341,13 @@
       else if(tab==='sessions' && txt.startsWith('👥')) b.classList.add('active');
       else if(tab==='cancelled' && txt.startsWith('🚫')) b.classList.add('active');
       else if(tab==='subscriptions' && txt.startsWith('👑')) b.classList.add('active');
+      else if((tab==='store'||tab==='gbstore') && (txt.includes('🪙')||txt.includes('🛍️'))) b.classList.add('active');
       else if(tab==='settings' && txt.startsWith('⚙️')) b.classList.add('active');
     });
     if(tab==='subscriptions') loadSubscriptions();
     if(tab==='sessions') loadSessions();
     if(tab==='cancelled') loadCancelledTab();
+    if(tab==='store'||tab==='gbstore') loadStoreAdmin();
   };
 
   window.addEventListener("DOMContentLoaded",()=>{
@@ -2152,6 +2182,223 @@
       loadCancelledTab();
     }
   };
+
+  // ═══════════════════════════════════════
+  // ADMIN — SISTEMA GB$ / LOJA
+  // ═══════════════════════════════════════
+  let adminStoreProducts = [];
+  let storeUnsubAdmin = null;
+  let redemptionsUnsubAdmin = null;
+
+  function loadStoreAdmin(){
+    if(storeUnsubAdmin) return;
+
+    // Escuta produtos
+    storeUnsubAdmin = onSnapshot(collection(db,'store_products'), snap=>{
+      adminStoreProducts = snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(a.cost||0)-(b.cost||0));
+      renderAdminStoreProducts();
+    });
+
+    // Escuta resgates
+    if(redemptionsUnsubAdmin) redemptionsUnsubAdmin();
+    redemptionsUnsubAdmin = onSnapshot(
+      query(collection(db,'redemptions'), orderBy('redeemedAt','desc')),
+      snap=>{
+        const items = snap.docs.map(d=>({id:d.id,...d.data()}));
+        updateRedemptionsBadge(items);
+        renderRedemptionsList(items);
+      }, ()=>{}
+    );
+  }
+
+  function updateRedemptionsBadge(items){
+    const pending = items.filter(r=>r.status==='pending').length;
+    const badge = document.getElementById('redemptions-badge');
+    if(!badge) return;
+    if(pending>0){ badge.textContent=pending; badge.style.display='inline'; }
+    else badge.style.display='none';
+  }
+
+  function renderRedemptionsList(items){
+    const el = document.getElementById('redemptions-list');
+    if(!el) return;
+    if(!items.length){
+      el.innerHTML='<div style="padding:20px;text-align:center;color:var(--text-dim);font-size:13px;">Nenhum resgate ainda.</div>';
+      return;
+    }
+    el.innerHTML='<table style="width:100%;border-collapse:collapse;">'
+      +'<thead><tr style="background:var(--bg2);">'
+      +'<th style="padding:10px 14px;text-align:left;font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">Cliente</th>'
+      +'<th style="padding:10px 14px;text-align:left;font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">Produto</th>'
+      +'<th style="padding:10px 14px;text-align:center;font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">Custo</th>'
+      +'<th style="padding:10px 14px;text-align:left;font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">Data</th>'
+      +'<th style="padding:10px 14px;text-align:left;font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">Status</th>'
+      +'<th style="padding:10px 14px;"></th>'
+      +'</tr></thead><tbody>'
+      +items.map(r=>{
+        const dateStr = r.redeemedAt ? new Date(r.redeemedAt).toLocaleString('pt-BR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : '—';
+        const statusBadge = r.status==='pending'
+          ? '<span style="background:rgba(234,179,8,0.15);color:#fde047;border:1px solid rgba(234,179,8,0.3);border-radius:10px;padding:2px 8px;font-size:10px;font-weight:700;">Pendente</span>'
+          : '<span style="background:var(--green-dim);color:#4ade80;border:1px solid rgba(22,163,74,.3);border-radius:10px;padding:2px 8px;font-size:10px;font-weight:700;">Entregue</span>';
+        return '<tr style="border-bottom:1px solid rgba(255,255,255,0.04);">'
+          +'<td style="padding:11px 14px;font-weight:700;font-size:13px;">'+esc(r.clientName||'—')+'<br><span style="font-size:11px;color:var(--text-dim);font-weight:400;">'+esc(r.clientPhone||'')+'</span></td>'
+          +'<td style="padding:11px 14px;font-size:13px;">'+esc(r.productName||'—')+'</td>'
+          +'<td style="padding:11px 14px;text-align:center;font-family:Bebas Neue,sans-serif;font-size:18px;color:var(--gold);">'+esc(String(r.productCost||0))+' GB$</td>'
+          +'<td style="padding:11px 14px;font-size:12px;color:var(--text-muted);">'+dateStr+'</td>'
+          +'<td style="padding:11px 14px;">'+statusBadge+'</td>'
+          +'<td style="padding:11px 14px;display:flex;gap:6px;">'
+            +(r.status==='pending'?'<button onclick="markRedemptionDelivered(''+r.id+'')" style="padding:4px 10px;border-radius:6px;border:1px solid rgba(22,163,74,.3);background:none;color:#4ade80;font-size:11px;font-weight:600;cursor:pointer;">✓ Entregar</button>':'')
+            +'<button onclick="deleteRedemption(''+r.id+'')" style="padding:4px 10px;border-radius:6px;border:1px solid rgba(220,38,38,.25);background:none;color:#f87171;font-size:11px;font-weight:600;cursor:pointer;">🗑️</button>'
+          +'</td>'
+          +'</tr>';
+      }).join('')
+      +'</tbody></table>';
+  }
+
+  window.markRedemptionDelivered = async function(id){
+    try {
+      await setDoc(doc(db,'redemptions',id),{status:'delivered'},{merge:true});
+      showToast('Resgate marcado como entregue!','green');
+    } catch(e){ showToast('Erro: '+e.message,'red'); }
+  };
+
+  window.deleteRedemption = async function(id){
+    if(!confirm('Remover este registro de resgate?')) return;
+    try { await deleteDoc(doc(db,'redemptions',id)); showToast('Removido!','green'); }
+    catch(e){ showToast('Erro: '+e.message,'red'); }
+  };
+
+  function renderAdminStoreProducts(){
+    const el = document.getElementById('store-products-admin');
+    if(!el) return;
+    if(!adminStoreProducts.length){
+      el.innerHTML='<div style="text-align:center;padding:32px;color:var(--text-dim);">Nenhum produto cadastrado. Clique em "+ Adicionar produto".</div>';
+      return;
+    }
+    el.innerHTML = adminStoreProducts.map((p,i)=>`
+      <div style="background:var(--bg2);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+          <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;">
+            ${p.imageUrl?`<img src="${p.imageUrl}" style="width:48px;height:48px;object-fit:contain;border-radius:8px;flex-shrink:0;" onerror="this.style.display='none'">`:`<div style="width:48px;height:48px;border-radius:8px;background:rgba(255,255,255,0.04);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;">${p.emoji||'🎁'}</div>`}
+            <div style="min-width:0;">
+              <div style="font-weight:700;font-size:14px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(p.name||'—')}</div>
+              <div style="font-size:12px;color:var(--text-dim);">${esc(p.category||'Geral')} • <span style="color:var(--gold);font-weight:700;">${p.cost||0} GB$</span></div>
+            </div>
+          </div>
+          <div style="display:flex;gap:6px;flex-shrink:0;">
+            <button onclick="editStoreProduct('${p.id}')" style="padding:5px 12px;border-radius:7px;border:1px solid var(--gold-border);background:var(--gold-dim);color:var(--gold);font-size:11px;font-weight:700;cursor:pointer;">✏️ Editar</button>
+            <button onclick="deleteStoreProduct('${p.id}','${esc(p.name||'')}')" style="padding:5px 10px;border-radius:7px;border:1px solid rgba(220,38,38,.25);background:none;color:#f87171;font-size:11px;font-weight:700;cursor:pointer;">🗑️</button>
+            <label style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-muted);cursor:pointer;">
+              <input type="checkbox" ${p.active!==false?'checked':''} onchange="toggleStoreProductActive('${p.id}',this.checked)" style="accent-color:var(--gold);width:15px;height:15px;"> Ativo
+            </label>
+          </div>
+        </div>
+      </div>`).join('');
+  }
+
+  // Modal de edição/criação de produto
+  window.addStoreProduct = function(){ openStoreProductModal(null); };
+
+  window.editStoreProduct = function(id){
+    const p = adminStoreProducts.find(x=>x.id===id);
+    if(p) openStoreProductModal(p);
+  };
+
+  function openStoreProductModal(product){
+    const isNew = !product;
+    const p = product || {name:'',cost:0,category:'',imageUrl:'',emoji:'🎁',description:'',active:true};
+    // Remove existing modal
+    const existing = document.getElementById('store-product-modal');
+    if(existing) existing.remove();
+
+    const modal = document.createElement('div');
+    modal.id = 'store-product-modal';
+    modal.style.cssText='position:fixed;inset:0;z-index:400;background:rgba(0,0,0,0.8);display:flex;align-items:center;justify-content:center;';
+    modal.innerHTML=`<div style="width:100%;max-width:480px;margin:16px;background:#1a1a1a;border:1px solid var(--gold-border);border-radius:16px;padding:28px;box-shadow:0 24px 80px rgba(0,0,0,.8);animation:slideUp .3s ease-out;max-height:90vh;overflow-y:auto;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--gold);">${isNew?'Novo Produto':'Editar Produto'}</div>
+        <button onclick="document.getElementById('store-product-modal').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer;">✕</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div>
+          <label class="plan-admin-label">Nome do produto / cupom</label>
+          <input class="plan-admin-input" id="sp-name" value="${esc(p.name||'')}" placeholder="Ex: Desconto 10% no corte">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div>
+            <label class="plan-admin-label">Custo em GB$</label>
+            <input type="number" class="plan-admin-input" id="sp-cost" value="${p.cost||0}" min="1" placeholder="Ex: 3">
+          </div>
+          <div>
+            <label class="plan-admin-label">Emoji (ícone)</label>
+            <input class="plan-admin-input" id="sp-emoji" value="${esc(p.emoji||'🎁')}" maxlength="4" placeholder="🎁">
+          </div>
+        </div>
+        <div>
+          <label class="plan-admin-label">Categoria (para filtro)</label>
+          <input class="plan-admin-input" id="sp-category" value="${esc(p.category||'')}" placeholder="Ex: Cupom, Produto, Serviço">
+        </div>
+        <div>
+          <label class="plan-admin-label">Link da imagem (Imgur)</label>
+          <input class="plan-admin-input" id="sp-image" value="${esc(p.imageUrl||'')}" placeholder="https://i.imgur.com/XXXXXX.png">
+        </div>
+        <div>
+          <label class="plan-admin-label">Descrição (opcional)</label>
+          <input class="plan-admin-input" id="sp-desc" value="${esc(p.description||'')}" placeholder="Detalhes do produto ou cupom">
+        </div>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-muted);cursor:pointer;">
+          <input type="checkbox" id="sp-active" ${p.active!==false?'checked':''} style="accent-color:var(--gold);width:16px;height:16px;"> Ativo (visível para clientes)
+        </label>
+        <button onclick="saveStoreProduct('${isNew?'':p.id}')" style="width:100%;padding:13px;border-radius:10px;border:none;background:var(--gold);color:#111;font-family:'DM Sans',sans-serif;font-weight:700;font-size:15px;cursor:pointer;margin-top:4px;">
+          💾 ${isNew?'Cadastrar Produto':'Salvar Alterações'}
+        </button>
+      </div>
+    </div>`;
+    document.body.appendChild(modal);
+  }
+
+  window.saveStoreProduct = async function(id){
+    const data = {
+      name:        (document.getElementById('sp-name')?.value||'').trim(),
+      cost:        parseInt(document.getElementById('sp-cost')?.value)||1,
+      emoji:       (document.getElementById('sp-emoji')?.value||'🎁').trim(),
+      category:    (document.getElementById('sp-category')?.value||'Geral').trim(),
+      imageUrl:    (document.getElementById('sp-image')?.value||'').trim(),
+      description: (document.getElementById('sp-desc')?.value||'').trim(),
+      active:      document.getElementById('sp-active')?.checked!==false,
+      updatedAt:   new Date().toISOString(),
+    };
+    if(!data.name){ showToast('Digite o nome do produto','red'); return; }
+    try {
+      if(id) await setDoc(doc(db,'store_products',id), data, {merge:true});
+      else    await setDoc(doc(db,'store_products','prod_'+Date.now()), {...data, createdAt:new Date().toISOString()});
+      document.getElementById('store-product-modal')?.remove();
+      showToast(id?'Produto atualizado!':'Produto cadastrado!','green');
+    } catch(e){ showToast('Erro: '+e.message,'red'); }
+  };
+
+  window.deleteStoreProduct = async function(id, name){
+    if(!confirm('Excluir o produto "'+name+'"?')) return;
+    try { await deleteDoc(doc(db,'store_products',id)); showToast('Produto removido!','green'); }
+    catch(e){ showToast('Erro: '+e.message,'red'); }
+  };
+
+  window.toggleStoreProductActive = async function(id, active){
+    try { await setDoc(doc(db,'store_products',id),{active},{merge:true}); }
+    catch(e){ showToast('Erro ao atualizar','red'); }
+  };
+
+
+  // ═══════════════════════════════════════
+  // GB$ LOJA — ADMIN
+  // ═══════════════════════════════════════
+  let gbAdminItems = [];
+  let gbRedeemsUnsubscribe = null;
+  let gbStoreAdminUnsubscribe = null;
+;
+;
+;
+
 </script>
 
 <!-- Botão instalar PWA Admin -->
