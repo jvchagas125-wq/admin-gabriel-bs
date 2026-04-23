@@ -457,6 +457,27 @@
 
   <!-- ABA PRODUTOS / LOJA GB$ -->
   <div id="tab-store" style="display:none;">
+
+    <!-- Configuração GB$ -->
+    <div class="cfg-card" style="margin-bottom:24px;">
+      <div class="cfg-title">🪙 Configurações GB$</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px;">
+        <div>
+          <span class="plan-admin-label">Valor da moeda (R$)</span>
+          <input class="plan-admin-input" id="gb-coin-value" placeholder="Ex: 0.25" value="0.25">
+        </div>
+        <div>
+          <span class="plan-admin-label">Link da imagem da moeda (Imgur)</span>
+          <input class="plan-admin-input" id="gb-coin-image" placeholder="https://i.imgur.com/XXXXXXX.jpeg" value="https://i.imgur.com/FzLPpDt.jpeg">
+        </div>
+      </div>
+      <div style="margin-top:10px;">
+        <span class="plan-admin-label">Texto explicativo (aparece abaixo do saldo)</span>
+        <input class="plan-admin-input" id="gb-sub-text" value="Cada agendamento concluído ganha 1 moeda GB$ (igual a R$0,25 centavos).">
+      </div>
+      <button class="cfg-save-btn" onclick="saveGBConfig()" style="margin-top:12px;max-width:240px;">💾 Salvar Configurações GB$</button>
+    </div>
+
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px;">
       <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;background:linear-gradient(135deg,#c9a84c,#f0d78c,#c9a84c);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">🛍️ Produtos & Cupons</div>
       <button onclick="addStoreProduct()" class="export-btn">+ Adicionar produto</button>
@@ -805,8 +826,38 @@
       const justifyCell = apt.justification
         ? '<td style="max-width:200px;"><span style="display:inline-block;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.25);border-radius:6px;padding:3px 8px;font-size:11px;color:#f0d78c;" title="'+esc(apt.justification)+'">'+esc(apt.justification.length>40?apt.justification.slice(0,40)+'...':apt.justification)+'</span></td>'
         : '<td style="color:var(--text-dim);font-size:12px;">—</td>';
-      return '<tr><td><strong>'+esc(apt.name)+'</strong></td><td style="color:var(--text-muted)">'+esc(apt.phone)+'</td><td>'+esc(apt.service)+'</td><td>'+fmtDate+'</td><td style="font-family:Bebas Neue,sans-serif;font-size:15px;color:var(--gold)">'+esc(apt.time)+'</td><td><span class="badge '+badgeClass+'">'+badgeLabel+'</span></td>'+justifyCell+'<td><button class="del-btn" onclick="deleteApt(\''+apt.id+'\')">Cancelar</button></td></tr>';
+      const alreadyDone = apt.done === true;
+      const concludeBtn = (st==='passado'||st==='hoje') && !alreadyDone
+        ? '<button data-aid="'+apt.id+'" data-phone="'+(apt.phone||'')+'" data-name="'+(apt.name||'')+'" onclick="concludeApt(this)" style="padding:4px 10px;border-radius:6px;border:1px solid rgba(22,163,74,.3);background:none;color:#4ade80;font-size:11px;font-weight:600;cursor:pointer;margin-right:4px;" title="Marcar como concluído e dar 1 GB$ ao cliente">✅ Concluído</button>'
+        : (alreadyDone ? '<span style="font-size:11px;color:#4ade80;font-weight:600;">✅ Concluído</span>&nbsp;' : '');
+      return '<tr><td><strong>'+esc(apt.name)+'</strong></td><td style="color:var(--text-muted)">'+esc(apt.phone)+'</td><td>'+esc(apt.service)+'</td><td>'+fmtDate+'</td><td style="font-family:Bebas Neue,sans-serif;font-size:15px;color:var(--gold)">'+esc(apt.time)+'</td><td><span class="badge '+badgeClass+'">'+badgeLabel+'</span></td>'+justifyCell+'<td style="white-space:nowrap;">'+concludeBtn+'<button class="del-btn" onclick="deleteApt(\''+apt.id+'\')">Cancelar</button></td></tr>';
     }).join("");
+  };
+
+  window.concludeApt = async function(btn){
+    const id    = btn.dataset.aid;
+    const phone = btn.dataset.phone;
+    const name  = btn.dataset.name;
+    if(!id || !phone) return;
+    if(!confirm('Marcar atendimento de "'+name+'" como concluído e dar 1 GB$ ao cliente?')) return;
+    const digits = phone.replace(/\D/g,'');
+    try {
+      // Marcar agendamento como concluído
+      await setDoc(doc(db,COL,id),{done:true},{merge:true});
+      // Adicionar 1 GB$ à carteira do cliente
+      const walRef = doc(db,'wallets',digits);
+      const walSnap = await getDoc(walRef);
+      const cur = walSnap.exists() ? (walSnap.data().balance||0) : 0;
+      await setDoc(walRef,{
+        balance: cur + 1,
+        phone, digits,
+        updatedAt: new Date().toISOString(),
+      },{merge:true});
+      showToast('Atendimento concluído! +1 GB$ para '+name,'green');
+    } catch(e){
+      console.error(e);
+      showToast('Erro: '+e.message,'red');
+    }
   };
 
   window.deleteApt = async function(id){
@@ -1347,7 +1398,7 @@
     if(tab==='subscriptions') loadSubscriptions();
     if(tab==='sessions') loadSessions();
     if(tab==='cancelled') loadCancelledTab();
-    if(tab==='store'||tab==='gbstore') loadStoreAdmin();
+    if(tab==='store'||tab==='gbstore'){ loadStoreAdmin(); loadGBConfig(); }
   };
 
   window.addEventListener("DOMContentLoaded",()=>{
@@ -2398,6 +2449,31 @@
 ;
 ;
 ;
+
+
+  // ═══════════════════════════════════════
+  // CONFIGURAÇÕES GB$ — ADMIN
+  // ═══════════════════════════════════════
+  async function loadGBConfig(){
+    try {
+      const snap = await getDoc(doc(db,'config','gb_store'));
+      if(!snap.exists()) return;
+      const d = snap.data();
+      if(d.coinValue) { const el=document.getElementById('gb-coin-value'); if(el) el.value=d.coinValue; }
+      if(d.coinImage) { const el=document.getElementById('gb-coin-image'); if(el) el.value=d.coinImage; }
+      if(d.subText)   { const el=document.getElementById('gb-sub-text');   if(el) el.value=d.subText; }
+    } catch(e){ console.warn('loadGBConfig:',e); }
+  }
+
+  window.saveGBConfig = async function(){
+    const coinValue = (document.getElementById('gb-coin-value')?.value||'0.25').trim();
+    const coinImage = (document.getElementById('gb-coin-image')?.value||'').trim();
+    const subText   = (document.getElementById('gb-sub-text')?.value||'').trim();
+    try {
+      await setDoc(doc(db,'config','gb_store'),{ coinValue, coinImage, subText },{merge:true});
+      showToast('Configurações GB$ salvas!','green');
+    } catch(e){ showToast('Erro: '+e.message,'red'); }
+  };
 
 </script>
 
