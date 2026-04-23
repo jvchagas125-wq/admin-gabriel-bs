@@ -2247,8 +2247,8 @@
           +'<td style="padding:11px 14px;font-size:12px;color:var(--text-muted);">'+dateStr+'</td>'
           +'<td style="padding:11px 14px;">'+statusBadge+'</td>'
           +'<td style="padding:11px 14px;display:flex;gap:6px;">'
-            +(r.status==='pending'?'<button onclick="markRedemptionDelivered(''+r.id+'')" style="padding:4px 10px;border-radius:6px;border:1px solid rgba(22,163,74,.3);background:none;color:#4ade80;font-size:11px;font-weight:600;cursor:pointer;">✓ Entregar</button>':'')
-            +'<button onclick="deleteRedemption(''+r.id+'')" style="padding:4px 10px;border-radius:6px;border:1px solid rgba(220,38,38,.25);background:none;color:#f87171;font-size:11px;font-weight:600;cursor:pointer;">🗑️</button>'
+            +(r.status==='pending'?'<button data-rid="'+r.id+'" onclick="markRedemptionDelivered(this.dataset.rid)" style="padding:4px 10px;border-radius:6px;border:1px solid rgba(22,163,74,.3);background:none;color:#4ade80;font-size:11px;font-weight:600;cursor:pointer;">✓ Entregar</button>':'')
+            +'<button data-rid="'+r.id+'" onclick="deleteRedemption(this.dataset.rid)" style="padding:4px 10px;border-radius:6px;border:1px solid rgba(220,38,38,.25);background:none;color:#f87171;font-size:11px;font-weight:600;cursor:pointer;">🗑️</button>'
           +'</td>'
           +'</tr>';
       }).join('')
