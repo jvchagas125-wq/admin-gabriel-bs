@@ -310,6 +310,63 @@
       .svc-info-grid {
         grid-template-columns: 1fr !important;
       }
+
+      /* ── TABS — scroll horizontal no mobile ── */
+      header > div:nth-child(2) {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        flex-wrap: nowrap !important;
+        padding-bottom: 2px;
+      }
+      header > div:nth-child(2)::-webkit-scrollbar { display: none; }
+      .tab-btn {
+        padding: 8px 10px;
+        font-size: 11px;
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+
+      /* ── TOP 3 GRID — empilha no mobile ── */
+      #top3-grid {
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+      }
+
+      /* ── TABELAS — scroll horizontal ── */
+      .table-wrap, #gb-redeems-list, #redemptions-list {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+      }
+      table { min-width: 600px; }
+
+      /* ── PRODUTOS: resgates e lista ── */
+      #store-products-admin .plan-admin-card {
+        padding: 12px !important;
+      }
+      /* Grid 2 colunas -> 1 coluna no mobile */
+      .plan-admin-card [style*="grid-template-columns:1fr 1fr"],
+      .plan-admin-card [style*="grid-template-columns: 1fr 1fr"] {
+        grid-template-columns: 1fr !important;
+      }
+
+      /* ── REVENUE CARDS ── */
+      #revenue-block .stats-grid-inner {
+        grid-template-columns: 1fr !important;
+      }
+
+      /* ── MODAL CLIENTE — full width ── */
+      #client-modal > div {
+        margin: 8px !important;
+        max-height: 90vh !important;
+      }
+
+      /* ── GB$ CONFIG — empilha ── */
+      .cfg-card [style*="grid-template-columns:1fr 1fr"],
+      .cfg-card [style*="grid-template-columns: 1fr 1fr"] {
+        grid-template-columns: 1fr !important;
+      }
+
     }
   </style>
 </head>
@@ -2308,33 +2365,33 @@
       el.innerHTML='<div style="padding:20px;text-align:center;color:var(--text-dim);font-size:13px;">Nenhum resgate ainda.</div>';
       return;
     }
-    el.innerHTML='<table style="width:100%;border-collapse:collapse;">'
-      +'<thead><tr style="background:var(--bg2);">'
-      +'<th style="padding:10px 14px;text-align:left;font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">Cliente</th>'
-      +'<th style="padding:10px 14px;text-align:left;font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">Produto</th>'
-      +'<th style="padding:10px 14px;text-align:center;font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">Custo</th>'
-      +'<th style="padding:10px 14px;text-align:left;font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">Data</th>'
-      +'<th style="padding:10px 14px;text-align:left;font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">Status</th>'
-      +'<th style="padding:10px 14px;"></th>'
-      +'</tr></thead><tbody>'
-      +items.map(r=>{
-        const dateStr = r.redeemedAt ? new Date(r.redeemedAt).toLocaleString('pt-BR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : '—';
-        const statusBadge = r.status==='pending'
-          ? '<span style="background:rgba(234,179,8,0.15);color:#fde047;border:1px solid rgba(234,179,8,0.3);border-radius:10px;padding:2px 8px;font-size:10px;font-weight:700;">Pendente</span>'
-          : '<span style="background:var(--green-dim);color:#4ade80;border:1px solid rgba(22,163,74,.3);border-radius:10px;padding:2px 8px;font-size:10px;font-weight:700;">Entregue</span>';
-        return '<tr style="border-bottom:1px solid rgba(255,255,255,0.04);">'
-          +'<td style="padding:11px 14px;font-weight:700;font-size:13px;">'+esc(r.clientName||'—')+'<br><span style="font-size:11px;color:var(--text-dim);font-weight:400;">'+esc(r.clientPhone||'')+'</span></td>'
-          +'<td style="padding:11px 14px;font-size:13px;">'+esc(r.productName||'—')+'</td>'
-          +'<td style="padding:11px 14px;text-align:center;font-family:Bebas Neue,sans-serif;font-size:18px;color:var(--gold);">'+esc(String(r.productCost||0))+' GB$</td>'
-          +'<td style="padding:11px 14px;font-size:12px;color:var(--text-muted);">'+dateStr+'</td>'
-          +'<td style="padding:11px 14px;">'+statusBadge+'</td>'
-          +'<td style="padding:11px 14px;display:flex;gap:6px;">'
-            +(r.status==='pending'?'<button data-rid="'+r.id+'" onclick="markRedemptionDelivered(this.dataset.rid)" style="padding:4px 10px;border-radius:6px;border:1px solid rgba(22,163,74,.3);background:none;color:#4ade80;font-size:11px;font-weight:600;cursor:pointer;">✓ Entregar</button>':'')
-            +'<button data-rid="'+r.id+'" onclick="deleteRedemption(this.dataset.rid)" style="padding:4px 10px;border-radius:6px;border:1px solid rgba(220,38,38,.25);background:none;color:#f87171;font-size:11px;font-weight:600;cursor:pointer;">🗑️</button>'
-          +'</td>'
-          +'</tr>';
-      }).join('')
-      +'</tbody></table>';
+    el.innerHTML = items.map(r=>{
+      const dateStr = r.redeemedAt ? new Date(r.redeemedAt).toLocaleString('pt-BR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : '—';
+      const isPending = r.status==='pending';
+      const statusBadge = isPending
+        ? '<span style="background:rgba(234,179,8,0.15);color:#fde047;border:1px solid rgba(234,179,8,0.3);border-radius:10px;padding:3px 10px;font-size:10px;font-weight:700;">⏳ Pendente</span>'
+        : '<span style="background:var(--green-dim);color:#4ade80;border:1px solid rgba(22,163,74,.3);border-radius:10px;padding:3px 10px;font-size:10px;font-weight:700;">✅ Entregue</span>';
+      return '<div style="padding:14px 16px;border-bottom:1px solid rgba(255,255,255,0.05);">'
+        +'<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap;margin-bottom:8px;">'
+          +'<div>'
+            +'<div style="font-weight:700;font-size:13px;color:var(--text);">'+esc(r.clientName||'—')+'</div>'
+            +'<div style="font-size:11px;color:var(--text-dim);margin-top:1px;">'+esc(r.clientPhone||'')+'</div>'
+          +'</div>'
+          +statusBadge
+        +'</div>'
+        +'<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">'
+          +'<div>'
+            +'<span style="font-size:13px;color:var(--text-muted);">'+esc(r.productName||'—')+'</span>'
+            +' <span style="font-family:Bebas Neue,sans-serif;font-size:16px;color:var(--gold);">'+esc(String(r.productCost||0))+' GB$</span>'
+            +'<div style="font-size:11px;color:var(--text-dim);margin-top:2px;">'+dateStr+'</div>'
+          +'</div>'
+          +'<div style="display:flex;gap:6px;flex-shrink:0;">'
+            +(isPending?'<button data-rid="'+r.id+'" onclick="markRedemptionDelivered(this.dataset.rid)" style="padding:7px 12px;border-radius:7px;border:1px solid rgba(22,163,74,.35);background:rgba(22,163,74,0.08);color:#4ade80;font-size:12px;font-weight:700;cursor:pointer;">✓ Entregar</button>':'')
+            +'<button data-rid="'+r.id+'" onclick="deleteRedemption(this.dataset.rid)" style="padding:7px 10px;border-radius:7px;border:1px solid rgba(220,38,38,.25);background:none;color:#f87171;font-size:12px;cursor:pointer;">🗑️</button>'
+          +'</div>'
+        +'</div>'
+        +'</div>';
+    }).join('');
   }
 
   window.markRedemptionDelivered = async function(id){
