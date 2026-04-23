@@ -880,6 +880,19 @@
         originalId:    id,
       };
       await setDoc(doc(db,'cancelled_appointments', cancelId), record);
+      // Se o agendamento foi marcado como concluído, debitar 1 GB$ do cliente
+      if(apt.done === true){
+        const digits = (apt.phone||'').replace(/\D/g,'');
+        if(digits){
+          try {
+            const walRef = doc(db,'wallets',digits);
+            const walSnap = await getDoc(walRef);
+            const cur = walSnap.exists() ? (walSnap.data().balance||0) : 0;
+            const newBal = Math.max(0, cur - 1);
+            await setDoc(walRef,{ balance: newBal, updatedAt: new Date().toISOString() },{merge:true});
+          } catch(we){ console.warn('wallet debit error:',we); }
+        }
+      }
       await deleteDoc(doc(db,COL,id));
       // Cancela slots bloqueados vinculados a este agendamento
       const blocked=allData.filter(a=>a.status==='Bloqueado'&&a.date===apt.date&&a.phone===apt.phone&&a.blockedBy===apt.time);
