@@ -1221,6 +1221,19 @@
       if(snap.exists()) currentSettings = snap.data();
     } catch(e){ console.error('loadSettings error',e); }
     renderSettingsUI();
+    // Carregar informações do site e plano de fundo
+    loadSiteConfigAdmin();
+    loadBgConfigAdmin();
+  }
+
+  async function loadBgConfigAdmin(){
+    try {
+      const snap = await getDoc(doc(db,'config','appearance'));
+      if(snap.exists() && snap.data().bgImage){
+        const el = document.getElementById('cfg-bg-image');
+        if(el) el.value = snap.data().bgImage;
+      }
+    } catch(e){ console.warn('loadBgConfig:',e); }
   }
 
   function renderSettingsUI(){
@@ -2192,6 +2205,7 @@
     try {
       await setDoc(doc(db,'config','appearance'),{ bgImage: url||'' },{merge:true});
       showToast('Plano de fundo salvo!','green');
+      loadBgConfigAdmin();
     } catch(e){
       console.error(e);
       showToast('Erro ao salvar plano de fundo','red');
@@ -2241,6 +2255,7 @@
     try {
       await setDoc(doc(db,'config','site'), data, {merge:true});
       showToast('Informações do site salvas!','green');
+      loadSiteConfigAdmin();
     } catch(e){
       console.error(e);
       showToast('Erro ao salvar informações','red');
