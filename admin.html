@@ -2252,9 +2252,18 @@
     if(!confirm('Excluir o cliente "'+name+'"? Esta ação não pode ser desfeita.')) return;
     try {
       await deleteDoc(doc(db,'clients',digits));
+      // Zerar carteira GB$ (remove saldo e flags de bônus)
+      await setDoc(doc(db,'wallets',digits),{
+        balance: 0,
+        totalAwarded: 0,
+        birthdateRewarded: false,
+        birthBonus: false,
+        digits,
+        resetAt: new Date().toISOString(),
+      });
       // Desativar push_subscribers
       await setDoc(doc(db,'push_subscribers',digits),{active:false},{merge:true});
-      showToast('Cliente "'+name+'" removido!','green');
+      showToast('Cliente "'+name+'" removido e carteira zerada!','green');
       // Recarregar lista
       allClients = allClients.filter(c=>c.digits!==digits);
       renderSessionsList(allClients);
