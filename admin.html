@@ -580,7 +580,11 @@
     <!-- Configuração GB$ -->
     <div class="cfg-card" style="margin-bottom:24px;">
       <div class="cfg-title">🪙 Configurações GB$</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-top:14px;">
+        <div>
+          <span class="plan-admin-label">GB$ por atendimento concluído</span>
+          <input type="number" class="plan-admin-input" id="gb-coins-per-apt" placeholder="Ex: 1" value="1" min="1" step="1">
+        </div>
         <div>
           <span class="plan-admin-label">Valor da moeda (R$)</span>
           <input class="plan-admin-input" id="gb-coin-value" placeholder="Ex: 0.25" value="0.25">
@@ -966,13 +970,19 @@
       // Adicionar 1 GB$ à carteira do cliente
       const walRef = doc(db,'wallets',digits);
       const walSnap = await getDoc(walRef);
+      // Buscar quantas moedas dar por atendimento
+      let coinsPerApt = 1;
+      try {
+        const cfgSnap = await getDoc(doc(db,'config','gb_store'));
+        if(cfgSnap.exists() && cfgSnap.data().coinsPerApt) coinsPerApt = parseInt(cfgSnap.data().coinsPerApt)||1;
+      } catch(e){}
       const cur = walSnap.exists() ? (walSnap.data().balance||0) : 0;
       await setDoc(walRef,{
-        balance: cur + 1,
+        balance: cur + coinsPerApt,
         phone, digits,
         updatedAt: new Date().toISOString(),
       },{merge:true});
-      showToast('Atendimento concluído! +1 GB$ para '+name,'green');
+      showToast('Atendimento concluído! +'+coinsPerApt+' GB$ para '+name,'green');
     } catch(e){
       console.error(e);
       showToast('Erro: '+e.message,'red');
@@ -2651,6 +2661,7 @@
       const snap = await getDoc(doc(db,'config','gb_store'));
       if(!snap.exists()) return;
       const d = snap.data();
+      if(d.coinsPerApt){ const el=document.getElementById('gb-coins-per-apt'); if(el) el.value=d.coinsPerApt; }
       if(d.coinValue) { const el=document.getElementById('gb-coin-value'); if(el) el.value=d.coinValue; }
       if(d.coinImage) { const el=document.getElementById('gb-coin-image'); if(el) el.value=d.coinImage; }
       if(d.subText)   { const el=document.getElementById('gb-sub-text');   if(el) el.value=d.subText; }
@@ -2658,11 +2669,12 @@
   }
 
   window.saveGBConfig = async function(){
+    const coinsPerApt = parseInt(document.getElementById('gb-coins-per-apt')?.value||'1')||1;
     const coinValue = (document.getElementById('gb-coin-value')?.value||'0.25').trim();
     const coinImage = (document.getElementById('gb-coin-image')?.value||'').trim();
     const subText   = (document.getElementById('gb-sub-text')?.value||'').trim();
     try {
-      await setDoc(doc(db,'config','gb_store'),{ coinValue, coinImage, subText },{merge:true});
+      await setDoc(doc(db,'config','gb_store'),{ coinsPerApt, coinValue, coinImage, subText },{merge:true});
       showToast('Configurações GB$ salvas!','green');
     } catch(e){ showToast('Erro: '+e.message,'red'); }
   };
