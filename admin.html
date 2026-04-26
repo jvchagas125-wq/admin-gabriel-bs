@@ -1165,11 +1165,11 @@
           <span class="plan-admin-label">Imagem do serviço</span>
           <div class="img-dropzone" id="dz-svc-${i}" onclick="document.getElementById('fi-svc-${i}').click()" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="dzDrop(event,'fi-svc-${i}','prev-svc-${i}','up-svc-${i}','svc-img-${i}',null)" style="padding:10px;">
             <input type="file" id="fi-svc-${i}" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="dzChange(this,'prev-svc-${i}','up-svc-${i}','svc-img-${i}',null)">
-            <div class="img-dropzone-label" style="font-size:11px;">📷 Clique ou <strong>arraste</strong> a imagem<br><span style="font-size:10px;color:var(--text-dim);">JPG, PNG ou WEBP · <strong style="color:var(--gold);">Ideal: 400x400px</strong></span></div>
+            <div class="img-dropzone-label" style="font-size:11px;">${svc.image?'✅ <strong>Imagem salva.</strong> Clique/arraste para trocar':'📷 Clique ou <strong>arraste</strong> a imagem<br><span style=\'font-size:10px;color:var(--text-dim);\'>JPG, PNG ou WEBP · <strong style=\'color:var(--gold);\'>Ideal: 400x400px</strong></span>'}</div>
           </div>
           <img id="prev-svc-${i}" class="img-upload-preview ${svc.image?'show':''}" src="${esc(svc.image||'')}" alt="" style="max-height:70px;">
           <div id="up-svc-${i}" class="img-uploading">⏳ Enviando...</div>
-          <button type="button" id="rm-svc-img-${i}" onclick="removeImgUpload('prev-svc-${i}','svc-img-${i}','dz-svc-${i}')" style="display:none;margin-top:6px;padding:4px 10px;border-radius:6px;border:1px solid rgba(220,38,38,0.35);background:none;color:#f87171;font-size:11px;font-weight:600;cursor:pointer;">🗑️ Remover imagem</button>
+          <button type="button" id="rm-svc-img-${i}" onclick="removeImgUpload('prev-svc-${i}','svc-img-${i}','dz-svc-${i}')" style="${svc.image?'':'display:none;'}margin-top:6px;padding:4px 10px;border-radius:6px;border:1px solid rgba(220,38,38,0.35);background:none;color:#f87171;font-size:11px;font-weight:600;cursor:pointer;">🗑️ Remover imagem</button>
           <input type="hidden" id="svc-img-${i}" value="${esc(svc.image||'')}">
         </div>
         <div style="margin-top:10px;">
