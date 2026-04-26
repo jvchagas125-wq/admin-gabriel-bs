@@ -397,6 +397,56 @@
       }
 
     }
+
+    /* ===== UPLOAD DE IMAGEM ===== */
+    .img-upload-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .img-dropzone {
+      border: 2px dashed rgba(201,168,76,0.3);
+      border-radius: 10px;
+      padding: 14px 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color .2s, background .2s;
+      background: var(--bg3);
+      position: relative;
+    }
+    .img-dropzone:hover, .img-dropzone.dragover {
+      border-color: var(--gold);
+      background: var(--gold-dim);
+    }
+    .img-dropzone input[type=file] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+    .img-dropzone-text {
+      font-size: 12px;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+    .img-dropzone-text strong { color: var(--gold); }
+    .img-upload-preview {
+      width: 100%;
+      height: 80px;
+      border-radius: 8px;
+      object-fit: cover;
+      display: none;
+      border: 1px solid var(--gold-border);
+    }
+    .img-upload-preview.visible { display: block; }
+    .img-uploading {
+      font-size: 11px;
+      color: var(--gold);
+      text-align: center;
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -590,8 +640,14 @@
           <input class="plan-admin-input" id="gb-coin-value" placeholder="Ex: 0.25" value="0.25">
         </div>
         <div>
-          <span class="plan-admin-label">Link da imagem da moeda (Imgur)</span>
-          <input class="plan-admin-input" id="gb-coin-image" placeholder="https://i.imgur.com/XXXXXXX.jpeg" value="https://i.imgur.com/FzLPpDt.jpeg">
+          <span class="plan-admin-label">Imagem da moeda</span>
+          <div class="img-dropzone" id="dz-coin-image" onclick="document.getElementById('fi-coin-image').click()" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="dzDrop(event,'fi-coin-image','prev-coin-image','up-coin-image','gb-coin-image',null)" style="padding:10px;">
+            <input type="file" id="fi-coin-image" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="dzChange(this,'prev-coin-image','up-coin-image','gb-coin-image',null)">
+            <div class="img-dropzone-label" style="font-size:11px;">📷 Clique ou arraste<br><span style="font-size:10px;color:var(--text-dim);">JPG/PNG</span></div>
+          </div>
+          <img id="prev-coin-image" class="img-upload-preview" src="" alt="moeda" style="max-height:60px;">
+          <div id="up-coin-image" class="img-uploading">⏳ Enviando...</div>
+          <input type="hidden" id="gb-coin-image" value="">
         </div>
       </div>
       <div style="margin-top:10px;">
@@ -639,14 +695,14 @@
 
         <!-- Logo hero -->
         <div class="cfg-subtitle">🖼️ Logo principal (acima dos serviços)</div>
-        <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:16px;">
-          <div style="flex:1;min-width:180px;">
-            <label class="cfg-label">Link do Imgur</label>
-            <input class="cfg-input" id="cfg-hero-logo" placeholder="https://i.imgur.com/XXXXXXX.png" style="width:100%;" oninput="previewHeroLogo()">
+        <div style="margin-bottom:16px;">
+          <div class="img-dropzone" id="dz-hero-logo" onclick="document.getElementById('fi-hero-logo').click()" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="dzDrop(event,'fi-hero-logo','prev-hero-logo','up-hero-logo','cfg-hero-logo',null)">
+            <input type="file" id="fi-hero-logo" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="dzChange(this,'prev-hero-logo','up-hero-logo','cfg-hero-logo',null)">
+            <div class="img-dropzone-label">📷 Clique ou <strong>arraste o logo</strong> aqui<br><span style="font-size:10px;color:var(--text-dim);">JPG, PNG ou WEBP · máx 10MB</span></div>
           </div>
-          <div id="cfg-hero-logo-preview" style="width:60px;height:60px;border-radius:8px;border:1px solid rgba(255,255,255,0.08);overflow:hidden;flex-shrink:0;background:var(--bg3);display:flex;align-items:center;justify-content:center;">
-            <span style="font-size:10px;color:var(--text-dim);padding:4px;text-align:center;">sem img</span>
-          </div>
+          <img id="prev-hero-logo" class="img-upload-preview" src="" alt="logo">
+          <div id="up-hero-logo" class="img-uploading">⏳ Enviando...</div>
+          <input type="hidden" id="cfg-hero-logo" value="">
         </div>
 
         <!-- WhatsApp -->
@@ -684,16 +740,14 @@
       <!-- PLANO DE FUNDO -->
       <div class="cfg-card">
         <div class="cfg-title">🖼️ Plano de Fundo do Site</div>
-        <div class="cfg-hint">Cole o link do Imgur da imagem que deseja usar como plano de fundo do site dos clientes. Recomendado: 1080x1920px, formato .jpg ou .png.</div>
-        <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;">
-          <div style="flex:1;min-width:200px;">
-            <label class="cfg-label">Link da imagem (Imgur)</label>
-            <input class="cfg-input" id="cfg-bg-image" placeholder="https://i.imgur.com/XXXXXXX.png" style="width:100%;" oninput="previewBgImage()">
-          </div>
-          <div id="cfg-bg-preview" style="width:60px;height:60px;border-radius:8px;border:1px solid rgba(255,255,255,0.08);overflow:hidden;flex-shrink:0;background:var(--bg3);display:flex;align-items:center;justify-content:center;">
-            <span style="font-size:10px;color:var(--text-dim);text-align:center;padding:4px;">sem img</span>
-          </div>
+        <div class="cfg-hint">Envie uma imagem para usar como plano de fundo. Recomendado: 1080x1920px.</div>
+        <div class="img-dropzone" id="dz-bg-image" onclick="document.getElementById('fi-bg-image').click()" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="dzDrop(event,'fi-bg-image','prev-bg-image','up-bg-image','cfg-bg-image',null)">
+          <input type="file" id="fi-bg-image" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="dzChange(this,'prev-bg-image','up-bg-image','cfg-bg-image',null)">
+          <div class="img-dropzone-label">📷 Clique ou <strong>arraste o plano de fundo</strong> aqui<br><span style="font-size:10px;color:var(--text-dim);">JPG, PNG ou WEBP · máx 10MB · Recomendado 1080x1920px</span></div>
         </div>
+        <img id="prev-bg-image" class="img-upload-preview" src="" alt="bg" style="max-height:140px;">
+        <div id="up-bg-image" class="img-uploading">⏳ Enviando...</div>
+        <input type="hidden" id="cfg-bg-image" value="">
         <button class="cfg-save-btn" onclick="saveBgImage()" style="margin-top:14px;">💾 Salvar Plano de Fundo</button>
       </div>
 
@@ -1104,16 +1158,15 @@
             <input type="number" class="plan-admin-input" id="svc-dur-${i}" value="${svc.duration||15}" min="5" max="240" step="5">
           </div>
         </div>
-        <div style="display:flex;gap:10px;align-items:flex-end;">
-          <div style="flex:1;">
-            <span class="plan-admin-label">Link da imagem (Imgur)</span>
-            <input class="plan-admin-input" id="svc-img-${i}" value="${esc(svc.image||'')}" placeholder="https://i.imgur.com/XXXXXXX.png" oninput="previewSvcImg(${i})">
+        <div style="margin-bottom:8px;">
+          <span class="plan-admin-label">Imagem do serviço</span>
+          <div class="img-dropzone" id="dz-svc-${i}" onclick="document.getElementById('fi-svc-${i}').click()" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="dzDrop(event,'fi-svc-${i}','prev-svc-${i}','up-svc-${i}','svc-img-${i}',null)" style="padding:10px;">
+            <input type="file" id="fi-svc-${i}" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="dzChange(this,'prev-svc-${i}','up-svc-${i}','svc-img-${i}',null)">
+            <div class="img-dropzone-label" style="font-size:11px;">📷 Clique ou <strong>arraste</strong> a imagem<br><span style="font-size:10px;color:var(--text-dim);">JPG, PNG ou WEBP</span></div>
           </div>
-          <div id="svc-img-preview-${i}" style="width:52px;height:52px;border-radius:8px;border:1px solid rgba(255,255,255,0.08);overflow:hidden;flex-shrink:0;background:var(--bg3);display:flex;align-items:center;justify-content:center;">
-            ${svc.image
-              ? `<img src="${esc(svc.image)}" style="width:100%;height:100%;object-fit:contain;" onerror="this.style.display='none'">`
-              : `<span style="font-size:10px;color:var(--text-dim);text-align:center;padding:4px;">sem img</span>`}
-          </div>
+          <img id="prev-svc-${i}" class="img-upload-preview ${svc.image?'show':''}" src="${esc(svc.image||'')}" alt="" style="max-height:70px;">
+          <div id="up-svc-${i}" class="img-uploading">⏳ Enviando...</div>
+          <input type="hidden" id="svc-img-${i}" value="${esc(svc.image||'')}">
         </div>
         <div style="margin-top:10px;">
           <span class="plan-admin-label" style="margin-bottom:6px;display:block;">Descrição / Características (aparecem no card do site)</span>
@@ -1240,8 +1293,7 @@
     try {
       const snap = await getDoc(doc(db,'config','appearance'));
       if(snap.exists() && snap.data().bgImage){
-        const el = document.getElementById('cfg-bg-image');
-        if(el) el.value = snap.data().bgImage;
+        restoreDropzonePreview('dz-bg-image','prev-bg-image','cfg-bg-image',snap.data().bgImage);
       }
     } catch(e){ console.warn('loadBgConfig:',e); }
   }
@@ -2231,7 +2283,7 @@
       const snap = await getDoc(doc(db,'config','site'));
       if(!snap.exists()) return;
       const d = snap.data();
-      if(d.heroLogo)         { document.getElementById('cfg-hero-logo').value = d.heroLogo; previewHeroLogo(); }
+      if(d.heroLogo)         { restoreDropzonePreview('dz-hero-logo','prev-hero-logo','cfg-hero-logo',d.heroLogo); }
       if(d.whatsappNum)       document.getElementById('cfg-whatsapp-num').value = d.whatsappNum;
       if(d.instagramHandle)   document.getElementById('cfg-instagram-handle').value = d.instagramHandle;
       if(d.addressText)       document.getElementById('cfg-address-text').value = d.addressText;
@@ -2593,7 +2645,13 @@
         </div>
         <div>
           <label class="plan-admin-label">Link da imagem (Imgur)</label>
-          <input class="plan-admin-input" id="sp-image" value="${esc(p.imageUrl||'')}" placeholder="https://i.imgur.com/XXXXXX.png">
+          <div class="img-dropzone" id="dz-sp-image" onclick="document.getElementById('fi-sp-image').click()" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="dzDrop(event,'fi-sp-image','prev-sp-image','up-sp-image','sp-image',null)" style="padding:10px;">
+            <input type="file" id="fi-sp-image" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="dzChange(this,'prev-sp-image','up-sp-image','sp-image',null)">
+            <div class="img-dropzone-label" style="font-size:11px;">📷 Clique ou arraste<br><span style="font-size:10px;color:var(--text-dim);">JPG/PNG</span></div>
+          </div>
+          <img id="prev-sp-image" class="img-upload-preview ${p.imageUrl?'show':''}" src="${esc(p.imageUrl||'')}" alt="" style="max-height:60px;">
+          <div id="up-sp-image" class="img-uploading">⏳ Enviando...</div>
+          <input type="hidden" id="sp-image" value="${esc(p.imageUrl||'')}">
         </div>
         <div>
           <label class="plan-admin-label">Descrição (opcional)</label>
@@ -2663,7 +2721,7 @@
       const d = snap.data();
       if(d.coinsPerApt){ const el=document.getElementById('gb-coins-per-apt'); if(el) el.value=d.coinsPerApt; }
       if(d.coinValue) { const el=document.getElementById('gb-coin-value'); if(el) el.value=d.coinValue; }
-      if(d.coinImage) { const el=document.getElementById('gb-coin-image'); if(el) el.value=d.coinImage; }
+      if(d.coinImage) { restoreDropzonePreview('dz-coin-image','prev-coin-image','gb-coin-image',d.coinImage); }
       if(d.subText)   { const el=document.getElementById('gb-sub-text');   if(el) el.value=d.subText; }
     } catch(e){ console.warn('loadGBConfig:',e); }
   }
@@ -2737,6 +2795,96 @@
       if(el) obs.observe(el, {attributes:true, childList:true, characterData:true});
     });
   }, 2000);
+
+
+
+  // ═══════════════════════════════════════
+  // CLOUDINARY UPLOAD
+  // ═══════════════════════════════════════
+  const CLOUDINARY_CLOUD = 'dcvhqnr1c';
+  const CLOUDINARY_PRESET = 'gabriel-bs';
+
+  async function uploadToCloudinary(file, onSuccess, uploadingId){
+    if(!file) return;
+    if(!['image/jpeg','image/png','image/webp'].includes(file.type)){
+      showToast('Use imagens JPG, PNG ou WEBP.','red'); return;
+    }
+    if(file.size > 10*1024*1024){ showToast('Imagem muito grande. Máx 10MB.','red'); return; }
+    const upEl = uploadingId ? document.getElementById(uploadingId) : null;
+    if(upEl) upEl.style.display = 'block';
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      fd.append('upload_preset', CLOUDINARY_PRESET);
+      const res = await fetch('https://api.cloudinary.com/v1_1/'+CLOUDINARY_CLOUD+'/image/upload',{method:'POST',body:fd});
+      const data = await res.json();
+      if(data.secure_url){ onSuccess(data.secure_url); showToast('Imagem enviada!','green'); }
+      else throw new Error(data.error?.message||'Erro');
+    } catch(e){ showToast('Erro no upload: '+e.message,'red'); }
+    finally { if(upEl) upEl.style.display = 'none'; }
+  }
+
+  function setupDropzone(dzId, fileInputId, previewId, uploadingId, hiddenInputId, onSuccess){
+    const dz = document.getElementById(dzId);
+    const fi = document.getElementById(fileInputId);
+    if(!dz||!fi) return;
+    dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('dragover');});
+    dz.addEventListener('dragleave',()=>dz.classList.remove('dragover'));
+    dz.addEventListener('drop',e=>{
+      e.preventDefault(); dz.classList.remove('dragover');
+      const f=e.dataTransfer?.files?.[0]; if(f) doUpload(f);
+    });
+    fi.addEventListener('change',()=>{ const f=fi.files?.[0]; if(f) doUpload(f); });
+    function doUpload(f){
+      uploadToCloudinary(f, url=>{
+        if(hiddenInputId){ const el=document.getElementById(hiddenInputId); if(el) el.value=url; }
+        if(previewId){ const el=document.getElementById(previewId); if(el){el.src=url;el.classList.add('show');} }
+        const lbl=dz.querySelector('.img-dropzone-label');
+        if(lbl) lbl.innerHTML='✅ <strong>Enviada!</strong> Clique/arraste para trocar';
+        if(onSuccess) onSuccess(url);
+      }, uploadingId);
+    }
+  }
+
+  // Shared handlers for all dropzones
+  window.dzChange = function(input, prevId, upId, hiddenId, cb){
+    const f = input.files?.[0]; if(!f) return;
+    uploadToCloudinary(f, url=>{
+      const hid = document.getElementById(hiddenId);
+      if(hid) hid.value = url;
+      const prev = document.getElementById(prevId);
+      if(prev){ prev.src=url; prev.classList.add('show'); }
+      const dz = input.closest('.img-dropzone');
+      if(dz){ const lbl=dz.querySelector('.img-dropzone-label'); if(lbl) lbl.innerHTML='✅ <strong>Enviada!</strong> Clique/arraste para trocar'; }
+      if(cb) cb(url);
+    }, upId);
+  };
+
+  window.dzDrop = function(e, fiId, prevId, upId, hiddenId, cb){
+    e.preventDefault();
+    e.currentTarget.classList.remove('dragover');
+    const f = e.dataTransfer?.files?.[0]; if(!f) return;
+    const fakeInput = { files:[f], closest: ()=>e.currentTarget };
+    uploadToCloudinary(f, url=>{
+      const hid = document.getElementById(hiddenId);
+      if(hid) hid.value = url;
+      const prev = document.getElementById(prevId);
+      if(prev){ prev.src=url; prev.classList.add('show'); }
+      const lbl = e.currentTarget.querySelector('.img-dropzone-label');
+      if(lbl) lbl.innerHTML='✅ <strong>Enviada!</strong> Clique/arraste para trocar';
+      if(cb) cb(url);
+    }, upId);
+  };
+
+  // Restore preview image from a URL into a dropzone
+  function restoreDropzonePreview(dzId, prevId, hiddenId, url){
+    if(!url) return;
+    const hid = document.getElementById(hiddenId); if(hid) hid.value = url;
+    const prev = document.getElementById(prevId);
+    if(prev){ prev.src=url; prev.classList.add('show'); }
+    const dz = document.getElementById(dzId);
+    if(dz){ const lbl=dz.querySelector('.img-dropzone-label'); if(lbl) lbl.innerHTML='✅ <strong>Imagem salva.</strong> Clique/arraste para trocar'; }
+  }
 
 
 </script>
