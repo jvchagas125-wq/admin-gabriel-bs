@@ -643,7 +643,7 @@
           <span class="plan-admin-label">Imagem da moeda</span>
           <div class="img-dropzone" id="dz-coin-image" onclick="document.getElementById('fi-coin-image').click()" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="dzDrop(event,'fi-coin-image','prev-coin-image','up-coin-image','gb-coin-image',null)" style="padding:10px;">
             <input type="file" id="fi-coin-image" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="dzChange(this,'prev-coin-image','up-coin-image','gb-coin-image',null)">
-            <div class="img-dropzone-label" style="font-size:11px;">📷 Clique ou arraste<br><span style="font-size:10px;color:var(--text-dim);">JPG/PNG</span></div>
+            <div class="img-dropzone-label" style="font-size:11px;">📷 Clique ou arraste<br><span style="font-size:10px;color:var(--text-dim);">JPG/PNG · <strong style="color:var(--gold);">Ideal: 200x200px</strong></span></div>
           </div>
           <img id="prev-coin-image" class="img-upload-preview" src="" alt="moeda" style="max-height:60px;">
           <div id="up-coin-image" class="img-uploading">⏳ Enviando...</div>
@@ -698,7 +698,7 @@
         <div style="margin-bottom:16px;">
           <div class="img-dropzone" id="dz-hero-logo" onclick="document.getElementById('fi-hero-logo').click()" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="dzDrop(event,'fi-hero-logo','prev-hero-logo','up-hero-logo','cfg-hero-logo',null)">
             <input type="file" id="fi-hero-logo" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="dzChange(this,'prev-hero-logo','up-hero-logo','cfg-hero-logo',null)">
-            <div class="img-dropzone-label">📷 Clique ou <strong>arraste o logo</strong> aqui<br><span style="font-size:10px;color:var(--text-dim);">JPG, PNG ou WEBP · máx 10MB</span></div>
+            <div class="img-dropzone-label">📷 Clique ou <strong>arraste o logo</strong> aqui<br><span style="font-size:10px;color:var(--text-dim);">JPG, PNG ou WEBP · máx 10MB · <strong style="color:var(--gold);">Recomendado: 300x100px</strong></span></div>
           </div>
           <img id="prev-hero-logo" class="img-upload-preview" src="" alt="logo">
           <div id="up-hero-logo" class="img-uploading">⏳ Enviando...</div>
@@ -743,7 +743,7 @@
         <div class="cfg-hint">Envie uma imagem para usar como plano de fundo. Recomendado: 1080x1920px.</div>
         <div class="img-dropzone" id="dz-bg-image" onclick="document.getElementById('fi-bg-image').click()" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="dzDrop(event,'fi-bg-image','prev-bg-image','up-bg-image','cfg-bg-image',null)">
           <input type="file" id="fi-bg-image" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="dzChange(this,'prev-bg-image','up-bg-image','cfg-bg-image',null)">
-          <div class="img-dropzone-label">📷 Clique ou <strong>arraste o plano de fundo</strong> aqui<br><span style="font-size:10px;color:var(--text-dim);">JPG, PNG ou WEBP · máx 10MB · Recomendado 1080x1920px</span></div>
+          <div class="img-dropzone-label">📷 Clique ou <strong>arraste o plano de fundo</strong> aqui<br><span style="font-size:10px;color:var(--text-dim);">JPG, PNG ou WEBP · máx 10MB · <strong style="color:var(--gold);">Recomendado: 1080x1920px</strong></span></div>
         </div>
         <img id="prev-bg-image" class="img-upload-preview" src="" alt="bg" style="max-height:140px;">
         <div id="up-bg-image" class="img-uploading">⏳ Enviando...</div>
@@ -1162,7 +1162,7 @@
           <span class="plan-admin-label">Imagem do serviço</span>
           <div class="img-dropzone" id="dz-svc-${i}" onclick="document.getElementById('fi-svc-${i}').click()" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="dzDrop(event,'fi-svc-${i}','prev-svc-${i}','up-svc-${i}','svc-img-${i}',null)" style="padding:10px;">
             <input type="file" id="fi-svc-${i}" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="dzChange(this,'prev-svc-${i}','up-svc-${i}','svc-img-${i}',null)">
-            <div class="img-dropzone-label" style="font-size:11px;">📷 Clique ou <strong>arraste</strong> a imagem<br><span style="font-size:10px;color:var(--text-dim);">JPG, PNG ou WEBP</span></div>
+            <div class="img-dropzone-label" style="font-size:11px;">📷 Clique ou <strong>arraste</strong> a imagem<br><span style="font-size:10px;color:var(--text-dim);">JPG, PNG ou WEBP · <strong style="color:var(--gold);">Ideal: 400x400px</strong></span></div>
           </div>
           <img id="prev-svc-${i}" class="img-upload-preview ${svc.image?'show':''}" src="${esc(svc.image||'')}" alt="" style="max-height:70px;">
           <div id="up-svc-${i}" class="img-uploading">⏳ Enviando...</div>
@@ -2647,7 +2647,7 @@
           <label class="plan-admin-label">Link da imagem (Imgur)</label>
           <div class="img-dropzone" id="dz-sp-image" onclick="document.getElementById('fi-sp-image').click()" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="dzDrop(event,'fi-sp-image','prev-sp-image','up-sp-image','sp-image',null)" style="padding:10px;">
             <input type="file" id="fi-sp-image" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="dzChange(this,'prev-sp-image','up-sp-image','sp-image',null)">
-            <div class="img-dropzone-label" style="font-size:11px;">📷 Clique ou arraste<br><span style="font-size:10px;color:var(--text-dim);">JPG/PNG</span></div>
+            <div class="img-dropzone-label" style="font-size:11px;">📷 Clique ou arraste<br><span style="font-size:10px;color:var(--text-dim);">JPG/PNG · <strong style="color:var(--gold);">Ideal: 400x400px</strong></span></div>
           </div>
           <img id="prev-sp-image" class="img-upload-preview ${p.imageUrl?'show':''}" src="${esc(p.imageUrl||'')}" alt="" style="max-height:60px;">
           <div id="up-sp-image" class="img-uploading">⏳ Enviando...</div>
