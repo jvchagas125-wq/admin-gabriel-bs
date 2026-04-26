@@ -640,7 +640,7 @@
           <input class="plan-admin-input" id="gb-coin-value" placeholder="Ex: 0.25" value="0.25">
         </div>
         <div>
-          <span class="plan-admin-label">Imagem da moeda</span>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><span class="plan-admin-label" style="margin-bottom:0;">Imagem da moeda</span><span style="font-size:11px;color:var(--gold);font-weight:600;">Ideal: 200x200px</span></div>
           <div class="img-dropzone" id="dz-coin-image" onclick="document.getElementById('fi-coin-image').click()" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="dzDrop(event,'fi-coin-image','prev-coin-image','up-coin-image','gb-coin-image',null)" style="padding:10px;">
             <input type="file" id="fi-coin-image" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="dzChange(this,'prev-coin-image','up-coin-image','gb-coin-image',null)">
             <div class="img-dropzone-label" style="font-size:11px;">📷 Clique ou arraste<br><span style="font-size:10px;color:var(--text-dim);">JPG/PNG · <strong style="color:var(--gold);">Ideal: 200x200px</strong></span></div>
@@ -694,7 +694,7 @@
         <div class="cfg-hint">Edite o logo, contatos e endereço exibidos no site dos clientes.</div>
 
         <!-- Logo hero -->
-        <div class="cfg-subtitle">🖼️ Logo principal (acima dos serviços)</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;margin-top:16px;"><div class="cfg-subtitle" style="margin:0;">🖼️ Logo principal (acima dos serviços)</div><span style="font-size:11px;color:var(--gold);font-weight:600;">Recomendado: 300x100px</span></div>
         <div style="margin-bottom:16px;">
           <div class="img-dropzone" id="dz-hero-logo" onclick="document.getElementById('fi-hero-logo').click()" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="dzDrop(event,'fi-hero-logo','prev-hero-logo','up-hero-logo','cfg-hero-logo',null)">
             <input type="file" id="fi-hero-logo" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="dzChange(this,'prev-hero-logo','up-hero-logo','cfg-hero-logo',null)">
