@@ -647,6 +647,7 @@
           </div>
           <img id="prev-coin-image" class="img-upload-preview" src="" alt="moeda" style="max-height:60px;">
           <div id="up-coin-image" class="img-uploading">⏳ Enviando...</div>
+          <button type="button" id="rm-gb-coin-image" onclick="removeImgUpload('prev-coin-image','gb-coin-image','dz-coin-image')" style="display:none;margin-top:6px;padding:4px 10px;border-radius:6px;border:1px solid rgba(220,38,38,0.35);background:none;color:#f87171;font-size:11px;font-weight:600;cursor:pointer;">🗑️ Remover imagem</button>
           <input type="hidden" id="gb-coin-image" value="">
         </div>
       </div>
@@ -702,6 +703,7 @@
           </div>
           <img id="prev-hero-logo" class="img-upload-preview" src="" alt="logo">
           <div id="up-hero-logo" class="img-uploading">⏳ Enviando...</div>
+          <button type="button" id="rm-cfg-hero-logo" onclick="removeImgUpload('prev-hero-logo','cfg-hero-logo','dz-hero-logo')" style="display:none;margin-top:6px;padding:4px 10px;border-radius:6px;border:1px solid rgba(220,38,38,0.35);background:none;color:#f87171;font-size:11px;font-weight:600;cursor:pointer;">🗑️ Remover imagem</button>
           <input type="hidden" id="cfg-hero-logo" value="">
         </div>
 
@@ -747,6 +749,7 @@
         </div>
         <img id="prev-bg-image" class="img-upload-preview" src="" alt="bg" style="max-height:140px;">
         <div id="up-bg-image" class="img-uploading">⏳ Enviando...</div>
+        <button type="button" id="rm-cfg-bg-image" onclick="removeImgUpload('prev-bg-image','cfg-bg-image','dz-bg-image')" style="display:none;margin-top:6px;padding:4px 10px;border-radius:6px;border:1px solid rgba(220,38,38,0.35);background:none;color:#f87171;font-size:11px;font-weight:600;cursor:pointer;">🗑️ Remover imagem</button>
         <input type="hidden" id="cfg-bg-image" value="">
         <button class="cfg-save-btn" onclick="saveBgImage()" style="margin-top:14px;">💾 Salvar Plano de Fundo</button>
       </div>
@@ -1166,6 +1169,7 @@
           </div>
           <img id="prev-svc-${i}" class="img-upload-preview ${svc.image?'show':''}" src="${esc(svc.image||'')}" alt="" style="max-height:70px;">
           <div id="up-svc-${i}" class="img-uploading">⏳ Enviando...</div>
+          <button type="button" id="rm-svc-img-${i}" onclick="removeImgUpload('prev-svc-${i}','svc-img-${i}','dz-svc-${i}')" style="display:none;margin-top:6px;padding:4px 10px;border-radius:6px;border:1px solid rgba(220,38,38,0.35);background:none;color:#f87171;font-size:11px;font-weight:600;cursor:pointer;">🗑️ Remover imagem</button>
           <input type="hidden" id="svc-img-${i}" value="${esc(svc.image||'')}">
         </div>
         <div style="margin-top:10px;">
@@ -2651,6 +2655,7 @@
           </div>
           <img id="prev-sp-image" class="img-upload-preview ${p.imageUrl?'show':''}" src="${esc(p.imageUrl||'')}" alt="" style="max-height:60px;">
           <div id="up-sp-image" class="img-uploading">⏳ Enviando...</div>
+          <button type="button" id="rm-sp-image" onclick="removeImgUpload('prev-sp-image','sp-image','dz-sp-image')" style="display:none;margin-top:6px;padding:4px 10px;border-radius:6px;border:1px solid rgba(220,38,38,0.35);background:none;color:#f87171;font-size:11px;font-weight:600;cursor:pointer;">🗑️ Remover imagem</button>
           <input type="hidden" id="sp-image" value="${esc(p.imageUrl||'')}">
         </div>
         <div>
@@ -2847,6 +2852,21 @@
   }
 
   // Shared handlers for all dropzones
+  function showRemoveBtn(hiddenId, show){
+    const btn = document.getElementById('rm-'+hiddenId);
+    if(btn) btn.style.display = show ? 'inline-block' : 'none';
+  }
+
+  window.removeImgUpload = function(prevId, hiddenId, dzId){
+    if(!confirm('Remover esta imagem?')) return;
+    const hid = document.getElementById(hiddenId); if(hid) hid.value = '';
+    const prev = document.getElementById(prevId);
+    if(prev){ prev.src=''; prev.classList.remove('show'); }
+    const dz = document.getElementById(dzId);
+    if(dz){ const lbl=dz.querySelector('.img-dropzone-label'); if(lbl) lbl.innerHTML='📷 Clique ou <strong>arraste</strong> a imagem aqui<br><span style="font-size:10px;color:var(--text-dim);">JPG, PNG ou WEBP · máx 10MB</span>'; }
+    showRemoveBtn(hiddenId, false);
+  };
+
   window.dzChange = function(input, prevId, upId, hiddenId, cb){
     const f = input.files?.[0]; if(!f) return;
     uploadToCloudinary(f, url=>{
@@ -2856,6 +2876,7 @@
       if(prev){ prev.src=url; prev.classList.add('show'); }
       const dz = input.closest('.img-dropzone');
       if(dz){ const lbl=dz.querySelector('.img-dropzone-label'); if(lbl) lbl.innerHTML='✅ <strong>Enviada!</strong> Clique/arraste para trocar'; }
+      showRemoveBtn(hiddenId, true);
       if(cb) cb(url);
     }, upId);
   };
@@ -2864,7 +2885,6 @@
     e.preventDefault();
     e.currentTarget.classList.remove('dragover');
     const f = e.dataTransfer?.files?.[0]; if(!f) return;
-    const fakeInput = { files:[f], closest: ()=>e.currentTarget };
     uploadToCloudinary(f, url=>{
       const hid = document.getElementById(hiddenId);
       if(hid) hid.value = url;
@@ -2872,6 +2892,7 @@
       if(prev){ prev.src=url; prev.classList.add('show'); }
       const lbl = e.currentTarget.querySelector('.img-dropzone-label');
       if(lbl) lbl.innerHTML='✅ <strong>Enviada!</strong> Clique/arraste para trocar';
+      showRemoveBtn(hiddenId, true);
       if(cb) cb(url);
     }, upId);
   };
@@ -2884,6 +2905,7 @@
     if(prev){ prev.src=url; prev.classList.add('show'); }
     const dz = document.getElementById(dzId);
     if(dz){ const lbl=dz.querySelector('.img-dropzone-label'); if(lbl) lbl.innerHTML='✅ <strong>Imagem salva.</strong> Clique/arraste para trocar'; }
+    showRemoveBtn(hiddenId, true);
   }
 
 
