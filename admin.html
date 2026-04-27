@@ -2653,8 +2653,8 @@
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
           <div>
-            <label class="plan-admin-label">Custo em R$</label>
-            <input type="number" class="plan-admin-input" id="sp-cost" value="${((p.cost||1)*0.25).toFixed(2)}" min="0.25" step="0.25" placeholder="Ex: 0,75">
+            <label class="plan-admin-label">Custo em GB$</label>
+            <input type="number" class="plan-admin-input" id="sp-cost" value="${p.cost||1}" min="1" step="1" placeholder="Ex: 3">
           </div>
           <div>
             <label class="plan-admin-label">Emoji (ícone)</label>
@@ -2694,7 +2694,7 @@
   window.saveStoreProduct = async function(id){
     const data = {
       name:        (document.getElementById('sp-name')?.value||'').trim(),
-      cost:        Math.max(1, Math.round(parseFloat(document.getElementById('sp-cost')?.value||'0.25') / 0.25)),
+      cost:        parseInt(document.getElementById('sp-cost')?.value||'1')||1,
       emoji:       (document.getElementById('sp-emoji')?.value||'🎁').trim(),
       category:    (document.getElementById('sp-category')?.value||'Geral').trim(),
       imageUrl:    (document.getElementById('sp-image')?.value||'').trim(),
