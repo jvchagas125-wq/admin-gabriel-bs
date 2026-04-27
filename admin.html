@@ -630,10 +630,14 @@
     <!-- Configuração GB$ -->
     <div class="cfg-card" style="margin-bottom:24px;">
       <div class="cfg-title">🪙 Configurações GB$</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-top:14px;">
         <div>
           <span class="plan-admin-label">GB$ por atendimento concluído</span>
           <input type="number" class="plan-admin-input" id="gb-coins-per-apt" placeholder="Ex: 1" value="1" min="1" step="1">
+        </div>
+        <div>
+          <span class="plan-admin-label">GB$ ao preencher aniversário</span>
+          <input type="number" class="plan-admin-input" id="gb-birth-coins" placeholder="Ex: 1" value="1" min="0" step="1">
         </div>
 
         <div>
@@ -2755,17 +2759,19 @@
       if(!snap.exists()) return;
       const d = snap.data();
       if(d.coinsPerApt){ const el=document.getElementById('gb-coins-per-apt'); if(el) el.value=d.coinsPerApt; }
+      if(d.birthCoins!==undefined){ const el=document.getElementById('gb-birth-coins'); if(el) el.value=d.birthCoins; }
       if(d.coinImage) { restoreDropzonePreview('dz-coin-image','prev-coin-image','gb-coin-image',d.coinImage); }
       if(d.subText)   { const el=document.getElementById('gb-sub-text');   if(el) el.value=d.subText; }
     } catch(e){ console.warn('loadGBConfig:',e); }
   }
 
   window.saveGBConfig = async function(){
-    const coinsPerApt = parseInt(document.getElementById('gb-coins-per-apt')?.value||'1')||1;
+    const coinsPerApt  = parseInt(document.getElementById('gb-coins-per-apt')?.value||'1')||1;
+    const birthCoins   = parseInt(document.getElementById('gb-birth-coins')?.value||'1')||0;
     const coinImage = (document.getElementById('gb-coin-image')?.value||'').trim();
     const subText   = (document.getElementById('gb-sub-text')?.value||'').trim();
     try {
-      await setDoc(doc(db,'config','gb_store'),{ coinsPerApt, coinImage, subText },{merge:true});
+      await setDoc(doc(db,'config','gb_store'),{ coinsPerApt, birthCoins, coinImage, subText },{merge:true});
       showToast('Configurações GB$ salvas!','green');
     } catch(e){ showToast('Erro: '+e.message,'red'); }
   };
