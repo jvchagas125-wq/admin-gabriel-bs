@@ -808,17 +808,30 @@
 
       <button class="cfg-save-btn" onclick="saveSettings()">💾 Salvar Configurações</button>
 
-      <!-- AVISOS -->
+      <!-- AVISOS PÁGINA INICIAL -->
       <div class="cfg-card" style="margin-top:24px;">
         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
           <div>
-            <div class="cfg-title" style="margin-bottom:2px;">📢 Avisos e Informações</div>
-            <div class="cfg-hint" style="margin:0;">Aparecem na página de Contato do site, abaixo dos horários.</div>
+            <div class="cfg-title" style="margin-bottom:2px;">📢 Avisos — Página Inicial</div>
+            <div class="cfg-hint" style="margin:0;">Aparecem na página inicial do site, abaixo dos serviços.</div>
           </div>
-          <button class="export-btn" onclick="addNotice()">+ Adicionar aviso</button>
+          <button class="export-btn" onclick="addNotice('home')">+ Adicionar</button>
         </div>
-        <div id="notices-admin-list" style="display:flex;flex-direction:column;gap:10px;"></div>
-        <button class="cfg-save-btn" onclick="saveNotices()" style="margin-top:14px;max-width:220px;">💾 Salvar Avisos</button>
+        <div id="notices-home-list" style="display:flex;flex-direction:column;gap:10px;"></div>
+        <button class="cfg-save-btn" onclick="saveNotices('home')" style="margin-top:14px;max-width:220px;">💾 Salvar</button>
+      </div>
+
+      <!-- AVISOS PÁGINA CONTATO -->
+      <div class="cfg-card" style="margin-top:16px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
+          <div>
+            <div class="cfg-title" style="margin-bottom:2px;">📢 Avisos — Página de Contato</div>
+            <div class="cfg-hint" style="margin:0;">Aparecem na página de Contato, abaixo dos horários de funcionamento.</div>
+          </div>
+          <button class="export-btn" onclick="addNotice('contact')">+ Adicionar</button>
+        </div>
+        <div id="notices-contact-list" style="display:flex;flex-direction:column;gap:10px;"></div>
+        <button class="cfg-save-btn" onclick="saveNotices('contact')" style="margin-top:14px;max-width:220px;">💾 Salvar</button>
       </div>
 
       <!-- PLANOS -->
@@ -2954,65 +2967,76 @@
   // ═══════════════════════════════════════
   // AVISOS E INFORMAÇÕES — ADMIN
   // ═══════════════════════════════════════
-  let adminNotices = [];
+  let adminNoticesHome = [];
+  let adminNoticesContact = [];
 
   async function loadNoticesAdmin(){
     try {
-      const snap = await getDoc(doc(db,'config','notices'));
-      if(snap.exists() && snap.data().list) adminNotices = snap.data().list;
+      const [snapH, snapC] = await Promise.all([
+        getDoc(doc(db,'config','notices_home')),
+        getDoc(doc(db,'config','notices_contact')),
+      ]);
+      if(snapH.exists() && snapH.data().list) adminNoticesHome = snapH.data().list;
+      if(snapC.exists() && snapC.data().list) adminNoticesContact = snapC.data().list;
     } catch(e){ console.warn('loadNoticesAdmin:',e); }
-    renderNoticesAdmin();
+    renderNoticesAdminFor('home');
+    renderNoticesAdminFor('contact');
   }
 
-  function renderNoticesAdmin(){
-    const el = document.getElementById('notices-admin-list');
+  function renderNoticesAdminFor(page){
+    const arr = page==='home' ? adminNoticesHome : adminNoticesContact;
+    const elId = page==='home' ? 'notices-home-list' : 'notices-contact-list';
+    const el = document.getElementById(elId);
     if(!el) return;
-    if(!adminNotices.length){
+    if(!arr.length){
       el.innerHTML='<div style="color:var(--text-dim);font-size:13px;padding:8px 0;">Nenhum aviso cadastrado.</div>';
       return;
     }
-    el.innerHTML = adminNotices.map((n,i)=>`
+    el.innerHTML = arr.map((n,i)=>`
       <div style="background:var(--bg3);border-radius:10px;padding:14px;border:1px solid rgba(255,255,255,0.06);">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
           <div style="display:flex;align-items:center;gap:8px;">
-            <select id="notice-type-${i}" class="plan-admin-input" style="width:140px;padding:6px 8px;">
+            <select id="notice-type-${page}-${i}" class="plan-admin-input" style="width:150px;padding:6px 8px;">
               <option value="aviso" ${n.type==='aviso'?'selected':''}>⚠️ Aviso</option>
               <option value="info" ${n.type==='info'?'selected':''}>ℹ️ Informação</option>
               <option value="promo" ${n.type==='promo'?'selected':''}>🎉 Promoção</option>
               <option value="lembrete" ${n.type==='lembrete'?'selected':''}>📌 Lembrete</option>
             </select>
             <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-muted);cursor:pointer;">
-              <input type="checkbox" id="notice-active-${i}" ${n.active!==false?'checked':''} style="accent-color:var(--gold);width:14px;height:14px;"> Ativo
+              <input type="checkbox" id="notice-active-${page}-${i}" ${n.active!==false?'checked':''} style="accent-color:var(--gold);width:14px;height:14px;"> Ativo
             </label>
           </div>
-          <button onclick="removeNotice(${i})" style="padding:4px 10px;border-radius:6px;border:1px solid rgba(220,38,38,0.3);background:none;color:#f87171;font-size:11px;font-weight:600;cursor:pointer;">🗑️ Remover</button>
+          <button onclick="removeNotice('${page}',${i})" style="padding:4px 10px;border-radius:6px;border:1px solid rgba(220,38,38,0.3);background:none;color:#f87171;font-size:11px;font-weight:600;cursor:pointer;">🗑️ Remover</button>
         </div>
-        <textarea id="notice-text-${i}" rows="3" placeholder="Digite o aviso ou informação..." style="width:100%;background:var(--bg2);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;resize:vertical;box-sizing:border-box;">${esc(n.text||'')}</textarea>
+        <textarea id="notice-text-${page}-${i}" rows="3" placeholder="Digite o aviso ou informação..." style="width:100%;background:var(--bg2);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;resize:vertical;box-sizing:border-box;">${esc(n.text||'')}</textarea>
       </div>`).join('');
   }
 
-  window.addNotice = function(){
-    adminNotices.push({ type:'aviso', text:'', active:true });
-    renderNoticesAdmin();
-    // Scroll to bottom of list
-    const el = document.getElementById('notices-admin-list');
-    if(el) el.lastElementChild?.scrollIntoView({behavior:'smooth', block:'nearest'});
+  window.addNotice = function(page){
+    if(page==='home') adminNoticesHome.push({type:'aviso',text:'',active:true});
+    else adminNoticesContact.push({type:'aviso',text:'',active:true});
+    renderNoticesAdminFor(page);
+    const elId = page==='home'?'notices-home-list':'notices-contact-list';
+    document.getElementById(elId)?.lastElementChild?.scrollIntoView({behavior:'smooth',block:'nearest'});
   };
 
-  window.removeNotice = function(i){
-    adminNotices.splice(i,1);
-    renderNoticesAdmin();
+  window.removeNotice = function(page, i){
+    if(page==='home') adminNoticesHome.splice(i,1);
+    else adminNoticesContact.splice(i,1);
+    renderNoticesAdminFor(page);
   };
 
-  window.saveNotices = async function(){
-    const list = adminNotices.map((_,i)=>({
-      type:   document.getElementById('notice-type-'+i)?.value||'aviso',
-      text:   (document.getElementById('notice-text-'+i)?.value||'').trim(),
-      active: document.getElementById('notice-active-'+i)?.checked!==false,
+  window.saveNotices = async function(page){
+    const arr = page==='home' ? adminNoticesHome : adminNoticesContact;
+    const cfgId = page==='home' ? 'notices_home' : 'notices_contact';
+    const list = arr.map((_,i)=>({
+      type:   document.getElementById(`notice-type-${page}-${i}`)?.value||'aviso',
+      text:   (document.getElementById(`notice-text-${page}-${i}`)?.value||'').trim(),
+      active: document.getElementById(`notice-active-${page}-${i}`)?.checked!==false,
     })).filter(n=>n.text);
     try {
-      await setDoc(doc(db,'config','notices'),{ list },{merge:true});
-      adminNotices = list;
+      await setDoc(doc(db,'config',cfgId),{list});
+      if(page==='home') adminNoticesHome=list; else adminNoticesContact=list;
       showToast('Avisos salvos!','green');
     } catch(e){ showToast('Erro: '+e.message,'red'); }
   };
