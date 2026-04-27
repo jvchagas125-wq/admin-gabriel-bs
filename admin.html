@@ -2188,8 +2188,6 @@
       if(walSnap.exists()) gbBalance = walSnap.data().balance||0;
       if(cfgSnap.exists() && cfgSnap.data().coinValue) coinValue = parseFloat(cfgSnap.data().coinValue)||0.25;
     } catch(e){ console.warn('wallet fetch:',e); }
-    const gbBrl = (gbBalance * coinValue).toFixed(2).replace('.',',');
-
     info.innerHTML=
       '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;">'
       +'<div style="background:var(--bg3);border-radius:10px;padding:14px;text-align:center;">'
@@ -2204,7 +2202,7 @@
       +'<div style="background:linear-gradient(135deg,#1a1508,#2a2010);border:1px solid var(--gold-border);border-radius:10px;padding:12px 14px;margin-bottom:12px;display:flex;align-items:center;gap:12px;">'
       +'<img src="https://i.imgur.com/FzLPpDt.jpeg" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);flex-shrink:0;">'
       +'<div><div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:2px;">Carteira GB$</div>'
-      +'<div style="display:flex;align-items:baseline;gap:8px;"><span style="font-family:Bebas Neue,sans-serif;font-size:26px;color:var(--gold);">'+gbBalance+'</span><span style="font-size:12px;color:var(--text-muted);">GB$</span><span style="font-size:13px;color:#4ade80;font-weight:700;">= R$'+gbBrl+'</span></div></div>'
+      +'<div style="display:flex;align-items:baseline;gap:8px;"><span style="font-family:Bebas Neue,sans-serif;font-size:26px;color:var(--gold);">'+gbBalance+'</span><span style="font-size:12px;color:var(--text-muted);">GB$</span></div></div>'
       +'</div>'
       +'<div style="background:var(--bg3);border-radius:10px;padding:14px;margin-bottom:12px;">'
       +'<div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:6px;">Informações</div>'
@@ -2623,7 +2621,7 @@
             ${p.imageUrl?`<img src="${p.imageUrl}" style="width:48px;height:48px;object-fit:contain;border-radius:8px;flex-shrink:0;" onerror="this.style.display='none'">`:`<div style="width:48px;height:48px;border-radius:8px;background:rgba(255,255,255,0.04);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;">${p.emoji||'🎁'}</div>`}
             <div style="min-width:0;">
               <div style="font-weight:700;font-size:14px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(p.name||'—')}</div>
-              <div style="font-size:12px;color:var(--text-dim);">${esc(p.category||'Geral')} • <span style="color:var(--gold);font-weight:700;">R$${((p.cost||1)*0.25).toFixed(2).replace('.',',')} (${p.cost||1} GB$)</span></div>
+              <div style="font-size:12px;color:var(--text-dim);">${esc(p.category||'Geral')} • <span style="color:var(--gold);font-weight:700;">${p.cost||1} GB$</span></div>
             </div>
           </div>
           <div style="display:flex;gap:6px;flex-shrink:0;">
