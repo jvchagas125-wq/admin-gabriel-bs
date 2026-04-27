@@ -760,6 +760,19 @@
         <button class="cfg-save-btn" onclick="saveBanners()" style="margin-top:14px;">💾 Salvar Avisos</button>
       </div>
 
+      <!-- AVISOS PÁGINA CONTATO -->
+      <div class="cfg-card">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
+          <div>
+            <div class="cfg-title" style="margin-bottom:2px;">📢 Avisos — Página de Contato</div>
+            <div class="cfg-hint" style="margin:0;">Aparecem na página de Contato, abaixo dos horários de funcionamento.</div>
+          </div>
+          <button class="export-btn" onclick="addNotice('contact')">+ Adicionar</button>
+        </div>
+        <div id="notices-contact-list" style="display:flex;flex-direction:column;gap:10px;"></div>
+        <button class="cfg-save-btn" onclick="saveNotices('contact')" style="margin-top:14px;max-width:220px;">💾 Salvar</button>
+      </div>
+
       <div class="cfg-card">
         <div class="cfg-title">📅 Dias e Horários de Funcionamento</div>
         <div class="cfg-hint">Defina quais dias funcionam e os horários de cada um.</div>
@@ -807,32 +820,6 @@
       </div>
 
       <button class="cfg-save-btn" onclick="saveSettings()">💾 Salvar Configurações</button>
-
-      <!-- AVISOS PÁGINA INICIAL -->
-      <div class="cfg-card" style="margin-top:24px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
-          <div>
-            <div class="cfg-title" style="margin-bottom:2px;">📢 Avisos — Página Inicial</div>
-            <div class="cfg-hint" style="margin:0;">Aparecem na página inicial do site, abaixo dos serviços.</div>
-          </div>
-          <button class="export-btn" onclick="addNotice('home')">+ Adicionar</button>
-        </div>
-        <div id="notices-home-list" style="display:flex;flex-direction:column;gap:10px;"></div>
-        <button class="cfg-save-btn" onclick="saveNotices('home')" style="margin-top:14px;max-width:220px;">💾 Salvar</button>
-      </div>
-
-      <!-- AVISOS PÁGINA CONTATO -->
-      <div class="cfg-card" style="margin-top:16px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
-          <div>
-            <div class="cfg-title" style="margin-bottom:2px;">📢 Avisos — Página de Contato</div>
-            <div class="cfg-hint" style="margin:0;">Aparecem na página de Contato, abaixo dos horários de funcionamento.</div>
-          </div>
-          <button class="export-btn" onclick="addNotice('contact')">+ Adicionar</button>
-        </div>
-        <div id="notices-contact-list" style="display:flex;flex-direction:column;gap:10px;"></div>
-        <button class="cfg-save-btn" onclick="saveNotices('contact')" style="margin-top:14px;max-width:220px;">💾 Salvar</button>
-      </div>
 
       <!-- PLANOS -->
       <div class="cfg-card" style="margin-top:24px;">
