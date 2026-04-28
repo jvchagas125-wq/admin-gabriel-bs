@@ -606,7 +606,7 @@
   </div>
 
   <!-- CANCELADOS — dentro da aba Agendamentos -->
-  <div id="tab-cancelled" style="display:block;margin-top:32px;">
+  <div id="tab-cancelled" style="display:none;margin-top:32px;">
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
       <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;background:linear-gradient(135deg,#dc2626,#f87171);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">
         🚫 Cancelados <span id="cancelled-badge" style="display:none;background:#dc2626;color:#fff;border-radius:10px;font-size:12px;padding:2px 8px;margin-left:4px;font-weight:700;vertical-align:middle;"></span>
@@ -1667,7 +1667,7 @@
   };
 
   window.switchTab = function(tab){
-    ['appointments','sessions','subscriptions','gbstore','store','gbcoins','settings'].forEach(t=>{
+    ['appointments','sessions','cancelled','subscriptions','gbstore','store','gbcoins','settings'].forEach(t=>{
       const el=document.getElementById('tab-'+t);
       if(el) el.style.display=t===tab?'block':'none';
     });
@@ -1682,7 +1682,11 @@
       else if(tab==='settings' && txt.startsWith('⚙️')) b.classList.add('active');
     });
     if(tab==='subscriptions') loadSubscriptions();
-    if(tab==='appointments') loadCancelledTab();
+    if(tab==='appointments'){
+      loadCancelledTab();
+      const cancelledDiv = document.getElementById('tab-cancelled');
+      if(cancelledDiv) cancelledDiv.style.display = 'block';
+    }
     if(tab==='settings') loadNoticesAdmin();
     if(tab==='sessions') loadSessions();
     if(tab==='store'||tab==='gbstore'){ loadStoreAdmin(); }
@@ -1715,6 +1719,7 @@
         loadAdminPlans();
         loadAdminServices();
         loadAdminBanners();
+        loadCancelledTab();
       } else {
         document.getElementById("login-screen").style.display="flex";
       }
@@ -2444,7 +2449,12 @@
 
   function loadCancelledTab(){
     const el = document.getElementById('cancelled-list');
-    if(cancelledUnsubscribe) return; // já está ouvindo
+    if(!el) return;
+    if(cancelledUnsubscribe) {
+      // Já ouvindo — só re-renderiza
+      renderCancelledList(allCancelled);
+      return;
+    }
     el.innerHTML = '<div style="text-align:center;padding:40px 0;"><div class="spinner" style="margin:0 auto;"></div></div>';
     cancelledUnsubscribe = onSnapshot(
       collection(db,'cancelled_appointments'),
