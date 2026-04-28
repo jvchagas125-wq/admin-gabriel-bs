@@ -712,10 +712,10 @@
           <span id="gb-purchases-badge-inline" style="display:none;background:#dc2626;color:#fff;border-radius:10px;font-size:12px;padding:2px 8px;margin-left:8px;font-weight:700;vertical-align:middle;"></span>
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;">
-          <button onclick="filterGBPurchases('all')" id="gbp-filter-all" class="store-filter-btn active" style="font-size:11px;padding:4px 10px;">Todos</button>
-          <button onclick="filterGBPurchases('pending')" id="gbp-filter-pending" class="store-filter-btn" style="font-size:11px;padding:4px 10px;">⏳ Pendentes</button>
-          <button onclick="filterGBPurchases('approved')" id="gbp-filter-approved" class="store-filter-btn" style="font-size:11px;padding:4px 10px;">✅ Aprovados</button>
-          <button onclick="filterGBPurchases('denied')" id="gbp-filter-denied" class="store-filter-btn" style="font-size:11px;padding:4px 10px;">❌ Negados</button>
+          <button onclick="filterGBPurchases('all')" id="gbp-filter-all" style="padding:5px 12px;border-radius:20px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.08);color:var(--text-muted);font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;">Todos</button>
+          <button onclick="filterGBPurchases('pending')" id="gbp-filter-pending" style="padding:5px 12px;border-radius:20px;border:1px solid rgba(234,179,8,0.3);background:rgba(234,179,8,0.08);color:#fde047;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;">⏳ Pendentes</button>
+          <button onclick="filterGBPurchases('approved')" id="gbp-filter-approved" style="padding:5px 12px;border-radius:20px;border:1px solid rgba(22,163,74,0.3);background:rgba(22,163,74,0.08);color:#4ade80;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;">✅ Aprovados</button>
+          <button onclick="filterGBPurchases('denied')" id="gbp-filter-denied" style="padding:5px 12px;border-radius:20px;border:1px solid rgba(220,38,38,0.3);background:rgba(220,38,38,0.08);color:#f87171;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;">❌ Negados</button>
         </div>
       </div>
       <div id="gb-purchases-list">
@@ -3161,12 +3161,30 @@
   let gbPurchasesFilter = 'all';
   let gbPurchasesAll = [];
 
+  const GBP_FILTER_STYLES = {
+    all:      { border:'rgba(255,255,255,0.15)', bg:'rgba(255,255,255,0.08)', color:'var(--text-muted)' },
+    pending:  { border:'rgba(234,179,8,0.3)',    bg:'rgba(234,179,8,0.15)',   color:'#fde047' },
+    approved: { border:'rgba(22,163,74,0.35)',   bg:'rgba(22,163,74,0.15)',   color:'#4ade80' },
+    denied:   { border:'rgba(220,38,38,0.35)',   bg:'rgba(220,38,38,0.15)',   color:'#f87171' },
+  };
+  const GBP_FILTER_INACTIVE = {
+    all:      { border:'rgba(255,255,255,0.15)', bg:'rgba(255,255,255,0.08)', color:'var(--text-muted)' },
+    pending:  { border:'rgba(234,179,8,0.3)',    bg:'rgba(234,179,8,0.08)',   color:'#fde047' },
+    approved: { border:'rgba(22,163,74,0.3)',    bg:'rgba(22,163,74,0.08)',   color:'#4ade80' },
+    denied:   { border:'rgba(220,38,38,0.3)',    bg:'rgba(220,38,38,0.08)',   color:'#f87171' },
+  };
+
   window.filterGBPurchases = function(status){
     gbPurchasesFilter = status;
-    // Update filter buttons
     ['all','pending','approved','denied'].forEach(s=>{
       const btn = document.getElementById('gbp-filter-'+s);
-      if(btn) btn.classList.toggle('active', s===status);
+      if(!btn) return;
+      const st = s===status ? GBP_FILTER_STYLES[s] : GBP_FILTER_INACTIVE[s];
+      btn.style.borderColor = st.border;
+      btn.style.background  = st.bg;
+      btn.style.color       = st.color;
+      btn.style.boxShadow   = s===status ? '0 0 0 2px '+st.border : 'none';
+      btn.style.fontWeight  = s===status ? '800' : '600';
     });
     const filtered = status==='all' ? gbPurchasesAll : gbPurchasesAll.filter(p=>p.status===status);
     renderGBPurchases(filtered);
@@ -3237,7 +3255,8 @@
   }
 
   window.approveGBPurchase = async function(purchaseId){
-    if(!confirm('Permitir esta compra e creditar GB$ ao cliente?')) return;
+    const ok = await showGBConfirm('✅ Permitir Compra','Deseja permitir esta compra e creditar os GB$ automaticamente na carteira do cliente?','Sim, permitir','Cancelar','green');
+    if(!ok) return;
     try {
       const snap = await getDoc(doc(db,'gb_purchases',purchaseId));
       if(!snap.exists()) return;
@@ -3263,7 +3282,7 @@
   };
 
   window.denyGBPurchase = async function(purchaseId){
-    const reason = prompt('Motivo da negação (será enviado ao cliente):');
+    const reason = await showGBDenyModal();
     if(reason===null) return;
     if(!reason.trim()){ showToast('Informe o motivo.','red'); return; }
     try {
@@ -3283,12 +3302,62 @@
   };
 
   window.deleteGBPurchase = async function(purchaseId){
-    if(!confirm('Apagar este pedido da lista?')) return;
+    const ok = await showGBConfirm('🗑️ Apagar Pedido','Deseja apagar este pedido da lista? Esta ação não pode ser desfeita.','Sim, apagar','Cancelar','red');
+    if(!ok) return;
     try {
       await deleteDoc(doc(db,'gb_purchases',purchaseId));
       showToast('Pedido apagado.','green');
     } catch(e){ showToast('Erro: '+e.message,'red'); }
   };
+
+
+
+  // ─── Modais customizados para GB$ ───
+  function showGBConfirm(title, message, confirmText, cancelText, type){
+    return new Promise(resolve=>{
+      const colors = { green:'#4ade80', red:'#f87171', gold:'var(--gold)' };
+      const borders = { green:'rgba(22,163,74,0.4)', red:'rgba(220,38,38,0.4)', gold:'var(--gold-border)' };
+      const color = colors[type]||colors.gold;
+      const border = borders[type]||borders.gold;
+      const modal = document.createElement('div');
+      modal.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;';
+      modal.innerHTML = `<div style="background:#1a1a1a;border:1px solid ${border};border-radius:16px;padding:28px 24px;width:90%;max-width:360px;animation:slideUp .25s ease-out;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:${color};margin-bottom:10px;">${title}</div>
+        <div style="font-size:14px;color:var(--text-muted);line-height:1.6;margin-bottom:22px;">${message}</div>
+        <div style="display:flex;gap:10px;">
+          <button id="gb-modal-cancel" style="flex:1;padding:11px;border-radius:9px;border:1px solid rgba(255,255,255,0.1);background:none;color:var(--text-muted);font-family:'DM Sans',sans-serif;font-weight:600;font-size:14px;cursor:pointer;">${cancelText}</button>
+          <button id="gb-modal-confirm" style="flex:1;padding:11px;border-radius:9px;border:none;background:${color};color:${type==='green'?'#111':'#fff'};font-family:'DM Sans',sans-serif;font-weight:700;font-size:14px;cursor:pointer;">${confirmText}</button>
+        </div>
+      </div>`;
+      document.body.appendChild(modal);
+      modal.querySelector('#gb-modal-confirm').onclick = ()=>{ document.body.removeChild(modal); resolve(true); };
+      modal.querySelector('#gb-modal-cancel').onclick  = ()=>{ document.body.removeChild(modal); resolve(false); };
+    });
+  }
+
+  function showGBDenyModal(){
+    return new Promise(resolve=>{
+      const modal = document.createElement('div');
+      modal.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;';
+      modal.innerHTML = `<div style="background:#1a1a1a;border:1px solid rgba(220,38,38,0.4);border-radius:16px;padding:28px 24px;width:90%;max-width:380px;animation:slideUp .25s ease-out;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#f87171;margin-bottom:10px;">❌ Negar Compra</div>
+        <div style="font-size:13px;color:var(--text-muted);margin-bottom:12px;">Informe o motivo da negação. Ele será enviado ao cliente como notificação.</div>
+        <textarea id="gb-deny-reason" rows="3" placeholder="Ex: Pagamento não identificado. Entre em contato pelo WhatsApp." style="width:100%;background:var(--bg3);border:1px solid rgba(255,255,255,0.1);border-radius:9px;padding:10px 12px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;resize:vertical;box-sizing:border-box;margin-bottom:14px;"></textarea>
+        <div style="display:flex;gap:10px;">
+          <button id="gb-deny-cancel" style="flex:1;padding:11px;border-radius:9px;border:1px solid rgba(255,255,255,0.1);background:none;color:var(--text-muted);font-family:'DM Sans',sans-serif;font-weight:600;font-size:14px;cursor:pointer;">Cancelar</button>
+          <button id="gb-deny-confirm" style="flex:1;padding:11px;border-radius:9px;border:none;background:#f87171;color:#fff;font-family:'DM Sans',sans-serif;font-weight:700;font-size:14px;cursor:pointer;">Confirmar negação</button>
+        </div>
+      </div>`;
+      document.body.appendChild(modal);
+      modal.querySelector('#gb-deny-confirm').onclick = ()=>{
+        const reason = modal.querySelector('#gb-deny-reason').value.trim();
+        document.body.removeChild(modal);
+        resolve(reason||null);
+      };
+      modal.querySelector('#gb-deny-cancel').onclick = ()=>{ document.body.removeChild(modal); resolve(null); };
+      setTimeout(()=>modal.querySelector('#gb-deny-reason').focus(), 100);
+    });
+  }
 
 
 </script>
