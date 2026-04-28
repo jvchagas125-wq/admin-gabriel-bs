@@ -1720,6 +1720,8 @@
         loadAdminServices();
         loadAdminBanners();
         loadCancelledTab();
+        const cancelledDiv = document.getElementById('tab-cancelled');
+        if(cancelledDiv) cancelledDiv.style.display = 'block';
       } else {
         document.getElementById("login-screen").style.display="flex";
       }
