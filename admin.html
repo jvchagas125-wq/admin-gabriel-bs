@@ -486,9 +486,6 @@
     <button class="admin-mob-item" data-tab="sessions" onclick="adminMobNav('sessions')" style="display:flex;align-items:center;gap:12px;padding:14px 18px;background:none;border:none;color:var(--text-muted);font-size:14px;font-weight:600;cursor:pointer;text-align:left;font-family:'DM Sans',sans-serif;transition:background .15s,color .15s;">
       <span style="font-size:18px;width:24px;text-align:center;">👥</span> Clientes
     </button>
-    <button class="admin-mob-item" data-tab="cancelled" onclick="adminMobNav('cancelled')" style="display:flex;align-items:center;gap:12px;padding:14px 18px;background:none;border:none;color:var(--text-muted);font-size:14px;font-weight:600;cursor:pointer;text-align:left;font-family:'DM Sans',sans-serif;transition:background .15s,color .15s;">
-      <span style="font-size:18px;width:24px;text-align:center;">🚫</span> Cancelados <span id="mob-cancelled-badge" style="display:none;background:#dc2626;color:#fff;border-radius:10px;font-size:10px;padding:1px 6px;margin-left:4px;font-weight:700;"></span>
-    </button>
     <button class="admin-mob-item" data-tab="subscriptions" onclick="adminMobNav('subscriptions')" style="display:flex;align-items:center;gap:12px;padding:14px 18px;background:none;border:none;color:var(--text-muted);font-size:14px;font-weight:600;cursor:pointer;text-align:left;font-family:'DM Sans',sans-serif;transition:background .15s,color .15s;">
       <span style="font-size:18px;width:24px;text-align:center;">👑</span> Assinaturas
     </button>
@@ -520,7 +517,6 @@
   <div style="max-width:1100px;margin:0 auto;padding:0 20px;display:flex;gap:4px;border-top:1px solid rgba(255,255,255,0.05);">
     <button class="tab-btn active" onclick="switchTab('appointments')">📋 Agendamentos</button>
     <button class="tab-btn" onclick="switchTab('sessions')">👥 Clientes</button>
-    <button class="tab-btn" onclick="switchTab('cancelled')">🚫 Cancelados <span id="cancelled-badge" style="display:none;background:#dc2626;color:#fff;border-radius:10px;font-size:10px;padding:1px 6px;margin-left:4px;font-weight:700;"></span></button>
     <button class="tab-btn" onclick="switchTab('subscriptions')">👑 Assinaturas</button>
     <button class="tab-btn" onclick="switchTab('store')">🛍️ Produtos <span id="redemptions-badge" style="display:none;background:#dc2626;color:#fff;border-radius:10px;font-size:10px;padding:1px 6px;margin-left:4px;font-weight:700;"></span></button>
     <button class="tab-btn" onclick="switchTab('gbcoins')">🪙 GB$ <span id="gb-purchases-badge" style="display:none;background:#dc2626;color:#fff;border-radius:10px;font-size:10px;padding:1px 6px;margin-left:4px;font-weight:700;"></span></button>
@@ -609,16 +605,18 @@
   </div>
   </div>
 
-  <!-- ABA CANCELADOS -->
-  <div id="tab-cancelled" style="display:none;">
-    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:18px;">
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;background:linear-gradient(135deg,#dc2626,#f87171);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">🚫 Agendamentos Cancelados</div>
+  <!-- CANCELADOS — dentro da aba Agendamentos -->
+  <div id="tab-cancelled" style="display:block;margin-top:32px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;background:linear-gradient(135deg,#dc2626,#f87171);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">
+        🚫 Cancelados <span id="cancelled-badge" style="display:none;background:#dc2626;color:#fff;border-radius:10px;font-size:12px;padding:2px 8px;margin-left:4px;font-weight:700;vertical-align:middle;"></span>
+      </div>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-        <input class="search-input" type="search" id="cancelled-search" placeholder="Buscar nome ou telefone..." oninput="filterCancelled()" style="width:220px;">
-        <button class="clear-btn" onclick="clearAllCancelled()" title="Limpar toda a lista de cancelados" style="white-space:nowrap;">🗑️ Limpar tudo</button>
+        <input class="search-input" type="search" id="cancelled-search" placeholder="Buscar nome ou telefone..." oninput="filterCancelled()" style="width:200px;">
+        <button class="clear-btn" onclick="clearAllCancelled()" title="Limpar toda a lista" style="white-space:nowrap;">🗑️ Limpar tudo</button>
       </div>
     </div>
-    <div style="font-size:12px;color:var(--text-dim);margin-bottom:14px;">Lista de agendamentos cancelados (pelo cliente ou pelo admin). Clique em 🗑️ para remover da lista.</div>
+    <div style="font-size:12px;color:var(--text-dim);margin-bottom:12px;">Agendamentos cancelados pelo cliente ou pelo admin.</div>
     <div id="cancelled-list" class="table-wrap fade-in">
       <div style="text-align:center;padding:40px 0;"><div class="spinner" style="margin:0 auto;"></div></div>
     </div>
@@ -1669,7 +1667,7 @@
   };
 
   window.switchTab = function(tab){
-    ['appointments','sessions','cancelled','subscriptions','gbstore','store','gbcoins','settings'].forEach(t=>{
+    ['appointments','sessions','subscriptions','gbstore','store','gbcoins','settings'].forEach(t=>{
       const el=document.getElementById('tab-'+t);
       if(el) el.style.display=t===tab?'block':'none';
     });
@@ -1678,16 +1676,15 @@
       const txt = b.textContent.trim().toLowerCase();
       if(tab==='appointments' && txt.startsWith('📋')) b.classList.add('active');
       else if(tab==='sessions' && txt.startsWith('👥')) b.classList.add('active');
-      else if(tab==='cancelled' && txt.startsWith('🚫')) b.classList.add('active');
       else if(tab==='subscriptions' && txt.startsWith('👑')) b.classList.add('active');
       else if((tab==='store'||tab==='gbstore') && txt.includes('🛍️')) b.classList.add('active');
       else if(tab==='gbcoins' && txt.includes('🪙')) b.classList.add('active');
       else if(tab==='settings' && txt.startsWith('⚙️')) b.classList.add('active');
     });
     if(tab==='subscriptions') loadSubscriptions();
+    if(tab==='appointments') loadCancelledTab();
     if(tab==='settings') loadNoticesAdmin();
     if(tab==='sessions') loadSessions();
-    if(tab==='cancelled') loadCancelledTab();
     if(tab==='store'||tab==='gbstore'){ loadStoreAdmin(); }
     if(tab==='gbcoins'){ loadGBConfig(); loadGBPackages(); loadGBPurchases(); }
   };
