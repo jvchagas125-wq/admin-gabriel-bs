@@ -1980,7 +1980,40 @@
         activatedAt:new Date().toISOString(),
       });
       await deleteDoc(doc(db,'pending_subscriptions',pendingId));
-      showToast('VIP ativado para '+phone+'!','green');
+
+      // Creditar GB$ de bônus de assinatura automaticamente
+      try {
+        const digits = phone.replace(/\D/g,'');
+        // Procura benefício com "+XXgb$" ou "+XX GB$" (case-insensitive)
+        let gbBonus = 0;
+        (benefits||[]).forEach(b=>{
+          const match = String(b).match(/\+(\d+)\s*gb\$/i);
+          if(match) gbBonus += parseInt(match[1])||0;
+        });
+        if(gbBonus > 0){
+          const walRef = doc(db,'wallets',digits);
+          const walSnap = await getDoc(walRef);
+          const cur = walSnap.exists() ? (walSnap.data().balance||0) : 0;
+          await setDoc(walRef,{
+            balance: cur + gbBonus,
+            phone, digits,
+            updatedAt: new Date().toISOString(),
+          },{merge:true});
+          // Notificação push para o cliente
+          await setDoc(doc(db,'push_notifications',digits+'_sub_gb_'+Date.now()),{
+            title:'🪙 +'+gbBonus+' GB$ de bônus!',
+            body:'Bônus do plano '+planName+' creditado na sua carteira. Bom proveito!',
+            phone, digits, createdAt:new Date().toISOString(), read:false,
+          });
+          showToast('VIP ativado e +'+gbBonus+' GB$ creditados para '+phone+'!','green');
+        } else {
+          showToast('VIP ativado para '+phone+'!','green');
+        }
+      } catch(ge){
+        console.warn('GB$ bonus error:',ge);
+        showToast('VIP ativado para '+phone+'!','green');
+      }
+
       loadSubscriptions();
     }catch(e){ console.error(e); showToast('Erro ao ativar VIP','red'); }
   };
