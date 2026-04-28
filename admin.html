@@ -523,6 +523,7 @@
     <button class="tab-btn" onclick="switchTab('cancelled')">🚫 Cancelados <span id="cancelled-badge" style="display:none;background:#dc2626;color:#fff;border-radius:10px;font-size:10px;padding:1px 6px;margin-left:4px;font-weight:700;"></span></button>
     <button class="tab-btn" onclick="switchTab('subscriptions')">👑 Assinaturas</button>
     <button class="tab-btn" onclick="switchTab('store')">🛍️ Produtos <span id="redemptions-badge" style="display:none;background:#dc2626;color:#fff;border-radius:10px;font-size:10px;padding:1px 6px;margin-left:4px;font-weight:700;"></span></button>
+    <button class="tab-btn" onclick="switchTab('gbcoins')">🪙 GB$ <span id="gb-purchases-badge" style="display:none;background:#dc2626;color:#fff;border-radius:10px;font-size:10px;padding:1px 6px;margin-left:4px;font-weight:700;"></span></button>
     <button class="tab-btn" onclick="switchTab('settings')">⚙️ Configurações</button>
   </div>
 </header>
@@ -627,37 +628,6 @@
   <!-- ABA PRODUTOS / LOJA GB$ -->
   <div id="tab-store" style="display:none;">
 
-    <!-- Configuração GB$ -->
-    <div class="cfg-card" style="margin-bottom:24px;">
-      <div class="cfg-title">🪙 Configurações GB$</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-top:14px;">
-        <div>
-          <span class="plan-admin-label">GB$ por atendimento concluído</span>
-          <input type="number" class="plan-admin-input" id="gb-coins-per-apt" placeholder="Ex: 1" value="1" min="1" step="1">
-        </div>
-        <div>
-          <span class="plan-admin-label">GB$ ao preencher aniversário</span>
-          <input type="number" class="plan-admin-input" id="gb-birth-coins" placeholder="Ex: 1" value="1" min="0" step="1">
-        </div>
-
-        <div>
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><span class="plan-admin-label" style="margin-bottom:0;">Imagem da moeda</span><span style="font-size:11px;color:var(--gold);font-weight:600;">Ideal: 200x200px</span></div>
-          <div class="img-dropzone" id="dz-coin-image" onclick="document.getElementById('fi-coin-image').click()" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="dzDrop(event,'fi-coin-image','prev-coin-image','up-coin-image','gb-coin-image',null)" style="padding:10px;">
-            <input type="file" id="fi-coin-image" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="dzChange(this,'prev-coin-image','up-coin-image','gb-coin-image',null)">
-            <div class="img-dropzone-label" style="font-size:11px;">📷 Clique ou arraste<br><span style="font-size:10px;color:var(--text-dim);">JPG/PNG · <strong style="color:var(--gold);">Ideal: 200x200px</strong></span></div>
-          </div>
-          <img id="prev-coin-image" class="img-upload-preview" src="" alt="moeda" style="max-height:60px;">
-          <div id="up-coin-image" class="img-uploading">⏳ Enviando...</div>
-          <button type="button" id="rm-gb-coin-image" onclick="removeImgUpload('prev-coin-image','gb-coin-image','dz-coin-image')" style="display:none;margin-top:6px;padding:4px 10px;border-radius:6px;border:1px solid rgba(220,38,38,0.35);background:none;color:#f87171;font-size:11px;font-weight:600;cursor:pointer;">🗑️ Remover imagem</button>
-          <input type="hidden" id="gb-coin-image" value="">
-        </div>
-      </div>
-      <div style="margin-top:10px;">
-        <span class="plan-admin-label">Texto explicativo (aparece abaixo do saldo)</span>
-        <input class="plan-admin-input" id="gb-sub-text" value="Cada agendamento concluído ganha 1 moeda GB$ (igual a R$0,25 centavos).">
-      </div>
-      <button class="cfg-save-btn" onclick="saveGBConfig()" style="margin-top:12px;max-width:240px;">💾 Salvar Configurações GB$</button>
-    </div>
 
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px;">
       <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;background:linear-gradient(135deg,#c9a84c,#f0d78c,#c9a84c);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">🛍️ Produtos & Cupons</div>
@@ -682,6 +652,70 @@
   </div>
 
 
+
+
+  <!-- ABA GB$ -->
+  <div id="tab-gbcoins" style="display:none;">
+
+    <!-- Configuração GB$ -->
+    <div class="cfg-card" style="margin-bottom:20px;">
+      <div class="cfg-title">🪙 Configurações GB$</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-top:14px;">
+        <div>
+          <span class="plan-admin-label">GB$ por atendimento concluído</span>
+          <input type="number" class="plan-admin-input" id="gb-coins-per-apt" placeholder="Ex: 1" value="1" min="1" step="1">
+        </div>
+        <div>
+          <span class="plan-admin-label">GB$ ao preencher aniversário</span>
+          <input type="number" class="plan-admin-input" id="gb-birth-coins" placeholder="Ex: 1" value="1" min="0" step="1">
+        </div>
+        <div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><span class="plan-admin-label" style="margin-bottom:0;">Imagem da moeda</span><span style="font-size:11px;color:var(--gold);font-weight:600;">Ideal: 200x200px</span></div>
+          <div class="img-dropzone" id="dz-coin-image" onclick="document.getElementById('fi-coin-image').click()" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="dzDrop(event,'fi-coin-image','prev-coin-image','up-coin-image','gb-coin-image',null)" style="padding:10px;">
+            <input type="file" id="fi-coin-image" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="dzChange(this,'prev-coin-image','up-coin-image','gb-coin-image',null)">
+            <div class="img-dropzone-label" style="font-size:11px;">📷 Clique ou arraste<br><span style="font-size:10px;color:var(--text-dim);">JPG/PNG · <strong style="color:var(--gold);">Ideal: 200x200px</strong></span></div>
+          </div>
+          <img id="prev-coin-image" class="img-upload-preview" src="" alt="moeda" style="max-height:60px;">
+          <div id="up-coin-image" class="img-uploading">⏳ Enviando...</div>
+          <button type="button" id="rm-gb-coin-image" onclick="removeImgUpload('prev-coin-image','gb-coin-image','dz-coin-image')" style="display:none;margin-top:6px;padding:4px 10px;border-radius:6px;border:1px solid rgba(220,38,38,0.35);background:none;color:#f87171;font-size:11px;font-weight:600;cursor:pointer;">🗑️ Remover imagem</button>
+          <input type="hidden" id="gb-coin-image" value="">
+        </div>
+      </div>
+      <div style="margin-top:10px;">
+        <span class="plan-admin-label">Texto explicativo (aparece abaixo do saldo)</span>
+        <input class="plan-admin-input" id="gb-sub-text" value="Cada agendamento concluído ganha 1 moeda GB$ (igual a R$0,25 centavos).">
+      </div>
+      <button class="cfg-save-btn" onclick="saveGBConfig()" style="margin-top:12px;max-width:240px;">💾 Salvar Configurações GB$</button>
+    </div>
+
+    <!-- Pacotes de compra GB$ -->
+    <div class="cfg-card" style="margin-bottom:20px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:6px;">
+        <div>
+          <div class="cfg-title" style="margin-bottom:2px;">💳 Pacotes de Compra GB$</div>
+          <div class="cfg-hint" style="margin:0;">Clientes podem comprar GB$ via Mercado Pago. Edite os pacotes abaixo.</div>
+        </div>
+        <button class="export-btn" onclick="addGBPackage()">+ Adicionar pacote</button>
+      </div>
+      <div style="margin-bottom:12px;">
+        <span class="plan-admin-label">Frase exibida no modal de compra</span>
+        <input class="plan-admin-input" id="gb-buy-phrase" value="Compre aqui seus GB$ caso esteja com vontade de resgatar os cupons e produtos de forma rápida.">
+      </div>
+      <div id="gb-packages-list" style="display:flex;flex-direction:column;gap:10px;"></div>
+      <button class="cfg-save-btn" onclick="saveGBPackages()" style="margin-top:14px;max-width:240px;">💾 Salvar Pacotes</button>
+    </div>
+
+    <!-- Pedidos de compra GB$ -->
+    <div class="cfg-card">
+      <div class="cfg-title" style="margin-bottom:14px;">🧾 Pedidos de Compra GB$
+        <span id="gb-purchases-badge-inline" style="display:none;background:#dc2626;color:#fff;border-radius:10px;font-size:12px;padding:2px 8px;margin-left:8px;font-weight:700;vertical-align:middle;"></span>
+      </div>
+      <div id="gb-purchases-list">
+        <div style="text-align:center;padding:32px;color:var(--text-dim);">Carregando...</div>
+      </div>
+    </div>
+
+  </div>
 
   <!-- ABA CONFIGURAÇÕES -->
   <div id="tab-settings" style="display:none;">
@@ -1627,7 +1661,7 @@
   };
 
   window.switchTab = function(tab){
-    ['appointments','sessions','cancelled','subscriptions','gbstore','store','settings'].forEach(t=>{
+    ['appointments','sessions','cancelled','subscriptions','gbstore','store','gbcoins','settings'].forEach(t=>{
       const el=document.getElementById('tab-'+t);
       if(el) el.style.display=t===tab?'block':'none';
     });
@@ -1638,14 +1672,16 @@
       else if(tab==='sessions' && txt.startsWith('👥')) b.classList.add('active');
       else if(tab==='cancelled' && txt.startsWith('🚫')) b.classList.add('active');
       else if(tab==='subscriptions' && txt.startsWith('👑')) b.classList.add('active');
-      else if((tab==='store'||tab==='gbstore') && (txt.includes('🪙')||txt.includes('🛍️'))) b.classList.add('active');
+      else if((tab==='store'||tab==='gbstore') && txt.includes('🛍️')) b.classList.add('active');
+      else if(tab==='gbcoins' && txt.includes('🪙')) b.classList.add('active');
       else if(tab==='settings' && txt.startsWith('⚙️')) b.classList.add('active');
     });
     if(tab==='subscriptions') loadSubscriptions();
     if(tab==='settings') loadNoticesAdmin();
     if(tab==='sessions') loadSessions();
     if(tab==='cancelled') loadCancelledTab();
-    if(tab==='store'||tab==='gbstore'){ loadStoreAdmin(); loadGBConfig(); }
+    if(tab==='store'||tab==='gbstore'){ loadStoreAdmin(); }
+    if(tab==='gbcoins'){ loadGBConfig(); loadGBPackages(); loadGBPurchases(); }
   };
 
   window.addEventListener("DOMContentLoaded",()=>{
@@ -3029,6 +3065,192 @@
       await setDoc(doc(db,'config',cfgId),{list});
       if(page==='home') adminNoticesHome=list; else adminNoticesContact=list;
       showToast('Avisos salvos!','green');
+    } catch(e){ showToast('Erro: '+e.message,'red'); }
+  };
+
+
+
+  // ═══════════════════════════════════════
+  // GB$ PACOTES DE COMPRA — ADMIN
+  // ═══════════════════════════════════════
+  let gbPackages = [
+    { id:'pkg1', price:10,  coins:11, bonus:1,   link:'https://mpago.la/1ntVSHj', active:true },
+    { id:'pkg2', price:25,  coins:30, bonus:5,   link:'https://mpago.la/1utPXfQ', active:true },
+    { id:'pkg3', price:50,  coins:70, bonus:20,  link:'https://mpago.la/11fNQU1', active:true },
+    { id:'pkg4', price:150, coins:250,bonus:100, link:'https://mpago.la/1V2C2BC', active:true },
+  ];
+
+  async function loadGBPackages(){
+    try {
+      const snap = await getDoc(doc(db,'config','gb_packages'));
+      if(snap.exists()){
+        if(snap.data().packages) gbPackages = snap.data().packages;
+        const phrase = document.getElementById('gb-buy-phrase');
+        if(phrase && snap.data().phrase) phrase.value = snap.data().phrase;
+      }
+    } catch(e){ console.warn('loadGBPackages:',e); }
+    renderGBPackages();
+  }
+
+  function renderGBPackages(){
+    const el = document.getElementById('gb-packages-list');
+    if(!el) return;
+    if(!gbPackages.length){ el.innerHTML='<div style="color:var(--text-dim);font-size:13px;">Nenhum pacote.</div>'; return; }
+    el.innerHTML = gbPackages.map((p,i)=>`
+      <div style="background:var(--bg3);border-radius:10px;padding:14px;border:1px solid rgba(255,255,255,0.06);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <span style="font-family:Bebas Neue,sans-serif;font-size:16px;color:var(--gold);">Pacote ${i+1}</span>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <label style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text-muted);cursor:pointer;">
+              <input type="checkbox" id="pkg-active-${i}" ${p.active!==false?'checked':''} style="accent-color:var(--gold);"> Ativo
+            </label>
+            <button onclick="removeGBPackage(${i})" style="padding:3px 8px;border-radius:6px;border:1px solid rgba(220,38,38,0.3);background:none;color:#f87171;font-size:11px;cursor:pointer;">🗑️</button>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:8px;">
+          <div><span class="plan-admin-label">Valor (R$)</span>
+            <input type="number" class="plan-admin-input" id="pkg-price-${i}" value="${p.price||0}" min="1" step="0.01"></div>
+          <div><span class="plan-admin-label">GB$ total</span>
+            <input type="number" class="plan-admin-input" id="pkg-coins-${i}" value="${p.coins||0}" min="1"></div>
+          <div><span class="plan-admin-label">Bônus GB$</span>
+            <input type="number" class="plan-admin-input" id="pkg-bonus-${i}" value="${p.bonus||0}" min="0"></div>
+          <div><span class="plan-admin-label">Link Mercado Pago</span>
+            <input class="plan-admin-input" id="pkg-link-${i}" value="${esc(p.link||'')}"></div>
+        </div>
+      </div>`).join('');
+  }
+
+  window.addGBPackage = function(){
+    gbPackages.push({ id:'pkg_'+Date.now(), price:10, coins:10, bonus:0, link:'', active:true });
+    renderGBPackages();
+  };
+
+  window.removeGBPackage = function(i){
+    gbPackages.splice(i,1);
+    renderGBPackages();
+  };
+
+  window.saveGBPackages = async function(){
+    const phrase = (document.getElementById('gb-buy-phrase')?.value||'').trim();
+    const packages = gbPackages.map((_,i)=>({
+      id:     gbPackages[i].id||'pkg_'+i,
+      price:  parseFloat(document.getElementById('pkg-price-'+i)?.value)||0,
+      coins:  parseInt(document.getElementById('pkg-coins-'+i)?.value)||0,
+      bonus:  parseInt(document.getElementById('pkg-bonus-'+i)?.value)||0,
+      link:   (document.getElementById('pkg-link-'+i)?.value||'').trim(),
+      active: document.getElementById('pkg-active-'+i)?.checked!==false,
+    }));
+    try {
+      await setDoc(doc(db,'config','gb_packages'),{ packages, phrase });
+      gbPackages = packages;
+      showToast('Pacotes salvos!','green');
+    } catch(e){ showToast('Erro: '+e.message,'red'); }
+  };
+
+  // ─── Pedidos de Compra ───
+  let gbPurchasesUnsubscribe = null;
+
+  function loadGBPurchases(){
+    if(gbPurchasesUnsubscribe) return;
+    gbPurchasesUnsubscribe = onSnapshot(
+      query(collection(db,'gb_purchases'), orderBy('createdAt','desc')),
+      snap => {
+        const items = snap.docs.map(d=>({id:d.id,...d.data()}));
+        renderGBPurchases(items);
+        const pending = items.filter(p=>p.status==='pending').length;
+        ['gb-purchases-badge','gb-purchases-badge-inline'].forEach(id=>{
+          const el=document.getElementById(id);
+          if(el){ el.textContent=pending; el.style.display=pending?'inline':'none'; }
+        });
+      }, e=>{
+        // Fallback without orderBy
+        onSnapshot(collection(db,'gb_purchases'), snap2=>{
+          const items = snap2.docs.map(d=>({id:d.id,...d.data()}))
+            .sort((a,b)=>(b.createdAt||'').localeCompare(a.createdAt||''));
+          renderGBPurchases(items);
+        });
+      }
+    );
+  }
+
+  function renderGBPurchases(items){
+    const el = document.getElementById('gb-purchases-list');
+    if(!el) return;
+    if(!items.length){ el.innerHTML='<div style="text-align:center;padding:24px;color:var(--text-dim);">Nenhum pedido ainda.</div>'; return; }
+    el.innerHTML = items.map(p=>{
+      const dt = p.createdAt ? new Date(p.createdAt).toLocaleString('pt-BR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : '—';
+      const statusBadge = p.status==='approved'
+        ? '<span style="background:rgba(22,163,74,0.15);color:#4ade80;border:1px solid rgba(22,163,74,0.3);border-radius:20px;font-size:10px;padding:2px 8px;font-weight:700;">✅ Aprovado</span>'
+        : p.status==='denied'
+        ? '<span style="background:rgba(220,38,38,0.12);color:#f87171;border:1px solid rgba(220,38,38,0.3);border-radius:20px;font-size:10px;padding:2px 8px;font-weight:700;">❌ Negado</span>'
+        : '<span style="background:rgba(234,179,8,0.12);color:#fde047;border:1px solid rgba(234,179,8,0.3);border-radius:20px;font-size:10px;padding:2px 8px;font-weight:700;">⏳ Pendente</span>';
+      const actions = p.status==='pending' ? `
+        <button onclick="approveGBPurchase('${p.id}')" style="padding:6px 12px;border-radius:7px;border:1px solid rgba(22,163,74,.35);background:rgba(22,163,74,0.08);color:#4ade80;font-size:12px;font-weight:700;cursor:pointer;">✅ Permitir</button>
+        <button onclick="denyGBPurchase('${p.id}')" style="padding:6px 12px;border-radius:7px;border:1px solid rgba(220,38,38,.25);background:none;color:#f87171;font-size:12px;font-weight:600;cursor:pointer;">❌ Negar</button>` : '';
+      return `<div style="padding:14px 16px;border-bottom:1px solid rgba(255,255,255,0.05);">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+          <div>
+            <div style="font-weight:700;font-size:13px;">${esc(p.clientName||'—')}</div>
+            <div style="font-size:11px;color:var(--text-dim);">${esc(p.email||'—')} • ${esc(p.phone||'—')}</div>
+          </div>
+          ${statusBadge}
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+          <div>
+            <span style="font-family:Bebas Neue,sans-serif;font-size:20px;color:var(--gold);">R$${(p.price||0).toFixed(2).replace('.',',')} → ${p.coins||0} GB$</span>
+            ${p.bonus?'<span style="font-size:11px;color:#4ade80;margin-left:4px;">+'+p.bonus+' bônus</span>':''}
+            <div style="font-size:11px;color:var(--text-dim);margin-top:2px;">${dt}</div>
+            ${p.denyReason?'<div style="font-size:11px;color:#f87171;margin-top:4px;">Motivo: '+esc(p.denyReason)+'</div>':''}
+          </div>
+          <div style="display:flex;gap:6px;">${actions}</div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  window.approveGBPurchase = async function(purchaseId){
+    if(!confirm('Permitir esta compra e creditar GB$ ao cliente?')) return;
+    try {
+      const snap = await getDoc(doc(db,'gb_purchases',purchaseId));
+      if(!snap.exists()) return;
+      const p = snap.data();
+      const digits = (p.phone||'').replace(/\D/g,'');
+      if(digits){
+        const walRef = doc(db,'wallets',digits);
+        const walSnap = await getDoc(walRef);
+        const cur = walSnap.exists() ? (walSnap.data().balance||0) : 0;
+        await setDoc(walRef,{ balance: cur+(p.coins||0), phone:p.phone||'', digits, updatedAt:new Date().toISOString() },{merge:true});
+      }
+      await setDoc(doc(db,'gb_purchases',purchaseId),{ status:'approved', approvedAt:new Date().toISOString() },{merge:true});
+      // Send push notification to client
+      if(digits){
+        await setDoc(doc(db,'push_notifications',digits+'_gb_'+Date.now()),{
+          title:'🪙 GB$ Creditados!',
+          body:'Sua compra foi aprovada! +'+(snap.data().coins||0)+' GB$ adicionados à sua carteira.',
+          phone:p.phone||'', digits, createdAt:new Date().toISOString(), read:false,
+        });
+      }
+      showToast('Compra aprovada! GB$ creditados.','green');
+    } catch(e){ showToast('Erro: '+e.message,'red'); }
+  };
+
+  window.denyGBPurchase = async function(purchaseId){
+    const reason = prompt('Motivo da negação (será enviado ao cliente):');
+    if(reason===null) return;
+    if(!reason.trim()){ showToast('Informe o motivo.','red'); return; }
+    try {
+      await setDoc(doc(db,'gb_purchases',purchaseId),{ status:'denied', denyReason:reason.trim(), deniedAt:new Date().toISOString() },{merge:true});
+      const snap = await getDoc(doc(db,'gb_purchases',purchaseId));
+      const p = snap.data();
+      const digits = (p.phone||'').replace(/\D/g,'');
+      if(digits){
+        await setDoc(doc(db,'push_notifications',digits+'_gb_deny_'+Date.now()),{
+          title:'❌ Compra de GB$ Negada',
+          body:'Sua solicitação foi negada. Motivo: '+reason.trim(),
+          phone:p.phone||'', digits, createdAt:new Date().toISOString(), read:false,
+        });
+      }
+      showToast('Compra negada.','red');
     } catch(e){ showToast('Erro: '+e.message,'red'); }
   };
 
