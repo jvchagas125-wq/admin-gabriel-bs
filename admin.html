@@ -634,7 +634,15 @@
 
     <!-- Resgates pendentes -->
     <div id="redemptions-section" style="margin-bottom:28px;">
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#f87171;margin-bottom:10px;">🔔 Resgates de Clientes</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:12px;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#f87171;">🔔 Resgates de Clientes</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <button onclick="filterRedemptions('all')" id="rdm-filter-all" style="padding:5px 12px;border-radius:20px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.1);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">Todos</button>
+          <button onclick="filterRedemptions('pending')" id="rdm-filter-pending" style="padding:5px 12px;border-radius:20px;border:1px solid rgba(234,179,8,0.3);background:rgba(234,179,8,0.08);color:#fde047;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;">⏳ Pendentes</button>
+          <button onclick="filterRedemptions('delivered')" id="rdm-filter-delivered" style="padding:5px 12px;border-radius:20px;border:1px solid rgba(22,163,74,0.3);background:rgba(22,163,74,0.08);color:#4ade80;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;">✅ Entregues</button>
+          <button onclick="filterRedemptions('denied')" id="rdm-filter-denied" style="padding:5px 12px;border-radius:20px;border:1px solid rgba(220,38,38,0.3);background:rgba(220,38,38,0.08);color:#f87171;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;">❌ Negados</button>
+        </div>
+      </div>
       <div id="redemptions-list" style="background:var(--bg2);border-radius:12px;border:1px solid rgba(255,255,255,0.06);overflow:hidden;">
         <div style="padding:20px;text-align:center;color:var(--text-dim);font-size:13px;">Nenhum resgate ainda.</div>
       </div>
@@ -2591,6 +2599,7 @@
       snap=>{
         const items = snap.docs.map(d=>({id:d.id,...d.data()}));
         updateRedemptionsBadge(items);
+        allRedemptions = items;
         renderRedemptionsList(items);
       }, ()=>{}
     );
@@ -2604,46 +2613,101 @@
     else badge.style.display='none';
   }
 
+  let redemptionsFilter = 'all';
+  let allRedemptions = [];
+
+  window.filterRedemptions = function(status){
+    redemptionsFilter = status;
+    const activeStyles = {
+      all:      ['rgba(255,255,255,0.15)','rgba(255,255,255,0.1)','var(--text)','700'],
+      pending:  ['rgba(234,179,8,0.4)','rgba(234,179,8,0.18)','#fde047','700'],
+      delivered:['rgba(22,163,74,0.4)','rgba(22,163,74,0.18)','#4ade80','700'],
+      denied:   ['rgba(220,38,38,0.4)','rgba(220,38,38,0.18)','#f87171','700'],
+    };
+    const inactiveStyles = {
+      all:      ['rgba(255,255,255,0.15)','rgba(255,255,255,0.05)','var(--text-muted)','600'],
+      pending:  ['rgba(234,179,8,0.3)','rgba(234,179,8,0.08)','#fde047','600'],
+      delivered:['rgba(22,163,74,0.3)','rgba(22,163,74,0.08)','#4ade80','600'],
+      denied:   ['rgba(220,38,38,0.3)','rgba(220,38,38,0.08)','#f87171','600'],
+    };
+    ['all','pending','delivered','denied'].forEach(s=>{
+      const btn = document.getElementById('rdm-filter-'+s);
+      if(!btn) return;
+      const [border,bg,color,fw] = s===status ? activeStyles[s] : inactiveStyles[s];
+      btn.style.borderColor=border; btn.style.background=bg; btn.style.color=color; btn.style.fontWeight=fw;
+      btn.style.boxShadow = s===status ? '0 0 0 2px '+border : 'none';
+    });
+    const filtered = status==='all' ? allRedemptions : allRedemptions.filter(r=>r.status===status);
+    _doRenderRedemptions(filtered);
+  };
+
   function renderRedemptionsList(items){
+    allRedemptions = items;
+    const filtered = redemptionsFilter==='all' ? items : items.filter(r=>r.status===redemptionsFilter);
+    _doRenderRedemptions(filtered);
+  }
+
+  function _doRenderRedemptions(filtered){
     const el = document.getElementById('redemptions-list');
     if(!el) return;
-    if(!items.length){
-      el.innerHTML='<div style="padding:20px;text-align:center;color:var(--text-dim);font-size:13px;">Nenhum resgate ainda.</div>';
+    if(!filtered.length){
+      el.innerHTML='<div style="padding:20px;text-align:center;color:var(--text-dim);font-size:13px;">Nenhum resgate encontrado.</div>';
       return;
     }
-    el.innerHTML = items.map(r=>{
+    el.innerHTML = filtered.map(r=>{
       const dateStr = r.redeemedAt ? new Date(r.redeemedAt).toLocaleString('pt-BR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : '—';
-      const isPending = r.status==='pending';
+      const isPending   = r.status==='pending';
+      const isDelivered = r.status==='delivered';
+      const isDenied    = r.status==='denied';
       const statusBadge = isPending
         ? '<span style="background:rgba(234,179,8,0.15);color:#fde047;border:1px solid rgba(234,179,8,0.3);border-radius:10px;padding:3px 10px;font-size:10px;font-weight:700;">⏳ Pendente</span>'
-        : '<span style="background:var(--green-dim);color:#4ade80;border:1px solid rgba(22,163,74,.3);border-radius:10px;padding:3px 10px;font-size:10px;font-weight:700;">✅ Entregue</span>';
-      return '<div style="padding:14px 16px;border-bottom:1px solid rgba(255,255,255,0.05);">'
-        +'<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap;margin-bottom:8px;">'
-          +'<div>'
-            +'<div style="font-weight:700;font-size:13px;color:var(--text);">'+esc(r.clientName||'—')+'</div>'
-            +'<div style="font-size:11px;color:var(--text-dim);margin-top:1px;">'+esc(r.clientPhone||'')+'</div>'
-          +'</div>'
-          +statusBadge
-        +'</div>'
-        +'<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">'
-          +'<div>'
-            +'<span style="font-size:13px;color:var(--text-muted);">'+esc(r.productName||'—')+'</span>'
-            +' <span style="font-family:Bebas Neue,sans-serif;font-size:16px;color:var(--gold);">'+esc(String(r.productCost||0))+' GB$</span>'
-            +'<div style="font-size:11px;color:var(--text-dim);margin-top:2px;">'+dateStr+'</div>'
-          +'</div>'
-          +'<div style="display:flex;gap:6px;flex-shrink:0;">'
-            +(isPending?'<button data-rid="'+r.id+'" onclick="markRedemptionDelivered(this.dataset.rid)" style="padding:7px 12px;border-radius:7px;border:1px solid rgba(22,163,74,.35);background:rgba(22,163,74,0.08);color:#4ade80;font-size:12px;font-weight:700;cursor:pointer;">✓ Entregar</button>':'')
-            +'<button data-rid="'+r.id+'" onclick="deleteRedemption(this.dataset.rid)" style="padding:7px 10px;border-radius:7px;border:1px solid rgba(220,38,38,.25);background:none;color:#f87171;font-size:12px;cursor:pointer;">🗑️</button>'
-          +'</div>'
-        +'</div>'
-        +'</div>';
+        : isDelivered
+        ? '<span style="background:var(--green-dim);color:#4ade80;border:1px solid rgba(22,163,74,.3);border-radius:10px;padding:3px 10px;font-size:10px;font-weight:700;">✅ Entregue</span>'
+        : '<span style="background:rgba(220,38,38,0.12);color:#f87171;border:1px solid rgba(220,38,38,.3);border-radius:10px;padding:3px 10px;font-size:10px;font-weight:700;">❌ Negado</span>';
+      const denyInfo = isDenied && r.denyReason ? '<div style="font-size:11px;color:#f87171;margin-top:4px;">Motivo: '+esc(r.denyReason)+'</div>' : '';
+      const cost = r.productCost||r.itemCost||0;
+      const phone = r.clientPhone||'';
+      return '<div style="padding:14px 16px;border-bottom:1px solid rgba(255,255,255,0.05);">'        +'<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap;margin-bottom:8px;">'          +'<div>'            +'<div style="font-weight:700;font-size:13px;color:var(--text);">'+esc(r.clientName||'—')+'</div>'            +'<div style="font-size:11px;color:var(--text-dim);">'+esc(phone)+'</div>'          +'</div>'+statusBadge        +'</div>'        +'<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">'          +'<div>'            +'<span style="font-size:13px;color:var(--text-muted);">'+esc(r.productName||r.itemName||'—')+'</span>'            +' <span style="font-family:Bebas Neue,sans-serif;font-size:16px;color:var(--gold);">'+cost+' GB$</span>'            +'<div style="font-size:11px;color:var(--text-dim);margin-top:2px;">'+dateStr+'</div>'            +denyInfo          +'</div>'          +'<div style="display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap;">'            +(isPending?'<button data-rid="'+r.id+'" onclick="markRedemptionDelivered(this.dataset.rid)" style="padding:7px 12px;border-radius:7px;border:1px solid rgba(22,163,74,.35);background:rgba(22,163,74,0.08);color:#4ade80;font-size:12px;font-weight:700;cursor:pointer;">✓ Entregar</button>':'')            +(isPending?'<button data-rid="'+r.id+'" data-phone="'+phone+'" data-cost="'+cost+'" onclick="denyRedemption(this)" style="padding:7px 12px;border-radius:7px;border:1px solid rgba(220,38,38,.3);background:rgba(220,38,38,0.08);color:#f87171;font-size:12px;font-weight:600;cursor:pointer;">❌ Negar</button>':'')            +(!isPending?'<button data-rid="'+r.id+'" onclick="deleteRedemption(this.dataset.rid)" style="padding:7px 10px;border-radius:7px;border:1px solid rgba(220,38,38,.25);background:none;color:#f87171;font-size:12px;cursor:pointer;">🗑️</button>':'')          +'</div>'        +'</div></div>';
     }).join('');
   }
 
+
   window.markRedemptionDelivered = async function(id){
+    const ok = await showGBConfirm('✅ Confirmar Entrega','Confirmar que o produto/cupom foi entregue ao cliente?','Sim, confirmar','Cancelar','green');
+    if(!ok) return;
     try {
       await setDoc(doc(db,'redemptions',id),{status:'delivered'},{merge:true});
       showToast('Resgate marcado como entregue!','green');
+    } catch(e){ showToast('Erro: '+e.message,'red'); }
+  };
+
+  window.denyRedemption = async function(btn){
+    const id    = btn.dataset.rid;
+    const phone = btn.dataset.phone||'';
+    const cost  = parseInt(btn.dataset.cost||'0')||0;
+    const reason = await showGBDenyModal();
+    if(reason===null) return;
+    if(!reason.trim()){ showToast('Informe o motivo.','red'); return; }
+    try {
+      await setDoc(doc(db,'redemptions',id),{ status:'denied', denyReason:reason.trim(), deniedAt:new Date().toISOString() },{merge:true});
+      // Devolver GB$ ao cliente
+      if(cost>0 && phone){
+        const digits = phone.replace(/\D/g,'');
+        const walRef = doc(db,'wallets',digits);
+        const walSnap = await getDoc(walRef);
+        const cur = walSnap.exists() ? (walSnap.data().balance||0) : 0;
+        await setDoc(walRef,{ balance: cur+cost, phone, digits, updatedAt:new Date().toISOString() },{merge:true});
+      }
+      // Notificar cliente
+      if(phone){
+        const digits = phone.replace(/\D/g,'');
+        await setDoc(doc(db,'push_notifications',digits+'_rdm_deny_'+Date.now()),{
+          title:'❌ Resgate Negado',
+          body:'Seu resgate foi negado. Motivo: '+reason.trim()+'. Seus GB$ foram devolvidos.',
+          phone, digits, createdAt:new Date().toISOString(), read:false,
+        });
+      }
+      showToast('Resgate negado e GB$ devolvidos ao cliente.','green');
     } catch(e){ showToast('Erro: '+e.message,'red'); }
   };
 
