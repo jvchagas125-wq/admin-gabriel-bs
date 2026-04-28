@@ -707,8 +707,16 @@
 
     <!-- Pedidos de compra GB$ -->
     <div class="cfg-card">
-      <div class="cfg-title" style="margin-bottom:14px;">🧾 Pedidos de Compra GB$
-        <span id="gb-purchases-badge-inline" style="display:none;background:#dc2626;color:#fff;border-radius:10px;font-size:12px;padding:2px 8px;margin-left:8px;font-weight:700;vertical-align:middle;"></span>
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
+        <div class="cfg-title" style="margin:0;">🧾 Pedidos de Compra GB$
+          <span id="gb-purchases-badge-inline" style="display:none;background:#dc2626;color:#fff;border-radius:10px;font-size:12px;padding:2px 8px;margin-left:8px;font-weight:700;vertical-align:middle;"></span>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <button onclick="filterGBPurchases('all')" id="gbp-filter-all" class="store-filter-btn active" style="font-size:11px;padding:4px 10px;">Todos</button>
+          <button onclick="filterGBPurchases('pending')" id="gbp-filter-pending" class="store-filter-btn" style="font-size:11px;padding:4px 10px;">⏳ Pendentes</button>
+          <button onclick="filterGBPurchases('approved')" id="gbp-filter-approved" class="store-filter-btn" style="font-size:11px;padding:4px 10px;">✅ Aprovados</button>
+          <button onclick="filterGBPurchases('denied')" id="gbp-filter-denied" class="store-filter-btn" style="font-size:11px;padding:4px 10px;">❌ Negados</button>
+        </div>
       </div>
       <div id="gb-purchases-list">
         <div style="text-align:center;padding:32px;color:var(--text-dim);">Carregando...</div>
@@ -3150,13 +3158,29 @@
   // ─── Pedidos de Compra ───
   let gbPurchasesUnsubscribe = null;
 
+  let gbPurchasesFilter = 'all';
+  let gbPurchasesAll = [];
+
+  window.filterGBPurchases = function(status){
+    gbPurchasesFilter = status;
+    // Update filter buttons
+    ['all','pending','approved','denied'].forEach(s=>{
+      const btn = document.getElementById('gbp-filter-'+s);
+      if(btn) btn.classList.toggle('active', s===status);
+    });
+    const filtered = status==='all' ? gbPurchasesAll : gbPurchasesAll.filter(p=>p.status===status);
+    renderGBPurchases(filtered);
+  };
+
   function loadGBPurchases(){
     if(gbPurchasesUnsubscribe) return;
     gbPurchasesUnsubscribe = onSnapshot(
       query(collection(db,'gb_purchases'), orderBy('createdAt','desc')),
       snap => {
         const items = snap.docs.map(d=>({id:d.id,...d.data()}));
-        renderGBPurchases(items);
+        gbPurchasesAll = items;
+        const filtered = gbPurchasesFilter==='all' ? items : items.filter(p=>p.status===gbPurchasesFilter);
+        renderGBPurchases(filtered);
         const pending = items.filter(p=>p.status==='pending').length;
         ['gb-purchases-badge','gb-purchases-badge-inline'].forEach(id=>{
           const el=document.getElementById(id);
@@ -3167,7 +3191,9 @@
         onSnapshot(collection(db,'gb_purchases'), snap2=>{
           const items = snap2.docs.map(d=>({id:d.id,...d.data()}))
             .sort((a,b)=>(b.createdAt||'').localeCompare(a.createdAt||''));
-          renderGBPurchases(items);
+          gbPurchasesAll = items;
+          const filtered2 = gbPurchasesFilter==='all' ? items : items.filter(p=>p.status===gbPurchasesFilter);
+          renderGBPurchases(filtered2);
         });
       }
     );
@@ -3184,12 +3210,11 @@
         : p.status==='denied'
         ? '<span style="background:rgba(220,38,38,0.12);color:#f87171;border:1px solid rgba(220,38,38,0.3);border-radius:20px;font-size:10px;padding:2px 8px;font-weight:700;">❌ Negado</span>'
         : '<span style="background:rgba(234,179,8,0.12);color:#fde047;border:1px solid rgba(234,179,8,0.3);border-radius:20px;font-size:10px;padding:2px 8px;font-weight:700;">⏳ Pendente</span>';
+      const deleteBtn = `<button onclick="deleteGBPurchase('${p.id}')" style="padding:6px 10px;border-radius:7px;border:1px solid rgba(220,38,38,.25);background:none;color:#f87171;font-size:12px;cursor:pointer;">🗑️</button>`;
       const actions = p.status==='pending'
         ? `<button onclick="approveGBPurchase('${p.id}')" style="padding:6px 12px;border-radius:7px;border:1px solid rgba(22,163,74,.35);background:rgba(22,163,74,0.08);color:#4ade80;font-size:12px;font-weight:700;cursor:pointer;">✅ Permitir</button>
            <button onclick="denyGBPurchase('${p.id}')" style="padding:6px 12px;border-radius:7px;border:1px solid rgba(220,38,38,.25);background:none;color:#f87171;font-size:12px;font-weight:600;cursor:pointer;">❌ Negar</button>`
-        : p.status==='denied'
-        ? `<button onclick="deleteGBPurchase('${p.id}')" style="padding:6px 10px;border-radius:7px;border:1px solid rgba(220,38,38,.25);background:none;color:#f87171;font-size:12px;cursor:pointer;">🗑️ Apagar</button>`
-        : '';
+        : deleteBtn;
       return `<div style="padding:14px 16px;border-bottom:1px solid rgba(255,255,255,0.05);">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
           <div>
