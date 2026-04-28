@@ -2453,27 +2453,16 @@
     const el = document.getElementById('cancelled-list');
     if(!el) return;
     if(cancelledUnsubscribe) {
-      // Já ouvindo — só re-renderiza
-      renderCancelledList(allCancelled);
-      return;
+      cancelledUnsubscribe();
+      cancelledUnsubscribe = null;
     }
+    allCancelled = []; // Reset sempre para garantir dados frescos do Firestore
     el.innerHTML = '<div style="text-align:center;padding:40px 0;"><div class="spinner" style="margin:0 auto;"></div></div>';
     cancelledUnsubscribe = onSnapshot(
       collection(db,'cancelled_appointments'),
       snap => {
-        // Usa docChanges para detectar apenas remoções reais do Firestore
-        // Evita recriar itens que foram removidos localmente
-        snap.docChanges().forEach(change => {
-          if(change.type === 'removed'){
-            allCancelled = allCancelled.filter(c => c.id !== change.doc.id);
-          } else if(change.type === 'added'){
-            const exists = allCancelled.find(c => c.id === change.doc.id);
-            if(!exists) allCancelled.push({id:change.doc.id,...change.doc.data()});
-          } else if(change.type === 'modified'){
-            const idx = allCancelled.findIndex(c => c.id === change.doc.id);
-            if(idx>=0) allCancelled[idx] = {id:change.doc.id,...change.doc.data()};
-          }
-        });
+        // Reconstrói a lista completa a cada snapshot
+        allCancelled = snap.docs.map(d=>({id:d.id,...d.data()}));
         allCancelled.sort((a,b)=>(b.cancelledAt||'').localeCompare(a.cancelledAt||''));
         updateCancelledBadge();
         renderCancelledList(allCancelled);
