@@ -495,6 +495,9 @@
     <button class="admin-mob-item" data-tab="services" onclick="adminMobNav('services')" style="display:flex;align-items:center;gap:12px;padding:14px 18px;background:none;border:none;color:var(--text-muted);font-size:14px;font-weight:600;cursor:pointer;text-align:left;font-family:'DM Sans',sans-serif;transition:background .15s,color .15s;">
       <span style="font-size:18px;width:24px;text-align:center;">✂️</span> Serviços
     </button>
+    <button class="admin-mob-item" data-tab="gbcoins" onclick="adminMobNav('gbcoins')" style="display:flex;align-items:center;gap:12px;padding:14px 18px;background:none;border:none;color:var(--text-muted);font-size:14px;font-weight:600;cursor:pointer;text-align:left;font-family:'DM Sans',sans-serif;transition:background .15s,color .15s;">
+      <span style="font-size:18px;width:24px;text-align:center;">🪙</span> GB$ <span id="mob-gb-badge" style="display:none;background:#dc2626;color:#fff;border-radius:10px;font-size:10px;padding:1px 6px;margin-left:4px;font-weight:700;"></span>
+    </button>
     <button class="admin-mob-item" data-tab="svcadmin" onclick="adminMobNav('svcadmin')" style="display:flex;align-items:center;gap:12px;padding:14px 18px;background:none;border:none;color:var(--text-muted);font-size:14px;font-weight:600;cursor:pointer;text-align:left;font-family:'DM Sans',sans-serif;transition:background .15s,color .15s;">
       <span style="font-size:18px;width:24px;text-align:center;">✂️</span> Serviços
     </button>
@@ -528,6 +531,7 @@
     <button class="tab-btn" onclick="switchTab('sessions')">👥 Clientes</button>
     <button class="tab-btn" onclick="switchTab('subscriptions')">👑 Assinaturas</button>
     <button class="tab-btn" onclick="switchTab('store')">🛍️ Produtos <span id="redemptions-badge" style="display:none;background:#dc2626;color:#fff;border-radius:10px;font-size:10px;padding:1px 6px;margin-left:4px;font-weight:700;"></span></button>
+    <button class="tab-btn" onclick="switchTab('gbcoins')">🪙 GB$ <span id="gb-purchases-badge" style="display:none;background:#dc2626;color:#fff;border-radius:10px;font-size:10px;padding:1px 6px;margin-left:4px;font-weight:700;"></span></button>
     <button class="tab-btn" onclick="switchTab('svcadmin')">✂️ Serviços</button>
     <button class="tab-btn" onclick="switchTab('avisos')">📢 Avisos</button>
     <button class="tab-btn" onclick="switchTab('settings')">⚙️ Configurações</button>
@@ -636,70 +640,6 @@
   <!-- ABA PRODUTOS / LOJA GB$ -->
   <div id="tab-store" style="display:none;">
 
-    <!-- Configuração GB$ -->
-    <div class="cfg-card" style="margin-bottom:24px;">
-      <div class="cfg-title">🪙 Configurações GB$</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-top:14px;">
-        <div>
-          <span class="plan-admin-label">GB$ por atendimento concluído</span>
-          <input type="number" class="plan-admin-input" id="gb-coins-per-apt" placeholder="Ex: 1" value="1" min="1" step="1">
-        </div>
-        <div>
-          <span class="plan-admin-label">GB$ ao preencher aniversário</span>
-          <input type="number" class="plan-admin-input" id="gb-birth-coins" placeholder="Ex: 1" value="1" min="0" step="1">
-        </div>
-        <div>
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><span class="plan-admin-label" style="margin-bottom:0;">Imagem da moeda</span><span style="font-size:11px;color:var(--gold);font-weight:600;">Ideal: 200x200px</span></div>
-          <div class="img-dropzone" id="dz-coin-image" onclick="document.getElementById('fi-coin-image').click()" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="dzDrop(event,'fi-coin-image','prev-coin-image','up-coin-image','gb-coin-image',null)" style="padding:10px;">
-            <input type="file" id="fi-coin-image" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="dzChange(this,'prev-coin-image','up-coin-image','gb-coin-image',null)">
-            <div class="img-dropzone-label" style="font-size:11px;">📷 Clique ou arraste<br><span style="font-size:10px;color:var(--text-dim);">JPG/PNG · <strong style="color:var(--gold);">Ideal: 200x200px</strong></span></div>
-          </div>
-          <img id="prev-coin-image" class="img-upload-preview" src="" alt="moeda" style="max-height:60px;">
-          <div id="up-coin-image" class="img-uploading">⏳ Enviando...</div>
-          <button type="button" id="rm-gb-coin-image" onclick="removeImgUpload('prev-coin-image','gb-coin-image','dz-coin-image')" style="display:none;margin-top:6px;padding:4px 10px;border-radius:6px;border:1px solid rgba(220,38,38,0.35);background:none;color:#f87171;font-size:11px;font-weight:600;cursor:pointer;">🗑️ Remover imagem</button>
-          <input type="hidden" id="gb-coin-image" value="">
-        </div>
-      </div>
-      <div style="margin-top:10px;">
-        <span class="plan-admin-label">Texto explicativo (aparece abaixo do saldo)</span>
-        <input class="plan-admin-input" id="gb-sub-text" value="Cada agendamento concluído ganha 1 moeda GB$.">
-      </div>
-      <button class="cfg-save-btn" onclick="saveGBConfig()" style="margin-top:12px;max-width:240px;">💾 Salvar Configurações GB$</button>
-    </div>
-
-    <!-- Pacotes de compra GB$ -->
-    <div class="cfg-card" style="margin-bottom:24px;">
-      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:6px;">
-        <div>
-          <div class="cfg-title" style="margin-bottom:2px;">💳 Pacotes de Compra GB$</div>
-          <div class="cfg-hint" style="margin:0;">Clientes podem comprar GB$ via Mercado Pago. Edite os pacotes abaixo.</div>
-        </div>
-        <button class="export-btn" onclick="addGBPackage()">+ Adicionar pacote</button>
-      </div>
-      <div style="margin-bottom:12px;">
-        <span class="plan-admin-label">Frase exibida no modal de compra</span>
-        <input class="plan-admin-input" id="gb-buy-phrase" value="Compre aqui seus GB$ caso esteja com vontade de resgatar os cupons e produtos de forma rápida.">
-      </div>
-      <div id="gb-packages-list" style="display:flex;flex-direction:column;gap:10px;"></div>
-      <button class="cfg-save-btn" onclick="saveGBPackages()" style="margin-top:14px;max-width:240px;">💾 Salvar Pacotes</button>
-    </div>
-
-    <!-- Pedidos de compra GB$ -->
-    <div class="cfg-card" style="margin-bottom:24px;">
-      <div class="cfg-title" style="margin-bottom:14px;">🧾 Pedidos de Compra GB$
-        <span id="gb-purchases-badge-inline" style="display:none;background:#dc2626;color:#fff;border-radius:10px;font-size:12px;padding:2px 8px;margin-left:8px;font-weight:700;vertical-align:middle;"></span>
-      </div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;">
-        <button onclick="filterGBPurchases('all')" id="gbp-filter-all" style="padding:5px 12px;border-radius:20px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.1);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">Todos</button>
-        <button onclick="filterGBPurchases('pending')" id="gbp-filter-pending" style="padding:5px 12px;border-radius:20px;border:1px solid rgba(234,179,8,0.3);background:rgba(234,179,8,0.08);color:#fde047;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;">⏳ Pendentes</button>
-        <button onclick="filterGBPurchases('approved')" id="gbp-filter-approved" style="padding:5px 12px;border-radius:20px;border:1px solid rgba(22,163,74,0.3);background:rgba(22,163,74,0.08);color:#4ade80;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;">✅ Aprovados</button>
-        <button onclick="filterGBPurchases('denied')" id="gbp-filter-denied" style="padding:5px 12px;border-radius:20px;border:1px solid rgba(220,38,38,0.3);background:rgba(220,38,38,0.08);color:#f87171;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;">❌ Negados</button>
-      </div>
-      <div id="gb-purchases-list">
-        <div style="text-align:center;padding:32px;color:var(--text-dim);">Carregando...</div>
-      </div>
-    </div>
-
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px;">
       <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;background:linear-gradient(135deg,#c9a84c,#f0d78c,#c9a84c);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">🛍️ Produtos & Cupons</div>
       <button onclick="addStoreProduct()" class="export-btn">+ Adicionar produto</button>
@@ -775,6 +715,74 @@
 
       <button class="cfg-save-btn" onclick="saveSvcAdminSettings()">💾 Salvar Serviços e Intervalos</button>
     </div>
+  </div>
+
+  <!-- ABA GB$ -->
+  <div id="tab-gbcoins" style="display:none;">
+    <!-- Configuração GB$ -->
+    <div class="cfg-card" style="margin-bottom:24px;">
+      <div class="cfg-title">🪙 Configurações GB$</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-top:14px;">
+        <div>
+          <span class="plan-admin-label">GB$ por atendimento concluído</span>
+          <input type="number" class="plan-admin-input" id="gb-coins-per-apt" placeholder="Ex: 1" value="1" min="1" step="1">
+        </div>
+        <div>
+          <span class="plan-admin-label">GB$ ao preencher aniversário</span>
+          <input type="number" class="plan-admin-input" id="gb-birth-coins" placeholder="Ex: 1" value="1" min="0" step="1">
+        </div>
+        <div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><span class="plan-admin-label" style="margin-bottom:0;">Imagem da moeda</span><span style="font-size:11px;color:var(--gold);font-weight:600;">Ideal: 200x200px</span></div>
+          <div class="img-dropzone" id="dz-coin-image" onclick="document.getElementById('fi-coin-image').click()" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="dzDrop(event,'fi-coin-image','prev-coin-image','up-coin-image','gb-coin-image',null)" style="padding:10px;">
+            <input type="file" id="fi-coin-image" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="dzChange(this,'prev-coin-image','up-coin-image','gb-coin-image',null)">
+            <div class="img-dropzone-label" style="font-size:11px;">📷 Clique ou arraste<br><span style="font-size:10px;color:var(--text-dim);">JPG/PNG · <strong style="color:var(--gold);">Ideal: 200x200px</strong></span></div>
+          </div>
+          <img id="prev-coin-image" class="img-upload-preview" src="" alt="moeda" style="max-height:60px;">
+          <div id="up-coin-image" class="img-uploading">⏳ Enviando...</div>
+          <button type="button" id="rm-gb-coin-image" onclick="removeImgUpload('prev-coin-image','gb-coin-image','dz-coin-image')" style="display:none;margin-top:6px;padding:4px 10px;border-radius:6px;border:1px solid rgba(220,38,38,0.35);background:none;color:#f87171;font-size:11px;font-weight:600;cursor:pointer;">🗑️ Remover imagem</button>
+          <input type="hidden" id="gb-coin-image" value="">
+        </div>
+      </div>
+      <div style="margin-top:10px;">
+        <span class="plan-admin-label">Texto explicativo (aparece abaixo do saldo)</span>
+        <input class="plan-admin-input" id="gb-sub-text" value="Cada agendamento concluído ganha 1 moeda GB$.">
+      </div>
+      <button class="cfg-save-btn" onclick="saveGBConfig()" style="margin-top:12px;max-width:240px;">💾 Salvar Configurações GB$</button>
+    </div>
+
+    <!-- Pacotes de compra GB$ -->
+    <div class="cfg-card" style="margin-bottom:24px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:6px;">
+        <div>
+          <div class="cfg-title" style="margin-bottom:2px;">💳 Pacotes de Compra GB$</div>
+          <div class="cfg-hint" style="margin:0;">Clientes podem comprar GB$ via Mercado Pago. Edite os pacotes abaixo.</div>
+        </div>
+        <button class="export-btn" onclick="addGBPackage()">+ Adicionar pacote</button>
+      </div>
+      <div style="margin-bottom:12px;">
+        <span class="plan-admin-label">Frase exibida no modal de compra</span>
+        <input class="plan-admin-input" id="gb-buy-phrase" value="Compre aqui seus GB$ caso esteja com vontade de resgatar os cupons e produtos de forma rápida.">
+      </div>
+      <div id="gb-packages-list" style="display:flex;flex-direction:column;gap:10px;"></div>
+      <button class="cfg-save-btn" onclick="saveGBPackages()" style="margin-top:14px;max-width:240px;">💾 Salvar Pacotes</button>
+    </div>
+
+    <!-- Pedidos de compra GB$ -->
+    <div class="cfg-card" style="margin-bottom:24px;">
+      <div class="cfg-title" style="margin-bottom:14px;">🧾 Pedidos de Compra GB$
+        <span id="gb-purchases-badge-inline" style="display:none;background:#dc2626;color:#fff;border-radius:10px;font-size:12px;padding:2px 8px;margin-left:8px;font-weight:700;vertical-align:middle;"></span>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;">
+        <button onclick="filterGBPurchases('all')" id="gbp-filter-all" style="padding:5px 12px;border-radius:20px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.1);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">Todos</button>
+        <button onclick="filterGBPurchases('pending')" id="gbp-filter-pending" style="padding:5px 12px;border-radius:20px;border:1px solid rgba(234,179,8,0.3);background:rgba(234,179,8,0.08);color:#fde047;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;">⏳ Pendentes</button>
+        <button onclick="filterGBPurchases('approved')" id="gbp-filter-approved" style="padding:5px 12px;border-radius:20px;border:1px solid rgba(22,163,74,0.3);background:rgba(22,163,74,0.08);color:#4ade80;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;">✅ Aprovados</button>
+        <button onclick="filterGBPurchases('denied')" id="gbp-filter-denied" style="padding:5px 12px;border-radius:20px;border:1px solid rgba(220,38,38,0.3);background:rgba(220,38,38,0.08);color:#f87171;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;">❌ Negados</button>
+      </div>
+      <div id="gb-purchases-list">
+        <div style="text-align:center;padding:32px;color:var(--text-dim);">Carregando...</div>
+      </div>
+    </div>
+
   </div>
 
   <!-- ABA AVISOS -->
@@ -1697,7 +1705,7 @@
   };
 
   window.switchTab = function(tab){
-    ['appointments','sessions','cancelled','subscriptions','gbstore','store','svcadmin','avisos','settings'].forEach(t=>{
+    ['appointments','sessions','cancelled','subscriptions','gbstore','store','gbcoins','svcadmin','avisos','settings'].forEach(t=>{
       const el=document.getElementById('tab-'+t);
       if(el) el.style.display=t===tab?'block':'none';
     });
@@ -1708,6 +1716,7 @@
       else if(tab==='sessions' && txt.startsWith('👥')) b.classList.add('active');
       else if(tab==='subscriptions' && txt.startsWith('👑')) b.classList.add('active');
       else if((tab==='store'||tab==='gbstore') && txt.includes('🛍️')) b.classList.add('active');
+      else if(tab==='gbcoins' && txt.includes('🪙')) b.classList.add('active');
       else if(tab==='svcadmin' && txt.startsWith('✂️')) b.classList.add('active');
       else if(tab==='avisos' && txt.startsWith('📢')) b.classList.add('active');
       else if(tab==='settings' && txt.startsWith('⚙️')) b.classList.add('active');
@@ -1725,7 +1734,8 @@
     if(tab==='avisos'){ loadAdminBanners(); loadNoticesAdmin(); }
     if(tab==='settings') { loadSettings(); loadAdminServices(); loadAdminPlans(); loadNoticesAdmin(); }
     if(tab==='sessions') loadSessions();
-    if(tab==='store'||tab==='gbstore'){ loadStoreAdmin(); loadGBConfig(); }
+    if(tab==='store'||tab==='gbstore') loadStoreAdmin();
+    if(tab==='gbcoins'){ loadGBConfig(); loadGBPackages(); loadGBPurchases(); }
   };
 
   window.addEventListener("DOMContentLoaded",()=>{
