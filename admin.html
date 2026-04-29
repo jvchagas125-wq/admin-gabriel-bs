@@ -1719,6 +1719,9 @@
       loadCancelledTab();
       const cancelledDiv = document.getElementById('tab-cancelled');
       if(cancelledDiv) cancelledDiv.style.display = 'block';
+    } else {
+      const cancelledDiv = document.getElementById('tab-cancelled');
+      if(cancelledDiv) cancelledDiv.style.display = 'none';
     }
     if(tab==='services'){ loadSettings(); loadAdminServices(); }
     if(tab==='settings') loadSettings();
