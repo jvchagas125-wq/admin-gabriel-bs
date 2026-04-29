@@ -495,8 +495,8 @@
     <button class="admin-mob-item" data-tab="services" onclick="adminMobNav('services')" style="display:flex;align-items:center;gap:12px;padding:14px 18px;background:none;border:none;color:var(--text-muted);font-size:14px;font-weight:600;cursor:pointer;text-align:left;font-family:'DM Sans',sans-serif;transition:background .15s,color .15s;">
       <span style="font-size:18px;width:24px;text-align:center;">✂️</span> Serviços
     </button>
-    <button class="admin-mob-item" data-tab="notices" onclick="adminMobNav('notices')" style="display:flex;align-items:center;gap:12px;padding:14px 18px;background:none;border:none;color:var(--text-muted);font-size:14px;font-weight:600;cursor:pointer;text-align:left;font-family:'DM Sans',sans-serif;transition:background .15s,color .15s;">
-      <span style="font-size:18px;width:24px;text-align:center;">📢</span> Avisos
+    <button class="admin-mob-item" data-tab="svcadmin" onclick="adminMobNav('svcadmin')" style="display:flex;align-items:center;gap:12px;padding:14px 18px;background:none;border:none;color:var(--text-muted);font-size:14px;font-weight:600;cursor:pointer;text-align:left;font-family:'DM Sans',sans-serif;transition:background .15s,color .15s;">
+      <span style="font-size:18px;width:24px;text-align:center;">✂️</span> Serviços
     </button>
     <button class="admin-mob-item" data-tab="settings" onclick="adminMobNav('settings')" style="display:flex;align-items:center;gap:12px;padding:14px 18px;background:none;border:none;color:var(--text-muted);font-size:14px;font-weight:600;cursor:pointer;text-align:left;font-family:'DM Sans',sans-serif;transition:background .15s,color .15s;">
       <span style="font-size:18px;width:24px;text-align:center;">⚙️</span> Configurações
@@ -525,8 +525,7 @@
     <button class="tab-btn" onclick="switchTab('sessions')">👥 Clientes</button>
     <button class="tab-btn" onclick="switchTab('subscriptions')">👑 Assinaturas</button>
     <button class="tab-btn" onclick="switchTab('store')">🛍️ Produtos <span id="redemptions-badge" style="display:none;background:#dc2626;color:#fff;border-radius:10px;font-size:10px;padding:1px 6px;margin-left:4px;font-weight:700;"></span></button>
-    <button class="tab-btn" onclick="switchTab('gbcoins')">🪙 GB$ <span id="gb-purchases-badge" style="display:none;background:#dc2626;color:#fff;border-radius:10px;font-size:10px;padding:1px 6px;margin-left:4px;font-weight:700;"></span></button>
-    <button class="tab-btn" onclick="switchTab('notices')">📢 Avisos</button>
+    <button class="tab-btn" onclick="switchTab('svcadmin')">✂️ Serviços</button>
     <button class="tab-btn" onclick="switchTab('settings')">⚙️ Configurações</button>
   </div>
 </header>
@@ -633,6 +632,69 @@
   <!-- ABA PRODUTOS / LOJA GB$ -->
   <div id="tab-store" style="display:none;">
 
+    <!-- Configuração GB$ -->
+    <div class="cfg-card" style="margin-bottom:24px;">
+      <div class="cfg-title">🪙 Configurações GB$</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-top:14px;">
+        <div>
+          <span class="plan-admin-label">GB$ por atendimento concluído</span>
+          <input type="number" class="plan-admin-input" id="gb-coins-per-apt" placeholder="Ex: 1" value="1" min="1" step="1">
+        </div>
+        <div>
+          <span class="plan-admin-label">GB$ ao preencher aniversário</span>
+          <input type="number" class="plan-admin-input" id="gb-birth-coins" placeholder="Ex: 1" value="1" min="0" step="1">
+        </div>
+        <div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><span class="plan-admin-label" style="margin-bottom:0;">Imagem da moeda</span><span style="font-size:11px;color:var(--gold);font-weight:600;">Ideal: 200x200px</span></div>
+          <div class="img-dropzone" id="dz-coin-image" onclick="document.getElementById('fi-coin-image').click()" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="dzDrop(event,'fi-coin-image','prev-coin-image','up-coin-image','gb-coin-image',null)" style="padding:10px;">
+            <input type="file" id="fi-coin-image" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="dzChange(this,'prev-coin-image','up-coin-image','gb-coin-image',null)">
+            <div class="img-dropzone-label" style="font-size:11px;">📷 Clique ou arraste<br><span style="font-size:10px;color:var(--text-dim);">JPG/PNG · <strong style="color:var(--gold);">Ideal: 200x200px</strong></span></div>
+          </div>
+          <img id="prev-coin-image" class="img-upload-preview" src="" alt="moeda" style="max-height:60px;">
+          <div id="up-coin-image" class="img-uploading">⏳ Enviando...</div>
+          <button type="button" id="rm-gb-coin-image" onclick="removeImgUpload('prev-coin-image','gb-coin-image','dz-coin-image')" style="display:none;margin-top:6px;padding:4px 10px;border-radius:6px;border:1px solid rgba(220,38,38,0.35);background:none;color:#f87171;font-size:11px;font-weight:600;cursor:pointer;">🗑️ Remover imagem</button>
+          <input type="hidden" id="gb-coin-image" value="">
+        </div>
+      </div>
+      <div style="margin-top:10px;">
+        <span class="plan-admin-label">Texto explicativo (aparece abaixo do saldo)</span>
+        <input class="plan-admin-input" id="gb-sub-text" value="Cada agendamento concluído ganha 1 moeda GB$.">
+      </div>
+      <button class="cfg-save-btn" onclick="saveGBConfig()" style="margin-top:12px;max-width:240px;">💾 Salvar Configurações GB$</button>
+    </div>
+
+    <!-- Pacotes de compra GB$ -->
+    <div class="cfg-card" style="margin-bottom:24px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:6px;">
+        <div>
+          <div class="cfg-title" style="margin-bottom:2px;">💳 Pacotes de Compra GB$</div>
+          <div class="cfg-hint" style="margin:0;">Clientes podem comprar GB$ via Mercado Pago. Edite os pacotes abaixo.</div>
+        </div>
+        <button class="export-btn" onclick="addGBPackage()">+ Adicionar pacote</button>
+      </div>
+      <div style="margin-bottom:12px;">
+        <span class="plan-admin-label">Frase exibida no modal de compra</span>
+        <input class="plan-admin-input" id="gb-buy-phrase" value="Compre aqui seus GB$ caso esteja com vontade de resgatar os cupons e produtos de forma rápida.">
+      </div>
+      <div id="gb-packages-list" style="display:flex;flex-direction:column;gap:10px;"></div>
+      <button class="cfg-save-btn" onclick="saveGBPackages()" style="margin-top:14px;max-width:240px;">💾 Salvar Pacotes</button>
+    </div>
+
+    <!-- Pedidos de compra GB$ -->
+    <div class="cfg-card" style="margin-bottom:24px;">
+      <div class="cfg-title" style="margin-bottom:14px;">🧾 Pedidos de Compra GB$
+        <span id="gb-purchases-badge-inline" style="display:none;background:#dc2626;color:#fff;border-radius:10px;font-size:12px;padding:2px 8px;margin-left:8px;font-weight:700;vertical-align:middle;"></span>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;">
+        <button onclick="filterGBPurchases('all')" id="gbp-filter-all" style="padding:5px 12px;border-radius:20px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.1);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">Todos</button>
+        <button onclick="filterGBPurchases('pending')" id="gbp-filter-pending" style="padding:5px 12px;border-radius:20px;border:1px solid rgba(234,179,8,0.3);background:rgba(234,179,8,0.08);color:#fde047;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;">⏳ Pendentes</button>
+        <button onclick="filterGBPurchases('approved')" id="gbp-filter-approved" style="padding:5px 12px;border-radius:20px;border:1px solid rgba(22,163,74,0.3);background:rgba(22,163,74,0.08);color:#4ade80;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;">✅ Aprovados</button>
+        <button onclick="filterGBPurchases('denied')" id="gbp-filter-denied" style="padding:5px 12px;border-radius:20px;border:1px solid rgba(220,38,38,0.3);background:rgba(220,38,38,0.08);color:#f87171;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;">❌ Negados</button>
+      </div>
+      <div id="gb-purchases-list">
+        <div style="text-align:center;padding:32px;color:var(--text-dim);">Carregando...</div>
+      </div>
+    </div>
 
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px;">
       <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;background:linear-gradient(135deg,#c9a84c,#f0d78c,#c9a84c);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">🛍️ Produtos & Cupons</div>
@@ -667,103 +729,48 @@
 
 
 
-  <!-- ABA GB$ -->
-  <div id="tab-gbcoins" style="display:none;">
 
-    <!-- Configuração GB$ -->
-    <div class="cfg-card" style="margin-bottom:20px;">
-      <div class="cfg-title">🪙 Configurações GB$</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-top:14px;">
-        <div>
-          <span class="plan-admin-label">GB$ por atendimento concluído</span>
-          <input type="number" class="plan-admin-input" id="gb-coins-per-apt" placeholder="Ex: 1" value="1" min="1" step="1">
-        </div>
-        <div>
-          <span class="plan-admin-label">GB$ ao preencher aniversário</span>
-          <input type="number" class="plan-admin-input" id="gb-birth-coins" placeholder="Ex: 1" value="1" min="0" step="1">
-        </div>
-        <div>
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><span class="plan-admin-label" style="margin-bottom:0;">Imagem da moeda</span><span style="font-size:11px;color:var(--gold);font-weight:600;">Ideal: 200x200px</span></div>
-          <div class="img-dropzone" id="dz-coin-image" onclick="document.getElementById('fi-coin-image').click()" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="dzDrop(event,'fi-coin-image','prev-coin-image','up-coin-image','gb-coin-image',null)" style="padding:10px;">
-            <input type="file" id="fi-coin-image" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="dzChange(this,'prev-coin-image','up-coin-image','gb-coin-image',null)">
-            <div class="img-dropzone-label" style="font-size:11px;">📷 Clique ou arraste<br><span style="font-size:10px;color:var(--text-dim);">JPG/PNG · <strong style="color:var(--gold);">Ideal: 200x200px</strong></span></div>
+
+
+
+  <!-- ABA SERVIÇOS -->
+  <div id="tab-svcadmin" style="display:none;">
+    <div style="max-width:720px;">
+      <div class="cfg-card">
+        <div class="cfg-title">✂️ Serviços</div>
+        <div class="cfg-hint">Adicione, edite ou remova os serviços. Nome, valor e duração são atualizados no site e no agendamento automaticamente.</div>
+        <div id="svcadmin-list"></div>
+        <button class="cfg-add-btn" onclick="addService()" style="margin-top:8px;">+ Adicionar serviço</button>
+      </div>
+
+      <div class="cfg-card">
+        <div class="cfg-title">⏱️ Intervalo entre Atendimentos</div>
+        <div class="cfg-hint">Tempo de descanso aplicado automaticamente após cada serviço (em minutos).</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:4px;">
+          <div>
+            <label class="cfg-label" style="margin-bottom:6px;display:block;">Intervalo de descanso (buffer)</label>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <input type="number" id="svc-buffer" min="0" max="60" step="5" value="5" class="cfg-input" style="width:90px;">
+              <span style="font-size:13px;color:var(--text-muted);">minutos</span>
+            </div>
           </div>
-          <img id="prev-coin-image" class="img-upload-preview" src="" alt="moeda" style="max-height:60px;">
-          <div id="up-coin-image" class="img-uploading">⏳ Enviando...</div>
-          <button type="button" id="rm-gb-coin-image" onclick="removeImgUpload('prev-coin-image','gb-coin-image','dz-coin-image')" style="display:none;margin-top:6px;padding:4px 10px;border-radius:6px;border:1px solid rgba(220,38,38,0.35);background:none;color:#f87171;font-size:11px;font-weight:600;cursor:pointer;">🗑️ Remover imagem</button>
-          <input type="hidden" id="gb-coin-image" value="">
+          <div>
+            <label class="cfg-label" style="margin-bottom:6px;display:block;">Intervalo entre horários</label>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <select id="svc-slot-interval" class="cfg-input" style="width:90px;">
+                <option value="5">5 min</option>
+                <option value="10">10 min</option>
+                <option value="15" selected>15 min</option>
+                <option value="20">20 min</option>
+                <option value="30">30 min</option>
+              </select>
+            </div>
+          </div>
         </div>
       </div>
-      <div style="margin-top:10px;">
-        <span class="plan-admin-label">Texto explicativo (aparece abaixo do saldo)</span>
-        <input class="plan-admin-input" id="gb-sub-text" value="Cada agendamento concluído ganha 1 moeda GB$ (igual a R$0,25 centavos).">
-      </div>
-      <button class="cfg-save-btn" onclick="saveGBConfig()" style="margin-top:12px;max-width:240px;">💾 Salvar Configurações GB$</button>
+
+      <button class="cfg-save-btn" onclick="saveSvcAdminSettings()">💾 Salvar Serviços e Intervalos</button>
     </div>
-
-    <!-- Pacotes de compra GB$ -->
-    <div class="cfg-card" style="margin-bottom:20px;">
-      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:6px;">
-        <div>
-          <div class="cfg-title" style="margin-bottom:2px;">💳 Pacotes de Compra GB$</div>
-          <div class="cfg-hint" style="margin:0;">Clientes podem comprar GB$ via Mercado Pago. Edite os pacotes abaixo.</div>
-        </div>
-        <button class="export-btn" onclick="addGBPackage()">+ Adicionar pacote</button>
-      </div>
-      <div style="margin-bottom:12px;">
-        <span class="plan-admin-label">Frase exibida no modal de compra</span>
-        <input class="plan-admin-input" id="gb-buy-phrase" value="Compre aqui seus GB$ caso esteja com vontade de resgatar os cupons e produtos de forma rápida.">
-      </div>
-      <div id="gb-packages-list" style="display:flex;flex-direction:column;gap:10px;"></div>
-      <button class="cfg-save-btn" onclick="saveGBPackages()" style="margin-top:14px;max-width:240px;">💾 Salvar Pacotes</button>
-    </div>
-
-    <!-- Pedidos de compra GB$ -->
-    <div class="cfg-card">
-      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
-        <div class="cfg-title" style="margin:0;">🧾 Pedidos de Compra GB$
-          <span id="gb-purchases-badge-inline" style="display:none;background:#dc2626;color:#fff;border-radius:10px;font-size:12px;padding:2px 8px;margin-left:8px;font-weight:700;vertical-align:middle;"></span>
-        </div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;">
-          <button onclick="filterGBPurchases('all')" id="gbp-filter-all" style="padding:5px 12px;border-radius:20px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.08);color:var(--text-muted);font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;">Todos</button>
-          <button onclick="filterGBPurchases('pending')" id="gbp-filter-pending" style="padding:5px 12px;border-radius:20px;border:1px solid rgba(234,179,8,0.3);background:rgba(234,179,8,0.08);color:#fde047;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;">⏳ Pendentes</button>
-          <button onclick="filterGBPurchases('approved')" id="gbp-filter-approved" style="padding:5px 12px;border-radius:20px;border:1px solid rgba(22,163,74,0.3);background:rgba(22,163,74,0.08);color:#4ade80;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;">✅ Aprovados</button>
-          <button onclick="filterGBPurchases('denied')" id="gbp-filter-denied" style="padding:5px 12px;border-radius:20px;border:1px solid rgba(220,38,38,0.3);background:rgba(220,38,38,0.08);color:#f87171;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;">❌ Negados</button>
-        </div>
-      </div>
-      <div id="gb-purchases-list">
-        <div style="text-align:center;padding:32px;color:var(--text-dim);">Carregando...</div>
-      </div>
-    </div>
-
-  </div>
-
-
-  <!-- ABA AVISOS -->
-  <div id="tab-notices" style="display:none;">
-
-    <!-- Avisos / Promoções do Site (banners) -->
-    <div class="cfg-card" style="margin-bottom:20px;">
-      <div class="cfg-title">📢 Avisos, Promoções e Ofertas</div>
-      <div class="cfg-hint">Aparecem no topo da página inicial para os clientes (promoções, avisos, ofertas).</div>
-      <div id="banners-admin-list"></div>
-      <button class="cfg-add-btn" onclick="addBanner()" style="margin-top:8px;">+ Adicionar aviso / promoção</button>
-      <button class="cfg-save-btn" onclick="saveBanners()" style="margin-top:14px;">💾 Salvar Avisos</button>
-    </div>
-
-    <!-- Avisos Página de Contato -->
-    <div class="cfg-card">
-      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
-        <div>
-          <div class="cfg-title" style="margin-bottom:2px;">📢 Avisos — Página de Contato</div>
-          <div class="cfg-hint" style="margin:0;">Aparecem na página de Contato, abaixo dos horários de funcionamento.</div>
-        </div>
-        <button class="export-btn" onclick="addNotice('contact')">+ Adicionar</button>
-      </div>
-      <div id="notices-contact-list" style="display:flex;flex-direction:column;gap:10px;"></div>
-      <button class="cfg-save-btn" onclick="saveNotices('contact')" style="margin-top:14px;max-width:220px;">💾 Salvar</button>
-    </div>
-
   </div>
 
   <!-- ABA CONFIGURAÇÕES -->
@@ -1691,7 +1698,7 @@
   };
 
   window.switchTab = function(tab){
-    ['appointments','sessions','cancelled','subscriptions','gbstore','store','gbcoins','notices','settings'].forEach(t=>{
+    ['appointments','sessions','cancelled','subscriptions','gbstore','store','svcadmin','settings'].forEach(t=>{
       const el=document.getElementById('tab-'+t);
       if(el) el.style.display=t===tab?'block':'none';
     });
@@ -1702,8 +1709,7 @@
       else if(tab==='sessions' && txt.startsWith('👥')) b.classList.add('active');
       else if(tab==='subscriptions' && txt.startsWith('👑')) b.classList.add('active');
       else if((tab==='store'||tab==='gbstore') && txt.includes('🛍️')) b.classList.add('active');
-      else if(tab==='gbcoins' && txt.includes('🪙')) b.classList.add('active');
-      else if(tab==='notices' && txt.includes('📢')) b.classList.add('active');
+      else if(tab==='svcadmin' && txt.startsWith('✂️')) b.classList.add('active');
       else if(tab==='settings' && txt.startsWith('⚙️')) b.classList.add('active');
     });
     if(tab==='subscriptions') { loadSubscriptions(); loadAdminPlans(); }
@@ -1715,11 +1721,10 @@
       const cancelledDiv = document.getElementById('tab-cancelled');
       if(cancelledDiv) cancelledDiv.style.display = 'none';
     }
+    if(tab==='svcadmin') loadSvcAdminTab();
     if(tab==='settings') { loadSettings(); loadAdminServices(); loadAdminPlans(); loadNoticesAdmin(); }
-    if(tab==='notices'){ loadAdminBanners(); loadNoticesAdmin(); }
     if(tab==='sessions') loadSessions();
-    if(tab==='store'||tab==='gbstore'){ loadStoreAdmin(); }
-    if(tab==='gbcoins'){ loadGBConfig(); loadGBPackages(); loadGBPurchases(); }
+    if(tab==='store'||tab==='gbstore'){ loadStoreAdmin(); loadGBConfig(); }
   };
 
   window.addEventListener("DOMContentLoaded",()=>{
@@ -3474,6 +3479,131 @@
       setTimeout(()=>modal.querySelector('#gb-deny-reason').focus(), 100);
     });
   }
+
+
+
+  // ═══════════════════════════════════════
+  // ABA ✂️ SERVIÇOS
+  // ═══════════════════════════════════════
+  let svcAdminLoaded = false;
+
+  async function loadSvcAdminTab(){
+    // Populate svcadmin-list with same data as services-admin-list
+    if(!svcAdminLoaded){
+      try {
+        const snap = await getDoc(doc(db,'config','schedule'));
+        if(snap.exists()){
+          const d = snap.data();
+          if(d.buffer !== undefined){
+            const bufEl = document.getElementById('svc-buffer');
+            if(bufEl) bufEl.value = d.buffer;
+          }
+          if(d.slotInterval){
+            const intEl = document.getElementById('svc-slot-interval');
+            if(intEl) intEl.value = d.slotInterval;
+          }
+        }
+      } catch(e){ console.warn('loadSvcAdminTab:',e); }
+      svcAdminLoaded = true;
+    }
+    renderSvcAdminList();
+  }
+
+  function renderSvcAdminList(){
+    const container = document.getElementById('svcadmin-list');
+    if(!container) return;
+    if(!adminServices || !adminServices.length){
+      container.innerHTML = '<div style="color:var(--text-dim);font-size:13px;padding:12px 0;">Nenhum serviço cadastrado.</div>';
+      return;
+    }
+    container.innerHTML = adminServices.map((svc,i)=>`
+      <div class="plan-admin-card" style="margin-bottom:12px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+          <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--gold);">Serviço ${i+1}</span>
+          <div style="display:flex;gap:6px;">
+            ${i>0?`<button onclick="moveSvcAdmin(${i},-1)" class="cfg-add-btn" style="padding:4px 8px;font-size:12px;">↑</button>`:''}
+            ${i<adminServices.length-1?`<button onclick="moveSvcAdmin(${i},1)" class="cfg-add-btn" style="padding:4px 8px;font-size:12px;">↓</button>`:''}
+            <button onclick="removeSvcAdmin(${i})" class="cfg-rm-btn">Remover</button>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px;">
+          <div>
+            <span class="plan-admin-label">Nome do serviço</span>
+            <input class="plan-admin-input" id="svcadm-name-${i}" value="${esc(svc.name||'')}" placeholder="Ex: Cabelo">
+          </div>
+          <div>
+            <span class="plan-admin-label">Valor (R$)</span>
+            <input class="plan-admin-input" id="svcadm-price-${i}" value="${esc(svc.price||'')}" placeholder="30,00">
+          </div>
+          <div>
+            <span class="plan-admin-label">Duração (min)</span>
+            <input type="number" class="plan-admin-input" id="svcadm-dur-${i}" value="${svc.duration||15}" min="5" max="240" step="5">
+          </div>
+        </div>
+        <div style="margin-bottom:8px;">
+          <span class="plan-admin-label">Imagem do serviço <span style="font-size:11px;color:var(--gold);font-weight:600;text-transform:none;letter-spacing:0;">Ideal: 400x400px</span></span>
+          <div class="img-dropzone" id="dz-svcadm-${i}" onclick="document.getElementById('fi-svcadm-${i}').click()" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="dzDrop(event,'fi-svcadm-${i}','prev-svcadm-${i}','up-svcadm-${i}','svcadm-img-${i}',()=>autoSaveSvcAdmImage(${i}))" style="padding:10px;">
+            <input type="file" id="fi-svcadm-${i}" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="dzChange(this,'prev-svcadm-${i}','up-svcadm-${i}','svcadm-img-${i}',()=>autoSaveSvcAdmImage(${i}))">
+            <div class="img-dropzone-label" style="font-size:11px;">${svc.image?'✅ <strong>Imagem salva.</strong> Clique/arraste para trocar':'📷 Clique ou <strong>arraste</strong> a imagem<br><span style=\'font-size:10px;color:var(--text-dim);\'>JPG, PNG ou WEBP</span>'}</div>
+          </div>
+          <img id="prev-svcadm-${i}" class="img-upload-preview ${svc.image?'show':''}" src="${esc(svc.image||'')}" alt="" style="max-height:70px;">
+          <div id="up-svcadm-${i}" class="img-uploading">⏳ Enviando...</div>
+          <button type="button" id="rm-svcadm-img-${i}" onclick="removeImgUpload('prev-svcadm-${i}','svcadm-img-${i}','dz-svcadm-${i}')" style="${svc.image?'':'display:none;'}margin-top:6px;padding:4px 10px;border-radius:6px;border:1px solid rgba(220,38,38,0.35);background:none;color:#f87171;font-size:11px;font-weight:600;cursor:pointer;">🗑️ Remover imagem</button>
+          <input type="hidden" id="svcadm-img-${i}" value="${esc(svc.image||'')}">
+        </div>
+      </div>`).join('');
+  }
+
+  window.moveSvcAdmin = function(i, dir){
+    const tmp = adminServices[i];
+    adminServices[i] = adminServices[i+dir];
+    adminServices[i+dir] = tmp;
+    renderSvcAdminList();
+  };
+
+  window.removeSvcAdmin = function(i){
+    if(!confirm('Remover este serviço?')) return;
+    adminServices.splice(i,1);
+    renderSvcAdminList();
+  };
+
+  window.autoSaveSvcAdmImage = async function(idx){
+    try {
+      const services = collectSvcAdminData();
+      await setDoc(doc(db,'config','services'),{ list: services });
+      showToast('Imagem salva!','green');
+    } catch(e){ showToast('Erro: '+e.message,'red'); }
+  };
+
+  function collectSvcAdminData(){
+    return adminServices.map((_,i)=>({
+      name:     (document.getElementById('svcadm-name-'+i)?.value||'').trim(),
+      price:    (document.getElementById('svcadm-price-'+i)?.value||'').trim(),
+      duration: parseInt(document.getElementById('svcadm-dur-'+i)?.value)||15,
+      image:    (document.getElementById('svcadm-img-'+i)?.value||'').trim(),
+      features: adminServices[i].features||[],
+      emoji:    adminServices[i].emoji||'',
+    })).filter(s=>s.name);
+  }
+
+  window.saveSvcAdminSettings = async function(){
+    const services = collectSvcAdminData();
+    const buffer = parseInt(document.getElementById('svc-buffer')?.value)||5;
+    const slotInterval = parseInt(document.getElementById('svc-slot-interval')?.value)||15;
+    try {
+      // Save services
+      await setDoc(doc(db,'config','services'),{ list: services });
+      // Save schedule settings
+      const schSnap = await getDoc(doc(db,'config','schedule'));
+      const current = schSnap.exists() ? schSnap.data() : {};
+      await setDoc(doc(db,'config','schedule'),{ ...current, buffer, slotInterval });
+      // Update local
+      adminServices = services;
+      SCHEDULE.buffer = buffer;
+      SCHEDULE.slotInterval = slotInterval;
+      showToast('Serviços e intervalos salvos!','green');
+    } catch(e){ showToast('Erro: '+e.message,'red'); }
+  };
 
 
 </script>
