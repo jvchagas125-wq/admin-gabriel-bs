@@ -1662,7 +1662,7 @@
       else if(tab==='notices' && txt.includes('📢')) b.classList.add('active');
       else if(tab==='settings' && txt.startsWith('⚙️')) b.classList.add('active');
     });
-    if(tab==='subscriptions') loadSubscriptions();
+    if(tab==='subscriptions') { loadSubscriptions(); loadAdminPlans(); }
     if(tab==='appointments'){
       loadCancelledTab();
       const cancelledDiv = document.getElementById('tab-cancelled');
@@ -1671,7 +1671,7 @@
       const cancelledDiv = document.getElementById('tab-cancelled');
       if(cancelledDiv) cancelledDiv.style.display = 'none';
     }
-    if(tab==='settings') { loadSettings(); loadNoticesAdmin(); }
+    if(tab==='settings') { loadSettings(); loadAdminServices(); loadAdminPlans(); loadNoticesAdmin(); }
     if(tab==='notices'){ loadAdminBanners(); loadNoticesAdmin(); }
     if(tab==='sessions') loadSessions();
     if(tab==='store'||tab==='gbstore'){ loadStoreAdmin(); }
