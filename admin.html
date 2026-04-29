@@ -857,42 +857,6 @@
       </div>
 
       <!-- SERVIÇOS -->
-      <div class="cfg-card">
-        <div class="cfg-title">✂️ Serviços</div>
-        <div class="cfg-hint">Adicione, edite ou remova os serviços. Nome, valor e duração são atualizados no site e no agendamento automaticamente.</div>
-        <div id="services-admin-list"></div>
-        <button class="cfg-add-btn" onclick="addService()" style="margin-top:8px;">+ Adicionar serviço</button>
-      </div>
-
-      <!-- INTERVALO ENTRE ATENDIMENTOS -->
-      <div class="cfg-card">
-        <div class="cfg-title">⏱️ Intervalo entre Atendimentos</div>
-        <div class="cfg-hint">Tempo de descanso aplicado automaticamente após cada serviço (em minutos).</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:4px;">
-          <div>
-            <label class="cfg-label" style="margin-bottom:6px;display:block;">Intervalo de descanso (buffer)</label>
-            <div style="display:flex;align-items:center;gap:8px;">
-              <input type="number" id="cfg-buffer" min="0" max="60" step="5" value="5" class="cfg-input" style="width:90px;">
-              <span style="font-size:13px;color:var(--text-muted);">minutos</span>
-            </div>
-            <div style="font-size:11px;color:var(--text-dim);margin-top:4px;">Ex: 5 min de descanso após cada atendimento</div>
-          </div>
-          <div>
-            <label class="cfg-label" style="margin-bottom:6px;display:block;">Intervalo entre horários disponíveis</label>
-            <div style="display:flex;align-items:center;gap:8px;">
-              <select id="cfg-slot-interval" class="cfg-input" style="width:90px;">
-                <option value="5">5 min</option>
-                <option value="10">10 min</option>
-                <option value="15" selected>15 min</option>
-                <option value="20">20 min</option>
-                <option value="30">30 min</option>
-              </select>
-            </div>
-            <div style="font-size:11px;color:var(--text-dim);margin-top:4px;">Ex: horários de 15 em 15 min (10:00, 10:15...)</div>
-          </div>
-        </div>
-      </div>
-
       <button class="cfg-save-btn" onclick="saveSettings()">💾 Salvar Configurações</button>
 
       <!-- PLANOS -->
