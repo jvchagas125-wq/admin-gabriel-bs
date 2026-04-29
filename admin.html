@@ -738,8 +738,10 @@
             <input type="file" id="fi-coin-image" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="dzChange(this,'prev-coin-image','up-coin-image','gb-coin-image',null)">
             <div class="img-dropzone-label" style="font-size:11px;">📷 Clique ou arraste<br><span style="font-size:10px;color:var(--text-dim);">JPG/PNG · <strong style="color:var(--gold);">Ideal: 200x200px</strong></span></div>
           </div>
-          <img id="prev-coin-image" class="img-upload-preview" src="" alt="moeda" style="max-height:60px;">
-          <div id="up-coin-image" class="img-uploading">⏳ Enviando...</div>
+          <div style="display:flex;align-items:flex-start;gap:10px;margin-top:6px;">
+            <img id="prev-coin-image" class="img-upload-preview" src="" alt="moeda" style="width:60px;height:60px;border-radius:50%;object-fit:cover;background:var(--bg3);border:2px solid var(--gold-border);flex-shrink:0;">
+            <div id="up-coin-image" class="img-uploading" style="margin-top:0;">⏳ Enviando...</div>
+          </div>
           <button type="button" id="rm-gb-coin-image" onclick="removeImgUpload('prev-coin-image','gb-coin-image','dz-coin-image')" style="display:none;margin-top:6px;padding:4px 10px;border-radius:6px;border:1px solid rgba(220,38,38,0.35);background:none;color:#f87171;font-size:11px;font-weight:600;cursor:pointer;">🗑️ Remover imagem</button>
           <input type="hidden" id="gb-coin-image" value="">
         </div>
@@ -836,8 +838,10 @@
             <input type="file" id="fi-hero-logo" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="dzChange(this,'prev-hero-logo','up-hero-logo','cfg-hero-logo',null)">
             <div class="img-dropzone-label">📷 Clique ou <strong>arraste o logo</strong> aqui<br><span style="font-size:10px;color:var(--text-dim);">JPG, PNG ou WEBP · máx 10MB · <strong style="color:var(--gold);">Recomendado: 300x100px</strong></span></div>
           </div>
-          <img id="prev-hero-logo" class="img-upload-preview" src="" alt="logo" style="max-height:80px;object-fit:contain;">
-          <div id="up-hero-logo" class="img-uploading">⏳ Enviando...</div>
+          <div style="display:flex;align-items:flex-start;gap:10px;margin-top:6px;">
+            <img id="prev-hero-logo" class="img-upload-preview" src="" alt="logo" style="width:72px;height:72px;border-radius:8px;object-fit:contain;background:var(--bg3);border:1px solid var(--gold-border);flex-shrink:0;">
+            <div id="up-hero-logo" class="img-uploading" style="margin-top:0;">⏳ Enviando...</div>
+          </div>
           <button type="button" id="rm-cfg-hero-logo" onclick="removeImgUpload('prev-hero-logo','cfg-hero-logo','dz-hero-logo')" style="display:none;margin-top:6px;padding:4px 10px;border-radius:6px;border:1px solid rgba(220,38,38,0.35);background:none;color:#f87171;font-size:11px;font-weight:600;cursor:pointer;">🗑️ Remover imagem</button>
           <input type="hidden" id="cfg-hero-logo" value="">
         </div>
@@ -882,8 +886,10 @@
           <input type="file" id="fi-bg-image" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="dzChange(this,'prev-bg-image','up-bg-image','cfg-bg-image',null)">
           <div class="img-dropzone-label">📷 Clique ou <strong>arraste o plano de fundo</strong> aqui<br><span style="font-size:10px;color:var(--text-dim);">JPG, PNG ou WEBP · máx 10MB · <strong style="color:var(--gold);">Recomendado: 1080x1920px</strong></span></div>
         </div>
-        <img id="prev-bg-image" class="img-upload-preview" src="" alt="bg" style="max-height:140px;">
-        <div id="up-bg-image" class="img-uploading">⏳ Enviando...</div>
+        <div style="display:flex;align-items:flex-start;gap:10px;margin-top:6px;">
+          <img id="prev-bg-image" class="img-upload-preview" src="" alt="bg" style="width:72px;height:72px;border-radius:8px;object-fit:cover;background:var(--bg3);border:1px solid var(--gold-border);flex-shrink:0;">
+          <div id="up-bg-image" class="img-uploading" style="margin-top:0;">⏳ Enviando...</div>
+        </div>
         <button type="button" id="rm-cfg-bg-image" onclick="removeImgUpload('prev-bg-image','cfg-bg-image','dz-bg-image')" style="display:none;margin-top:6px;padding:4px 10px;border-radius:6px;border:1px solid rgba(220,38,38,0.35);background:none;color:#f87171;font-size:11px;font-weight:600;cursor:pointer;">🗑️ Remover imagem</button>
         <input type="hidden" id="cfg-bg-image" value="">
         <button class="cfg-save-btn" onclick="saveBgImage()" style="margin-top:14px;">💾 Salvar Plano de Fundo</button>
@@ -1279,8 +1285,10 @@
             <input type="file" id="fi-svc-${i}" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="dzChange(this,'prev-svc-${i}','up-svc-${i}','svc-img-${i}',()=>autoSaveSvcImage(${i}))">
             <div class="img-dropzone-label" style="font-size:11px;">${svc.image?'✅ <strong>Imagem salva.</strong> Clique/arraste para trocar':'📷 Clique ou <strong>arraste</strong> a imagem<br><span style=\'font-size:10px;color:var(--text-dim);\'>JPG, PNG ou WEBP · <strong style=\'color:var(--gold);\'>Ideal: 400x400px</strong></span>'}</div>
           </div>
-          <img id="prev-svc-${i}" class="img-upload-preview ${svc.image?'show':''}" src="${esc(svc.image||'')}" alt="" style="max-height:70px;">
-          <div id="up-svc-${i}" class="img-uploading">⏳ Enviando...</div>
+          <div style="display:flex;align-items:flex-start;gap:10px;margin-top:6px;">
+            <img id="prev-svc-${i}" class="img-upload-preview ${svc.image?'show':''}" src="${esc(svc.image||'')}" alt="" style="width:64px;height:64px;border-radius:8px;object-fit:cover;background:var(--bg3);border:1px solid var(--gold-border);flex-shrink:0;">
+            <div id="up-svc-${i}" class="img-uploading" style="margin-top:0;">⏳ Enviando...</div>
+          </div>
           <button type="button" id="rm-svc-img-${i}" onclick="removeImgUpload('prev-svc-${i}','svc-img-${i}','dz-svc-${i}')" style="${svc.image?'':'display:none;'}margin-top:6px;padding:4px 10px;border-radius:6px;border:1px solid rgba(220,38,38,0.35);background:none;color:#f87171;font-size:11px;font-weight:600;cursor:pointer;">🗑️ Remover imagem</button>
           <input type="hidden" id="svc-img-${i}" value="${esc(svc.image||'')}">
         </div>
@@ -2870,8 +2878,10 @@
             <input type="file" id="fi-sp-image" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="dzChange(this,'prev-sp-image','up-sp-image','sp-image',null)">
             <div class="img-dropzone-label" style="font-size:11px;">📷 Clique ou arraste<br><span style="font-size:10px;color:var(--text-dim);">JPG/PNG · <strong style="color:var(--gold);">Ideal: 400x400px</strong></span></div>
           </div>
-          <img id="prev-sp-image" class="img-upload-preview ${p.imageUrl?'show':''}" src="${esc(p.imageUrl||'')}" alt="" style="max-height:60px;">
-          <div id="up-sp-image" class="img-uploading">⏳ Enviando...</div>
+          <div style="display:flex;align-items:flex-start;gap:10px;margin-top:6px;">
+            <img id="prev-sp-image" class="img-upload-preview ${p.imageUrl?'show':''}" src="${esc(p.imageUrl||'')}" alt="" style="width:64px;height:64px;border-radius:8px;object-fit:cover;background:var(--bg3);border:1px solid var(--gold-border);flex-shrink:0;">
+            <div id="up-sp-image" class="img-uploading" style="margin-top:0;">⏳ Enviando...</div>
+          </div>
           <button type="button" id="rm-sp-image" onclick="removeImgUpload('prev-sp-image','sp-image','dz-sp-image')" style="display:none;margin-top:6px;padding:4px 10px;border-radius:6px;border:1px solid rgba(220,38,38,0.35);background:none;color:#f87171;font-size:11px;font-weight:600;cursor:pointer;">🗑️ Remover imagem</button>
           <input type="hidden" id="sp-image" value="${esc(p.imageUrl||'')}">
         </div>
@@ -3564,8 +3574,10 @@
             <input type="file" id="fi-svcadm-${i}" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="dzChange(this,'prev-svcadm-${i}','up-svcadm-${i}','svcadm-img-${i}',()=>autoSaveSvcAdmImage(${i}))">
             <div class="img-dropzone-label" style="font-size:11px;">${svc.image?'✅ <strong>Imagem salva.</strong> Clique/arraste para trocar':'📷 Clique ou <strong>arraste</strong> a imagem<br><span style=\'font-size:10px;color:var(--text-dim);\'>JPG, PNG ou WEBP</span>'}</div>
           </div>
-          <img id="prev-svcadm-${i}" class="img-upload-preview ${svc.image?'show':''}" src="${esc(svc.image||'')}" alt="" style="max-height:70px;">
-          <div id="up-svcadm-${i}" class="img-uploading">⏳ Enviando...</div>
+          <div style="display:flex;align-items:flex-start;gap:10px;margin-top:6px;">
+            <img id="prev-svcadm-${i}" class="img-upload-preview ${svc.image?'show':''}" src="${esc(svc.image||'')}" alt="" style="width:64px;height:64px;border-radius:8px;object-fit:cover;background:var(--bg3);border:1px solid var(--gold-border);flex-shrink:0;">
+            <div id="up-svcadm-${i}" class="img-uploading" style="margin-top:0;">⏳ Enviando...</div>
+          </div>
           <button type="button" id="rm-svcadm-img-${i}" onclick="removeImgUpload('prev-svcadm-${i}','svcadm-img-${i}','dz-svcadm-${i}')" style="${svc.image?'':'display:none;'}margin-top:6px;padding:4px 10px;border-radius:6px;border:1px solid rgba(220,38,38,0.35);background:none;color:#f87171;font-size:11px;font-weight:600;cursor:pointer;">🗑️ Remover imagem</button>
           <input type="hidden" id="svcadm-img-${i}" value="${esc(svc.image||'')}">
         </div>
