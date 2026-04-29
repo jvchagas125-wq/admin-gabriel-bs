@@ -526,7 +526,6 @@
     <button class="tab-btn" onclick="switchTab('subscriptions')">👑 Assinaturas</button>
     <button class="tab-btn" onclick="switchTab('store')">🛍️ Produtos <span id="redemptions-badge" style="display:none;background:#dc2626;color:#fff;border-radius:10px;font-size:10px;padding:1px 6px;margin-left:4px;font-weight:700;"></span></button>
     <button class="tab-btn" onclick="switchTab('gbcoins')">🪙 GB$ <span id="gb-purchases-badge" style="display:none;background:#dc2626;color:#fff;border-radius:10px;font-size:10px;padding:1px 6px;margin-left:4px;font-weight:700;"></span></button>
-    <button class="tab-btn" onclick="switchTab('services')">✂️ Serviços</button>
     <button class="tab-btn" onclick="switchTab('notices')">📢 Avisos</button>
     <button class="tab-btn" onclick="switchTab('settings')">⚙️ Configurações</button>
   </div>
@@ -857,48 +856,6 @@
   </div>
 
 
-  <!-- ABA SERVIÇOS -->
-  <div id="tab-services" style="display:none;">
-    <div style="max-width:720px;">
-      <div class="cfg-card">
-        <div class="cfg-title">✂️ Serviços</div>
-        <div class="cfg-hint">Adicione, edite ou remova os serviços. Nome, valor e duração são atualizados no site e no agendamento automaticamente.</div>
-        <div id="services-admin-list"></div>
-        <button class="cfg-add-btn" onclick="addService()" style="margin-top:8px;">+ Adicionar serviço</button>
-      </div>
-
-      <div class="cfg-card">
-        <div class="cfg-title">⏱️ Intervalo entre Atendimentos</div>
-        <div class="cfg-hint">Tempo de descanso aplicado automaticamente após cada serviço (em minutos).</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:4px;">
-          <div>
-            <label class="cfg-label" style="margin-bottom:6px;display:block;">Intervalo de descanso (buffer)</label>
-            <div style="display:flex;align-items:center;gap:8px;">
-              <input type="number" id="cfg-buffer" min="0" max="60" step="5" value="5" class="cfg-input" style="width:90px;">
-              <span style="font-size:13px;color:var(--text-muted);">minutos</span>
-            </div>
-            <div style="font-size:11px;color:var(--text-dim);margin-top:4px;">Ex: 5 min de descanso após cada atendimento</div>
-          </div>
-          <div>
-            <label class="cfg-label" style="margin-bottom:6px;display:block;">Intervalo entre horários disponíveis</label>
-            <div style="display:flex;align-items:center;gap:8px;">
-              <select id="cfg-slot-interval" class="cfg-input" style="width:90px;">
-                <option value="5">5 min</option>
-                <option value="10">10 min</option>
-                <option value="15" selected>15 min</option>
-                <option value="20">20 min</option>
-                <option value="30">30 min</option>
-              </select>
-            </div>
-            <div style="font-size:11px;color:var(--text-dim);margin-top:4px;">Ex: horários de 15 em 15 min (10:00, 10:15...)</div>
-          </div>
-        </div>
-      </div>
-
-      <button class="cfg-save-btn" onclick="saveSettings()">💾 Salvar Configurações</button>
-    </div>
-  </div>
-
   <!-- ABA ASSINATURAS -->
   <div id="tab-subscriptions" style="display:none;">
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px;">
@@ -923,14 +880,6 @@
       <div id="active-subs-list"><div style="text-align:center;padding:32px 0;"><div class="spinner" style="margin:0 auto;"></div></div></div>
     </div>
 
-    <!-- Planos de Assinatura -->
-    <div class="cfg-card" style="margin-top:20px;">
-      <div class="cfg-title">💎 Planos de Assinatura</div>
-      <div class="cfg-hint">Adicione, edite ou remova os planos exibidos no site.</div>
-      <div id="plans-admin-list"></div>
-      <button class="cfg-add-btn" onclick="addPlan()" style="margin-top:12px;">+ Adicionar plano</button>
-    </div>
-    <button class="cfg-save-btn" onclick="savePlans()" style="background:#1a6634;margin-top:8px;">💾 Salvar Planos</button>
   </div>
 
 
@@ -1698,7 +1647,7 @@
   };
 
   window.switchTab = function(tab){
-    ['appointments','sessions','cancelled','subscriptions','services','gbstore','store','gbcoins','notices','settings'].forEach(t=>{
+    ['appointments','sessions','cancelled','subscriptions','gbstore','store','gbcoins','notices','settings'].forEach(t=>{
       const el=document.getElementById('tab-'+t);
       if(el) el.style.display=t===tab?'block':'none';
     });
@@ -1710,11 +1659,10 @@
       else if(tab==='subscriptions' && txt.startsWith('👑')) b.classList.add('active');
       else if((tab==='store'||tab==='gbstore') && txt.includes('🛍️')) b.classList.add('active');
       else if(tab==='gbcoins' && txt.includes('🪙')) b.classList.add('active');
-      else if(tab==='services' && txt.startsWith('✂️')) b.classList.add('active');
       else if(tab==='notices' && txt.includes('📢')) b.classList.add('active');
       else if(tab==='settings' && txt.startsWith('⚙️')) b.classList.add('active');
     });
-    if(tab==='subscriptions'){ loadSubscriptions(); loadAdminPlans(); }
+    if(tab==='subscriptions') loadSubscriptions();
     if(tab==='appointments'){
       loadCancelledTab();
       const cancelledDiv = document.getElementById('tab-cancelled');
@@ -1723,8 +1671,7 @@
       const cancelledDiv = document.getElementById('tab-cancelled');
       if(cancelledDiv) cancelledDiv.style.display = 'none';
     }
-    if(tab==='services'){ loadSettings(); loadAdminServices(); }
-    if(tab==='settings') loadSettings();
+    if(tab==='settings') { loadSettings(); loadNoticesAdmin(); }
     if(tab==='notices'){ loadAdminBanners(); loadNoticesAdmin(); }
     if(tab==='sessions') loadSessions();
     if(tab==='store'||tab==='gbstore'){ loadStoreAdmin(); }
