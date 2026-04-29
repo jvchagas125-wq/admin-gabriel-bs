@@ -1399,9 +1399,9 @@
       if(snap.exists()) currentSettings = snap.data();
     } catch(e){ console.error('loadSettings error',e); }
     renderSettingsUI();
-    // Carregar informações do site e plano de fundo
-    loadSiteConfigAdmin();
-    loadBgConfigAdmin();
+    // Sempre recarregar para mostrar valores atuais
+    await loadSiteConfigAdmin();
+    await loadBgConfigAdmin();
   }
 
   async function loadBgConfigAdmin(){
@@ -1732,7 +1732,7 @@
     }
     if(tab==='svcadmin') loadSvcAdminTab();
     if(tab==='avisos'){ loadAdminBanners(); loadNoticesAdmin(); }
-    if(tab==='settings') { loadSettings(); loadAdminServices(); loadAdminPlans(); loadNoticesAdmin(); }
+    if(tab==='settings') { loadSettings(); loadAdminPlans(); loadNoticesAdmin(); loadSiteConfigAdmin(); loadBgConfigAdmin(); }
     if(tab==='sessions') loadSessions();
     if(tab==='store'||tab==='gbstore') loadStoreAdmin();
     if(tab==='gbcoins'){ loadGBConfig(); loadGBPackages(); loadGBPurchases(); }
@@ -2445,13 +2445,19 @@
   async function loadSiteConfigAdmin(){
     try {
       const snap = await getDoc(doc(db,'config','site'));
-      if(!snap.exists()) return;
-      const d = snap.data();
-      if(d.heroLogo)         { restoreDropzonePreview('dz-hero-logo','prev-hero-logo','cfg-hero-logo',d.heroLogo); }
-      if(d.whatsappNum)       document.getElementById('cfg-whatsapp-num').value = d.whatsappNum;
-      if(d.instagramHandle)   document.getElementById('cfg-instagram-handle').value = d.instagramHandle;
-      if(d.addressText)       document.getElementById('cfg-address-text').value = d.addressText;
-      if(d.mapsLink)          document.getElementById('cfg-maps-link').value = d.mapsLink;
+      const d = snap.exists() ? snap.data() : {};
+      // Restore logo preview
+      if(d.heroLogo) restoreDropzonePreview('dz-hero-logo','prev-hero-logo','cfg-hero-logo',d.heroLogo);
+      // Always populate fields (show saved values or clear)
+      [
+        ['cfg-whatsapp-num',     d.whatsappNum||''],
+        ['cfg-instagram-handle', d.instagramHandle||''],
+        ['cfg-address-text',     d.addressText||''],
+        ['cfg-maps-link',        d.mapsLink||''],
+      ].forEach(([id, val])=>{
+        const el = document.getElementById(id);
+        if(el) el.value = val;
+      });
     } catch(e){ console.warn('loadSiteConfigAdmin:',e); }
   }
 
