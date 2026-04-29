@@ -441,6 +441,7 @@
       border: 1px solid var(--gold-border);
     }
     .img-upload-preview.visible { display: block; }
+    .img-upload-preview.show { display: block; }
     .img-uploading {
       font-size: 11px;
       color: var(--gold);
@@ -835,7 +836,7 @@
             <input type="file" id="fi-hero-logo" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="dzChange(this,'prev-hero-logo','up-hero-logo','cfg-hero-logo',null)">
             <div class="img-dropzone-label">📷 Clique ou <strong>arraste o logo</strong> aqui<br><span style="font-size:10px;color:var(--text-dim);">JPG, PNG ou WEBP · máx 10MB · <strong style="color:var(--gold);">Recomendado: 300x100px</strong></span></div>
           </div>
-          <img id="prev-hero-logo" class="img-upload-preview" src="" alt="logo">
+          <img id="prev-hero-logo" class="img-upload-preview" src="" alt="logo" style="max-height:80px;object-fit:contain;">
           <div id="up-hero-logo" class="img-uploading">⏳ Enviando...</div>
           <button type="button" id="rm-cfg-hero-logo" onclick="removeImgUpload('prev-hero-logo','cfg-hero-logo','dz-hero-logo')" style="display:none;margin-top:6px;padding:4px 10px;border-radius:6px;border:1px solid rgba(220,38,38,0.35);background:none;color:#f87171;font-size:11px;font-weight:600;cursor:pointer;">🗑️ Remover imagem</button>
           <input type="hidden" id="cfg-hero-logo" value="">
