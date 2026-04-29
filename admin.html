@@ -1757,9 +1757,9 @@
         loadAdminPlans();
         loadAdminServices();
         loadAdminBanners();
-        loadCancelledTab();
-        const cancelledDiv = document.getElementById('tab-cancelled');
-        if(cancelledDiv) cancelledDiv.style.display = 'block';
+        loadCancelledTab(); // Carrega dados mas não mostra ainda — switchTab controla visibilidade
+        // Inicializa a aba padrão corretamente
+        setTimeout(()=>switchTab('appointments'), 100);
       } else {
         document.getElementById("login-screen").style.display="flex";
       }
