@@ -498,6 +498,9 @@
     <button class="admin-mob-item" data-tab="svcadmin" onclick="adminMobNav('svcadmin')" style="display:flex;align-items:center;gap:12px;padding:14px 18px;background:none;border:none;color:var(--text-muted);font-size:14px;font-weight:600;cursor:pointer;text-align:left;font-family:'DM Sans',sans-serif;transition:background .15s,color .15s;">
       <span style="font-size:18px;width:24px;text-align:center;">✂️</span> Serviços
     </button>
+    <button class="admin-mob-item" data-tab="avisos" onclick="adminMobNav('avisos')" style="display:flex;align-items:center;gap:12px;padding:14px 18px;background:none;border:none;color:var(--text-muted);font-size:14px;font-weight:600;cursor:pointer;text-align:left;font-family:'DM Sans',sans-serif;transition:background .15s,color .15s;">
+      <span style="font-size:18px;width:24px;text-align:center;">📢</span> Avisos
+    </button>
     <button class="admin-mob-item" data-tab="settings" onclick="adminMobNav('settings')" style="display:flex;align-items:center;gap:12px;padding:14px 18px;background:none;border:none;color:var(--text-muted);font-size:14px;font-weight:600;cursor:pointer;text-align:left;font-family:'DM Sans',sans-serif;transition:background .15s,color .15s;">
       <span style="font-size:18px;width:24px;text-align:center;">⚙️</span> Configurações
     </button>
@@ -526,6 +529,7 @@
     <button class="tab-btn" onclick="switchTab('subscriptions')">👑 Assinaturas</button>
     <button class="tab-btn" onclick="switchTab('store')">🛍️ Produtos <span id="redemptions-badge" style="display:none;background:#dc2626;color:#fff;border-radius:10px;font-size:10px;padding:1px 6px;margin-left:4px;font-weight:700;"></span></button>
     <button class="tab-btn" onclick="switchTab('svcadmin')">✂️ Serviços</button>
+    <button class="tab-btn" onclick="switchTab('avisos')">📢 Avisos</button>
     <button class="tab-btn" onclick="switchTab('settings')">⚙️ Configurações</button>
   </div>
 </header>
@@ -771,6 +775,37 @@
 
       <button class="cfg-save-btn" onclick="saveSvcAdminSettings()">💾 Salvar Serviços e Intervalos</button>
     </div>
+  </div>
+
+  <!-- ABA AVISOS -->
+  <div id="tab-avisos" style="display:none;">
+
+    <!-- Avisos/Promoções do site (banners) -->
+    <div class="cfg-card" style="margin-bottom:20px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:12px;">
+        <div>
+          <div class="cfg-title" style="margin-bottom:2px;">📢 Avisos, Promoções e Ofertas</div>
+          <div class="cfg-hint" style="margin:0;">Aparecem como banners na página inicial do site para os clientes.</div>
+        </div>
+        <button class="export-btn" onclick="addBanner()">+ Adicionar banner</button>
+      </div>
+      <div id="banners-admin-list" style="display:flex;flex-direction:column;gap:10px;"></div>
+      <button class="cfg-save-btn" onclick="saveBanners()" style="margin-top:14px;">💾 Salvar Avisos</button>
+    </div>
+
+    <!-- Avisos Página de Contato -->
+    <div class="cfg-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
+        <div>
+          <div class="cfg-title" style="margin-bottom:2px;">📢 Avisos — Página de Contato</div>
+          <div class="cfg-hint" style="margin:0;">Aparecem na página de Contato, abaixo dos horários de funcionamento.</div>
+        </div>
+        <button class="export-btn" onclick="addNotice('contact')">+ Adicionar</button>
+      </div>
+      <div id="notices-contact-list" style="display:flex;flex-direction:column;gap:10px;"></div>
+      <button class="cfg-save-btn" onclick="saveNotices('contact')" style="margin-top:14px;max-width:220px;">💾 Salvar</button>
+    </div>
+
   </div>
 
   <!-- ABA CONFIGURAÇÕES -->
@@ -1662,7 +1697,7 @@
   };
 
   window.switchTab = function(tab){
-    ['appointments','sessions','cancelled','subscriptions','gbstore','store','svcadmin','settings'].forEach(t=>{
+    ['appointments','sessions','cancelled','subscriptions','gbstore','store','svcadmin','avisos','settings'].forEach(t=>{
       const el=document.getElementById('tab-'+t);
       if(el) el.style.display=t===tab?'block':'none';
     });
@@ -1674,6 +1709,7 @@
       else if(tab==='subscriptions' && txt.startsWith('👑')) b.classList.add('active');
       else if((tab==='store'||tab==='gbstore') && txt.includes('🛍️')) b.classList.add('active');
       else if(tab==='svcadmin' && txt.startsWith('✂️')) b.classList.add('active');
+      else if(tab==='avisos' && txt.startsWith('📢')) b.classList.add('active');
       else if(tab==='settings' && txt.startsWith('⚙️')) b.classList.add('active');
     });
     if(tab==='subscriptions') { loadSubscriptions(); loadAdminPlans(); }
@@ -1686,6 +1722,7 @@
       if(cancelledDiv) cancelledDiv.style.display = 'none';
     }
     if(tab==='svcadmin') loadSvcAdminTab();
+    if(tab==='avisos'){ loadAdminBanners(); loadNoticesAdmin(); }
     if(tab==='settings') { loadSettings(); loadAdminServices(); loadAdminPlans(); loadNoticesAdmin(); }
     if(tab==='sessions') loadSessions();
     if(tab==='store'||tab==='gbstore'){ loadStoreAdmin(); loadGBConfig(); }
