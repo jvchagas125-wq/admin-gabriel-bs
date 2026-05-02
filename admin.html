@@ -2335,8 +2335,8 @@
     // Buscar agendamentos deste cliente
     const apts = allData.filter(a=>a.status!=='Bloqueado'&&(a.phone||'').replace(/\D/g,'')===(digits||''));
     const today = getTodayStr();
-    const done  = apts.filter(a=>a.date<today).length;
-    const upcoming = apts.filter(a=>a.date>=today);
+    const done  = apts.filter(a=>a.date<today || a.status==='Concluído').length;
+    const upcoming = apts.filter(a=>a.date>=today && a.status!=='Concluído');
     const total = apts.length;
 
     // Serviço favorito
