@@ -1444,9 +1444,11 @@
     // Intervalos
     renderBreaksUI();
 
-    // Buffer
-    document.getElementById('cfg-buffer').value = s.buffer||5;
-    if(s.slotInterval){ const el=document.getElementById('cfg-slot-interval'); if(el) el.value=s.slotInterval; }
+    // Buffer (pode estar na aba Serviços - usar null check)
+    const bufEl=document.getElementById('cfg-buffer'); if(bufEl) bufEl.value=s.buffer||5;
+    const slotEl=document.getElementById('cfg-slot-interval'); if(slotEl && s.slotInterval) slotEl.value=s.slotInterval;
+    const svcBufEl=document.getElementById('svc-buffer'); if(svcBufEl) svcBufEl.value=s.buffer||5;
+    const svcSlotEl=document.getElementById('svc-slot-interval'); if(svcSlotEl && s.slotInterval) svcSlotEl.value=s.slotInterval;
   }
 
   function renderBreaksUI(){
@@ -2361,6 +2363,8 @@
   // ENVIAR NOTIFICAÇÃO PUSH PARA CLIENTES
   // ═══════════════════════════════════════
   async function sendPushNotification(title, body){
+    // CORS: admin domain cannot call client API — skip silently
+    if(typeof window !== 'undefined' && window.location.hostname !== 'gabriel-barber-studio.vercel.app') return;
     try {
       // 1. Salvar no Firestore — clientes com app aberto recebem via onMessage
       const notifId = 'notif_' + Date.now();
