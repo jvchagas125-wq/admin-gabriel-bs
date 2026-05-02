@@ -2383,10 +2383,13 @@
       +'<div style="font-family:Bebas Neue,sans-serif;font-size:32px;color:#4ade80;">'+done+'</div>'
       +'</div>'
       +'</div>'
-      +'<div style="background:linear-gradient(135deg,#1a1508,#2a2010);border:1px solid var(--gold-border);border-radius:10px;padding:12px 14px;margin-bottom:12px;display:flex;align-items:center;gap:12px;">'
+      +'<div style="background:linear-gradient(135deg,#1a1508,#2a2010);border:1px solid var(--gold-border);border-radius:10px;padding:12px 14px;margin-bottom:12px;">'
+      +'<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">'
       +'<img src="https://i.imgur.com/FzLPpDt.jpeg" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);flex-shrink:0;">'
-      +'<div><div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:2px;">Carteira GB$</div>'
+      +'<div style="flex:1;"><div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:2px;">Carteira GB$</div>'
       +'<div style="display:flex;align-items:baseline;gap:8px;"><span style="font-family:Bebas Neue,sans-serif;font-size:26px;color:var(--gold);">'+gbBalance+'</span><span style="font-size:12px;color:var(--text-muted);">GB$</span></div></div>'
+      +'<button onclick="openEditGBModal(\'' +digits+ '\',\''+esc(clientData&&clientData.name||name||'')+'\',' +gbBalance+ ')" style="padding:7px 12px;border-radius:8px;border:1px solid var(--gold-border);background:var(--gold-dim);color:var(--gold);font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">🪙 +/− GB$</button>'
+      +'</div>'
       +'</div>'
       +'<div style="background:var(--bg3);border-radius:10px;padding:14px;margin-bottom:12px;">'
       +'<div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:6px;">Informações</div>'
@@ -3699,6 +3702,88 @@
   window.addEventListener('DOMContentLoaded', ()=>{
     setTimeout(creditMonthlyGBs, 5000);
   });
+
+
+
+  // ─── Creditar / Remover GB$ manual ───
+  window.openEditGBModal = function(digits, clientName, currentBalance){
+    const modal = document.createElement('div');
+    modal.id = 'credit-gb-modal';
+    modal.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.75);display:flex;align-items:center;justify-content:center;';
+    const bal = parseInt(currentBalance)||0;
+    modal.innerHTML = `
+      <div style="background:#1a1a1a;border:1px solid var(--gold-border);border-radius:18px;padding:28px 24px;width:90%;max-width:360px;animation:slideUp .25s ease-out;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;background:linear-gradient(135deg,#c9a84c,#f0d78c);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px;">🪙 Gerenciar GB$</div>
+        <div style="font-size:13px;color:var(--text-muted);margin-bottom:6px;">Cliente: <strong style="color:var(--text);">${esc(clientName||digits)}</strong></div>
+        <div style="font-size:13px;color:var(--text-muted);margin-bottom:18px;">Saldo atual: <strong style="color:var(--gold);">${bal} GB$</strong></div>
+
+        <!-- Tipo de operação -->
+        <div style="display:flex;gap:8px;margin-bottom:16px;">
+          <button id="gb-op-add" onclick="setGBOp('add')" style="flex:1;padding:9px;border-radius:9px;border:2px solid var(--gold);background:var(--gold-dim);color:var(--gold);font-family:'DM Sans',sans-serif;font-weight:700;font-size:13px;cursor:pointer;">+ Creditar</button>
+          <button id="gb-op-remove" onclick="setGBOp('remove')" style="flex:1;padding:9px;border-radius:9px;border:1px solid rgba(220,38,38,0.3);background:none;color:var(--text-muted);font-family:'DM Sans',sans-serif;font-weight:700;font-size:13px;cursor:pointer;">− Remover</button>
+        </div>
+
+        <div style="margin-bottom:16px;">
+          <label style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px;">Quantidade de GB$</label>
+          <input type="number" id="edit-gb-amount" min="1" step="1" placeholder="Ex: 10" style="width:100%;padding:12px 14px;border-radius:10px;background:var(--bg3);border:1px solid rgba(255,255,255,0.1);color:var(--text);font-family:'DM Sans',sans-serif;font-size:16px;box-sizing:border-box;">
+        </div>
+        <div style="display:flex;gap:10px;">
+          <button id="edit-gb-cancel" style="flex:1;padding:11px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);background:none;color:var(--text-muted);font-family:'DM Sans',sans-serif;font-weight:600;font-size:14px;cursor:pointer;">Cancelar</button>
+          <button id="edit-gb-confirm" style="flex:1;padding:11px;border-radius:10px;border:none;background:var(--gold);color:#111;font-family:'DM Sans',sans-serif;font-weight:700;font-size:14px;cursor:pointer;">Confirmar</button>
+        </div>
+      </div>`;
+    document.body.appendChild(modal);
+
+    let gbOp = 'add';
+    window.setGBOp = function(op){
+      gbOp = op;
+      const addBtn = modal.querySelector('#gb-op-add');
+      const rmBtn  = modal.querySelector('#gb-op-remove');
+      if(op==='add'){
+        addBtn.style.cssText += 'border:2px solid var(--gold);background:var(--gold-dim);color:var(--gold);';
+        rmBtn.style.cssText  += 'border:1px solid rgba(220,38,38,0.3);background:none;color:var(--text-muted);';
+      } else {
+        rmBtn.style.cssText  += 'border:2px solid #f87171;background:rgba(220,38,38,0.12);color:#f87171;';
+        addBtn.style.cssText += 'border:1px solid var(--gold-border);background:none;color:var(--text-muted);';
+      }
+    };
+
+    setTimeout(()=>modal.querySelector('#edit-gb-amount').focus(), 100);
+    modal.querySelector('#edit-gb-cancel').onclick = ()=>document.body.removeChild(modal);
+    modal.querySelector('#edit-gb-confirm').onclick = async ()=>{
+      const amount = parseInt(modal.querySelector('#edit-gb-amount').value)||0;
+      if(amount<=0){ showToast('Informe uma quantidade válida.','red'); return; }
+      const isAdd = gbOp==='add';
+      const label = isAdd ? '+'+amount+' GB$' : '−'+amount+' GB$';
+      const confirmed = await showGBConfirm(
+        isAdd ? '🪙 Confirmar Crédito' : '🪙 Confirmar Remoção',
+        (isAdd
+          ? 'Deseja creditar <strong style="color:var(--gold);">+'+amount+' GB$</strong>'
+          : 'Deseja remover <strong style="color:#f87171;">−'+amount+' GB$</strong>')+
+          ' da conta de <strong>'+esc(clientName||digits)+'</strong>?',
+        'Sim, confirmar', 'Cancelar',
+        isAdd ? 'gold' : 'red'
+      );
+      if(!confirmed) return;
+      try {
+        const walRef = doc(db,'wallets',digits);
+        const walSnap = await getDoc(walRef);
+        const cur = walSnap.exists() ? (walSnap.data().balance||0) : 0;
+        const newBal = isAdd ? cur+amount : Math.max(0, cur-amount);
+        await setDoc(walRef,{ balance:newBal, digits, updatedAt:new Date().toISOString() },{merge:true});
+        if(isAdd){
+          await setDoc(doc(db,'push_notifications',digits+'_credit_'+Date.now()),{
+            title:'🪙 +'+amount+' GB$ creditados!',
+            body:'Gabriel adicionou '+amount+' GB$ à sua carteira. Aproveite!',
+            digits, createdAt:new Date().toISOString(), read:false, pending:true,
+          });
+        }
+        document.body.removeChild(modal);
+        showToast(label+' '+(isAdd?'creditados':'removidos')+' para '+esc(clientName||digits)+'!', isAdd?'green':'red');
+      } catch(e){ showToast('Erro: '+e.message,'red'); }
+    };
+    modal.onclick = e=>{ if(e.target===modal) document.body.removeChild(modal); };
+  };
 
 
 </script>
