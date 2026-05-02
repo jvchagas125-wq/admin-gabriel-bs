@@ -502,6 +502,9 @@
     <button class="admin-mob-item" data-tab="avisos" onclick="adminMobNav('avisos')" style="display:flex;align-items:center;gap:12px;padding:14px 18px;background:none;border:none;color:var(--text-muted);font-size:14px;font-weight:600;cursor:pointer;text-align:left;font-family:'DM Sans',sans-serif;transition:background .15s,color .15s;">
       <span style="font-size:18px;width:24px;text-align:center;">📢</span> Avisos
     </button>
+    <button class="admin-mob-item" data-tab="reviews" onclick="adminMobNav('reviews')" style="display:flex;align-items:center;gap:12px;padding:14px 18px;background:none;border:none;color:var(--text-muted);font-size:14px;font-weight:600;cursor:pointer;text-align:left;font-family:'DM Sans',sans-serif;transition:background .15s,color .15s;">
+      <span style="font-size:18px;width:24px;text-align:center;">⭐</span> Comentários
+    </button>
     <button class="admin-mob-item" data-tab="settings" onclick="adminMobNav('settings')" style="display:flex;align-items:center;gap:12px;padding:14px 18px;background:none;border:none;color:var(--text-muted);font-size:14px;font-weight:600;cursor:pointer;text-align:left;font-family:'DM Sans',sans-serif;transition:background .15s,color .15s;">
       <span style="font-size:18px;width:24px;text-align:center;">⚙️</span> Configurações
     </button>
@@ -532,6 +535,7 @@
     <button class="tab-btn" onclick="switchTab('gbcoins')">🪙 GB$ <span id="gb-purchases-badge" style="display:none;background:#dc2626;color:#fff;border-radius:10px;font-size:10px;padding:1px 6px;margin-left:4px;font-weight:700;"></span></button>
     <button class="tab-btn" onclick="switchTab('svcadmin')">✂️ Serviços</button>
     <button class="tab-btn" onclick="switchTab('avisos')">📢 Avisos</button>
+    <button class="tab-btn" onclick="switchTab('reviews')">⭐ Comentários</button>
     <button class="tab-btn" onclick="switchTab('settings')">⚙️ Configurações</button>
   </div>
 </header>
@@ -814,6 +818,23 @@
       <button class="cfg-save-btn" onclick="saveNotices('contact')" style="margin-top:14px;max-width:220px;">💾 Salvar</button>
     </div>
 
+  </div>
+
+  <!-- ABA COMENTÁRIOS -->
+  <div id="tab-reviews" style="display:none;">
+    <div style="max-width:720px;">
+      <div class="cfg-card">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
+          <div>
+            <div class="cfg-title" style="margin-bottom:2px;">⭐ Comentários e Avaliações</div>
+            <div class="cfg-hint" style="margin:0;">Adicione prints e fotos de avaliações dos clientes. Aparecem na aba "Comentários" do site.</div>
+          </div>
+          <button class="export-btn" onclick="addReviewImage()">+ Adicionar imagem</button>
+        </div>
+        <div id="reviews-admin-list" style="display:flex;flex-direction:column;gap:10px;"></div>
+        <button class="cfg-save-btn" onclick="saveReviews()" style="margin-top:14px;max-width:220px;">💾 Salvar</button>
+      </div>
+    </div>
   </div>
 
   <!-- ABA CONFIGURAÇÕES -->
@@ -1756,7 +1777,7 @@
   };
 
   window.switchTab = function(tab){
-    ['appointments','sessions','cancelled','subscriptions','gbstore','store','gbcoins','svcadmin','avisos','settings'].forEach(t=>{
+    ['appointments','sessions','cancelled','subscriptions','gbstore','store','gbcoins','svcadmin','avisos','reviews','settings'].forEach(t=>{
       const el=document.getElementById('tab-'+t);
       if(el) el.style.display=t===tab?'block':'none';
     });
@@ -1770,6 +1791,7 @@
       else if(tab==='gbcoins' && txt.includes('🪙')) b.classList.add('active');
       else if(tab==='svcadmin' && txt.startsWith('✂️')) b.classList.add('active');
       else if(tab==='avisos' && txt.startsWith('📢')) b.classList.add('active');
+      else if(tab==='reviews' && txt.startsWith('⭐')) b.classList.add('active');
       else if(tab==='settings' && txt.startsWith('⚙️')) b.classList.add('active');
     });
     if(tab==='subscriptions') { loadSubscriptions(); loadAdminPlans(); }
@@ -1783,6 +1805,7 @@
     }
     if(tab==='svcadmin') loadSvcAdminTab();
     if(tab==='avisos'){ loadAdminBanners(); loadNoticesAdmin(); }
+    if(tab==='reviews') loadReviewsAdmin();
     if(tab==='settings') { loadSettings(); loadAdminPlans(); loadNoticesAdmin(); loadSiteConfigAdmin(); loadBgConfigAdmin(); }
     if(tab==='sessions') loadSessions();
     if(tab==='store'||tab==='gbstore') loadStoreAdmin();
@@ -3783,6 +3806,74 @@
       }).catch(()=>{});
     } catch(e){ console.warn('sendPersonalNotification:',e); }
   }
+
+
+
+  // ═══════════════════════════════════════
+  // COMENTÁRIOS — ADMIN
+  // ═══════════════════════════════════════
+  let adminReviews = [];
+
+  async function loadReviewsAdmin(){
+    try {
+      const snap = await getDoc(doc(db,'config','reviews'));
+      if(snap.exists()) adminReviews = snap.data().list||[];
+    } catch(e){ console.warn('loadReviewsAdmin:',e); }
+    renderReviewsAdmin();
+  }
+
+  function renderReviewsAdmin(){
+    const el = document.getElementById('reviews-admin-list');
+    if(!el) return;
+    if(!adminReviews.length){
+      el.innerHTML='<div style="color:var(--text-dim);font-size:13px;padding:8px 0;">Nenhuma imagem adicionada.</div>';
+      return;
+    }
+    el.innerHTML = adminReviews.map((r,i)=>`
+      <div style="background:var(--bg3);border-radius:10px;padding:14px;border:1px solid rgba(255,255,255,0.06);display:flex;align-items:flex-start;gap:14px;">
+        <div style="flex-shrink:0;">
+          ${r.url ? `<img src="${esc(r.url)}" alt="" style="width:80px;height:80px;border-radius:8px;object-fit:cover;border:1px solid var(--gold-border);">` : '<div style="width:80px;height:80px;border-radius:8px;background:var(--bg2);border:1px dashed rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-size:24px;">📷</div>'}
+        </div>
+        <div style="flex:1;min-width:0;">
+          <div class="img-dropzone" id="dz-rev-${i}" onclick="document.getElementById('fi-rev-${i}').click()" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="dzDrop(event,'fi-rev-${i}','prev-rev-${i}','up-rev-${i}','rev-img-${i}',()=>autoSaveRevImg(${i}))" style="padding:8px;margin-bottom:6px;">
+            <input type="file" id="fi-rev-${i}" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="dzChange(this,'prev-rev-${i}','up-rev-${i}','rev-img-${i}',()=>autoSaveRevImg(${i}))">
+            <div class="img-dropzone-label" style="font-size:11px;">${r.url?'✅ <strong>Imagem salva.</strong> Clique para trocar':'📷 Clique ou arraste a imagem'}</div>
+          </div>
+          <input type="hidden" id="rev-img-${i}" value="${esc(r.url||'')}">
+          <img id="prev-rev-${i}" class="img-upload-preview" src="${esc(r.url||'')}" alt="" style="display:none;">
+          <div id="up-rev-${i}" class="img-uploading">⏳ Enviando...</div>
+        </div>
+        <button onclick="removeReview(${i})" style="padding:4px 8px;border-radius:6px;border:1px solid rgba(220,38,38,0.3);background:none;color:#f87171;font-size:11px;cursor:pointer;flex-shrink:0;">🗑️</button>
+      </div>`).join('');
+  }
+
+  window.addReviewImage = function(){
+    adminReviews.push({ url:'' });
+    renderReviewsAdmin();
+    document.getElementById('reviews-admin-list')?.lastElementChild?.scrollIntoView({behavior:'smooth',block:'nearest'});
+  };
+
+  window.removeReview = function(i){
+    adminReviews.splice(i,1);
+    renderReviewsAdmin();
+  };
+
+  window.autoSaveRevImg = async function(i){
+    const url = (document.getElementById('rev-img-'+i)?.value||'').trim();
+    if(url) adminReviews[i] = { url };
+    await saveReviews(true);
+  };
+
+  window.saveReviews = async function(silent=false){
+    const list = adminReviews.map((_,i)=>({
+      url:(document.getElementById('rev-img-'+i)?.value||adminReviews[i]?.url||'').trim()
+    })).filter(r=>r.url);
+    try {
+      await setDoc(doc(db,'config','reviews'),{ list });
+      adminReviews = list;
+      if(!silent) showToast('Comentários salvos!','green');
+    } catch(e){ if(!silent) showToast('Erro: '+e.message,'red'); }
+  };
 
 
 </script>
