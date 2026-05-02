@@ -1486,14 +1486,28 @@
   };
 
   window.saveSettings = async function(){
-    const s = {days:{}, breaks:[], services:{}, buffer:0};
+    // Preserva buffer e slotInterval atuais (editados na aba Serviços)
+    const curBuffer = currentSettings.buffer||5;
+    const curSlotInterval = currentSettings.slotInterval||15;
+    const curServices = currentSettings.services||{};
+
+    const s = {
+      days:{},
+      breaks:[],
+      services: curServices,
+      buffer: curBuffer,
+      slotInterval: curSlotInterval,
+    };
 
     // Lê dias
     DAYS.forEach(d=>{
-      s.days[d.key] = {
-        open:  document.getElementById('day-open-'+d.key).checked,
-        start: document.getElementById('day-start-'+d.key).value,
-        end:   document.getElementById('day-end-'+d.key).value,
+      const openEl  = document.getElementById('day-open-'+d.key);
+      const startEl = document.getElementById('day-start-'+d.key);
+      const endEl   = document.getElementById('day-end-'+d.key);
+      if(openEl) s.days[d.key] = {
+        open:  openEl.checked,
+        start: startEl?.value||'10:00',
+        end:   endEl?.value||'21:00',
       };
     });
 
@@ -1509,26 +1523,11 @@
       });
     });
 
-    // Lê buffer
-    s.buffer = parseInt(document.getElementById('cfg-buffer').value)||5;
-    s.slotInterval = parseInt(document.getElementById('cfg-slot-interval')?.value)||15;
-
-    // Lê serviços do novo UI dinâmico
-    const services = collectAdminServices();
-    if(services.length===0){ showToast('Adicione ao menos um serviço','red'); return; }
-    services.forEach(svc=>{ s.services[svc.name] = {duration: svc.duration}; });
-
     try {
-      // Salva horários/buffer/serviços duração
       await setDoc(doc(db,'config','schedule'), s);
-      // Salva lista completa de serviços (nome + valor + duração)
-      await setDoc(doc(db,'config','services'), { list: services });
       currentSettings = s;
-      adminServices = services;
-      // Atualiza filtro de serviços na tabela de agendamentos
-      updateServicesFilter(services);
       showToast('Configurações salvas!','green');
-      await sendPushNotification('Gabriel Barber Studio 📢','Os horários de funcionamento e serviços foram atualizados. Confira!');
+      await sendPushNotification('Gabriel Barber Studio 📢','Os horários de funcionamento foram atualizados. Confira!');
     } catch(e){
       console.error(e);
       showToast('Erro ao salvar configurações','red');
