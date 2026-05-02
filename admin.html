@@ -1622,8 +1622,47 @@
           </div>
           <button onclick="addBenefit(${i})" class="cfg-add-btn" style="margin-top:6px;font-size:11px;">+ Beneficio</button>
         </div>
+
+        <!-- GB$ Assinatura -->
+        <div style="border-top:1px solid rgba(255,255,255,0.07);margin-top:14px;padding-top:14px;display:flex;flex-direction:column;gap:10px;">
+          <div style="font-size:11px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.5px;">🪙 Bônus em GB$</div>
+
+          <!-- GB$ no ato da assinatura -->
+          <div style="background:var(--bg2);border-radius:9px;padding:12px 14px;">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:8px;">
+              <input type="checkbox" id="p-gb-signup-active-${i}" ${p.gbSignup?'checked':''} onchange="toggleGBField('p-gb-signup-val-${i}',this.checked)" style="accent-color:var(--gold);width:15px;height:15px;">
+              <span style="font-size:13px;font-weight:600;color:var(--text);">Ganhar GB$ no ato da assinatura</span>
+            </label>
+            <div id="p-gb-signup-val-${i}" style="${p.gbSignup?'':'display:none;'}">
+              <div style="display:flex;align-items:center;gap:8px;">
+                <input type="number" class="plan-admin-input" id="p-gb-signup-${i}" value="${p.gbSignup||0}" min="0" step="1" placeholder="Ex: 20" style="width:110px;">
+                <span style="font-size:13px;color:var(--text-muted);">GB$ creditados imediatamente</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- GB$ por mês -->
+          <div style="background:var(--bg2);border-radius:9px;padding:12px 14px;">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:8px;">
+              <input type="checkbox" id="p-gb-monthly-active-${i}" ${p.gbMonthly?'checked':''} onchange="toggleGBField('p-gb-monthly-val-${i}',this.checked)" style="accent-color:var(--gold);width:15px;height:15px;">
+              <span style="font-size:13px;font-weight:600;color:var(--text);">Ganhar GB$ por mês</span>
+            </label>
+            <div id="p-gb-monthly-val-${i}" style="${p.gbMonthly?'':'display:none;'}">
+              <div style="display:flex;align-items:center;gap:8px;">
+                <input type="number" class="plan-admin-input" id="p-gb-monthly-${i}" value="${p.gbMonthly||0}" min="0" step="1" placeholder="Ex: 10" style="width:110px;">
+                <span style="font-size:13px;color:var(--text-muted);">GB$ creditados todo mês</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>`).join('');
   }
+
+  window.toggleGBField = function(id, show){
+    const el = document.getElementById(id);
+    if(el) el.style.display = show ? 'block' : 'none';
+  };
 
   window.addPlan = function(){
     adminPlans.push({ id:'plan_'+Date.now(), order:adminPlans.length+1, emoji:'✂️', name:'Novo Plano', price:'0,00', originalPrice:'', discount:'', featured:false, mpLink:'', benefits:['Benefício 1'] });
@@ -1685,6 +1724,10 @@
       featured:      document.getElementById('p-featured-'+i)?.checked||false,
       bestValue:     document.getElementById('p-bestvalue-'+i)?.checked||false,
       benefits:      collectBenefits(i),
+      gbSignup:      document.getElementById('p-gb-signup-active-'+i)?.checked
+                       ? (parseInt(document.getElementById('p-gb-signup-'+i)?.value)||0) : 0,
+      gbMonthly:     document.getElementById('p-gb-monthly-active-'+i)?.checked
+                       ? (parseInt(document.getElementById('p-gb-monthly-'+i)?.value)||0) : 0,
     }));
   }
 
@@ -2029,31 +2072,34 @@
       // Creditar GB$ de bônus de assinatura automaticamente
       try {
         const digits = phone.replace(/\D/g,'');
-        // Procura benefício com "+XXgb$" ou "+XX GB$" (case-insensitive)
-        let gbBonus = 0;
-        (benefits||[]).forEach(b=>{
-          const match = String(b).match(/\+(\d+)\s*gb\$/i);
-          if(match) gbBonus += parseInt(match[1])||0;
-        });
-        if(gbBonus > 0){
+        // Buscar gbSignup e gbMonthly do plano salvo
+        let gbSignup = planDoc?.gbSignup||0;
+        let gbMonthly = planDoc?.gbMonthly||0;
+        // Fallback: detecta "+XXgb$" nos benefícios (compatibilidade)
+        if(!gbSignup){
+          (benefits||[]).forEach(b=>{
+            const match = String(b).match(/\+(\d+)\s*gb\$/i);
+            if(match) gbSignup += parseInt(match[1])||0;
+          });
+        }
+        // Creditar gbSignup imediatamente
+        if(gbSignup > 0){
           const walRef = doc(db,'wallets',digits);
           const walSnap = await getDoc(walRef);
           const cur = walSnap.exists() ? (walSnap.data().balance||0) : 0;
-          await setDoc(walRef,{
-            balance: cur + gbBonus,
-            phone, digits,
-            updatedAt: new Date().toISOString(),
-          },{merge:true});
-          // Notificação push para o cliente
+          await setDoc(walRef,{ balance: cur+gbSignup, phone, digits, updatedAt:new Date().toISOString() },{merge:true});
           await setDoc(doc(db,'push_notifications',digits+'_sub_gb_'+Date.now()),{
-            title:'🪙 +'+gbBonus+' GB$ de bônus!',
-            body:'Bônus do plano '+planName+' creditado na sua carteira. Bom proveito!',
-            phone, digits, createdAt:new Date().toISOString(), read:false,
+            title:'🪙 +'+gbSignup+' GB$ de bônus!',
+            body:'Bônus do plano '+planName+' creditado na sua carteira!',
+            phone, digits, createdAt:new Date().toISOString(), read:false, pending:true,
           });
-          showToast('VIP ativado e +'+gbBonus+' GB$ creditados para '+phone+'!','green');
-        } else {
-          showToast('VIP ativado para '+phone+'!','green');
         }
+        // Salvar gbMonthly na assinatura para cobrança mensal
+        if(gbMonthly > 0){
+          await setDoc(subRef,{ gbMonthly, nextGbAt: getNextMonthISO() },{merge:true});
+        }
+        const msg = gbSignup>0 ? 'VIP ativado e +'+gbSignup+' GB$ creditados para '+phone+'!' : 'VIP ativado para '+phone+'!';
+        showToast(msg,'green');
       } catch(ge){
         console.warn('GB$ bonus error:',ge);
         showToast('VIP ativado para '+phone+'!','green');
@@ -3610,6 +3656,49 @@
       showToast('Serviços e intervalos salvos!','green');
     } catch(e){ showToast('Erro: '+e.message,'red'); }
   };
+
+
+
+  // ─── GB$ Mensal ───
+  function getNextMonthISO(){
+    const d = new Date();
+    d.setMonth(d.getMonth()+1);
+    return d.toISOString();
+  }
+
+  async function creditMonthlyGBs(){
+    // Verifica assinaturas ativas com gbMonthly configurado e nextGbAt passado
+    try {
+      const snap = await getDocs(collection(db,'subscriptions'));
+      const now = new Date().toISOString();
+      for(const d of snap.docs){
+        const sub = d.data();
+        if(sub.status!=='active'||!sub.gbMonthly||!sub.nextGbAt) continue;
+        if(sub.nextGbAt > now) continue; // ainda não é hora
+        const digits = (sub.phone||'').replace(/\D/g,'');
+        if(!digits) continue;
+        // Creditar
+        const walRef = doc(db,'wallets',digits);
+        const walSnap = await getDoc(walRef);
+        const cur = walSnap.exists() ? (walSnap.data().balance||0) : 0;
+        await setDoc(walRef,{ balance:cur+sub.gbMonthly, phone:sub.phone, digits, updatedAt:now },{merge:true});
+        // Notificar
+        await setDoc(doc(db,'push_notifications',digits+'_monthly_gb_'+Date.now()),{
+          title:'🪙 +'+sub.gbMonthly+' GB$ mensais!',
+          body:'Seus GB$ mensais do plano foram creditados. Bom proveito!',
+          phone:sub.phone, digits, createdAt:now, read:false, pending:true,
+        });
+        // Atualizar próxima data
+        await setDoc(doc(db,'subscriptions',d.id),{ nextGbAt: getNextMonthISO() },{merge:true});
+        console.log('Monthly GB$ credited to', sub.phone, '+'+sub.gbMonthly);
+      }
+    } catch(e){ console.warn('creditMonthlyGBs:',e); }
+  }
+
+  // Rodar verificação ao carregar o painel (uma vez por sessão)
+  window.addEventListener('DOMContentLoaded', ()=>{
+    setTimeout(creditMonthlyGBs, 5000);
+  });
 
 
 </script>
