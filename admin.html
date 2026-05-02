@@ -2218,7 +2218,7 @@
     const phones = {};
     const today  = getTodayStr();
     // Conta apenas agendamentos REALIZADOS (data passada, não bloqueado)
-    allData.filter(a=>a.status!=='Bloqueado' && a.date < today).forEach(a=>{
+    allData.filter(a=>a.status!=='Bloqueado' && (a.date < today || a.done===true)).forEach(a=>{
       const d = (a.phone||'').replace(/\D/g,'');
       counts[d] = (counts[d]||0) + 1;
       if(!names[d]) names[d] = a.name||'—';
@@ -2293,7 +2293,7 @@
     }
     const counts={};
     const today2 = getTodayStr();
-    allData.filter(a=>a.status!=='Bloqueado' && a.date < today2).forEach(a=>{
+    allData.filter(a=>a.status!=='Bloqueado' && (a.date < today2 || a.done===true)).forEach(a=>{
       const d=(a.phone||'').replace(/\D/g,'');
       counts[d]=(counts[d]||0)+1;
     });
