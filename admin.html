@@ -2363,45 +2363,20 @@
   // ENVIAR NOTIFICAÇÃO PUSH PARA CLIENTES
   // ═══════════════════════════════════════
   async function sendPushNotification(title, body){
-    // CORS: admin domain cannot call client API — skip silently
-    if(typeof window !== 'undefined' && window.location.hostname !== 'gabriel-barber-studio.vercel.app') return;
     try {
-      // 1. Salvar no Firestore — clientes com app aberto recebem via onMessage
+      // Salva no Firestore — o site do cliente lê e envia via FCM
+      // Isso evita CORS pois o admin só escreve no Firestore
       const notifId = 'notif_' + Date.now();
       await setDoc(doc(db,'push_notifications', notifId),{
         title, body,
         icon: 'https://i.postimg.cc/FFpNdnLT/Design-sem-nome.png',
         createdAt: new Date().toISOString(),
         sentBy: currentAdmin||'admin',
+        pending: true, // cliente lê e envia FCM
       });
-
-      // 2. Chamar a API do Vercel para enviar FCM a todos os tokens
-      //    (funciona mesmo com app fechado)
-      const resp = await fetch('https://gabriel-barber-studio.vercel.app/api/notify', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-notify-secret': 'gbs-notify-2026',
-        },
-        body: JSON.stringify({
-          title,
-          body,
-          icon: 'https://i.postimg.cc/FFpNdnLT/Design-sem-nome.png',
-        }),
-      });
-
-      if(resp.ok){
-        const data = await resp.json();
-        console.log('FCM response:', data);
-        showToast('Notificação enviada para '+data.sent+' cliente(s)! 🔔','green');
-      } else {
-        const errText = await resp.text();
-        console.error('FCM API error:', resp.status, errText);
-        showToast('Erro FCM '+resp.status+': '+errText.slice(0,60),'red');
-      }
+      showToast('Notificação agendada para os clientes! 🔔','green');
     } catch(e){
-      console.error('sendPushNotification fetch error:',e);
-      showToast('Erro ao chamar API: '+e.message,'red');
+      console.warn('sendPushNotification error:',e);
     }
   }
 
