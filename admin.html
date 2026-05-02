@@ -2088,11 +2088,7 @@
           const walSnap = await getDoc(walRef);
           const cur = walSnap.exists() ? (walSnap.data().balance||0) : 0;
           await setDoc(walRef,{ balance: cur+gbSignup, phone, digits, updatedAt:new Date().toISOString() },{merge:true});
-          await setDoc(doc(db,'push_notifications',digits+'_sub_gb_'+Date.now()),{
-            title:'🪙 +'+gbSignup+' GB$ de bônus!',
-            body:'Bônus do plano '+planName+' creditado na sua carteira!',
-            phone, digits, createdAt:new Date().toISOString(), read:false, pending:true,
-          });
+          await sendPersonalNotification(digits,'🪙 +'+gbSignup+' GB$ de bônus!','Bônus do plano '+planName+' creditado na sua carteira!');
         }
         // Salvar gbMonthly na assinatura para cobrança mensal
         if(gbMonthly > 0){
@@ -2421,7 +2417,8 @@
         icon: 'https://i.postimg.cc/FFpNdnLT/Design-sem-nome.png',
         createdAt: new Date().toISOString(),
         sentBy: currentAdmin||'admin',
-        pending: true, // cliente lê e envia FCM
+        pending: true,
+        broadcast: true, // mostrar para todos os clientes
       });
       showToast('Notificação agendada para os clientes! 🔔','green');
     } catch(e){
@@ -2811,11 +2808,7 @@
       // Notificar cliente
       if(phone){
         const digits = phone.replace(/\D/g,'');
-        await setDoc(doc(db,'push_notifications',digits+'_rdm_deny_'+Date.now()),{
-          title:'❌ Resgate Negado',
-          body:'Seu resgate foi negado. Motivo: '+reason.trim()+'. Seus GB$ foram devolvidos.',
-          phone, digits, createdAt:new Date().toISOString(), read:false,
-        });
+        await sendPersonalNotification(digits,'❌ Resgate Negado','Seu resgate foi negado. Motivo: '+reason.trim()+'. Seus GB$ foram devolvidos.');
       }
       showToast('Resgate negado e GB$ devolvidos ao cliente.','green');
     } catch(e){ showToast('Erro: '+e.message,'red'); }
@@ -3445,11 +3438,7 @@
       await setDoc(doc(db,'gb_purchases',purchaseId),{ status:'approved', approvedAt:new Date().toISOString() },{merge:true});
       // Send push notification to client
       if(digits){
-        await setDoc(doc(db,'push_notifications',digits+'_gb_'+Date.now()),{
-          title:'🪙 GB$ Creditados!',
-          body:'Sua compra foi aprovada! +'+(snap.data().coins||0)+' GB$ adicionados à sua carteira.',
-          phone:p.phone||'', digits, createdAt:new Date().toISOString(), read:false,
-        });
+        await sendPersonalNotification(digits,'🪙 GB$ Creditados!','Sua compra foi aprovada! +'+(snap.data().coins||0)+' GB$ adicionados à sua carteira.');
       }
       showToast('Compra aprovada! GB$ creditados.','green');
     } catch(e){ showToast('Erro: '+e.message,'red'); }
@@ -3465,11 +3454,7 @@
       const p = snap.data();
       const digits = (p.phone||'').replace(/\D/g,'');
       if(digits){
-        await setDoc(doc(db,'push_notifications',digits+'_gb_deny_'+Date.now()),{
-          title:'❌ Compra de GB$ Negada',
-          body:'Sua solicitação foi negada. Motivo: '+reason.trim(),
-          phone:p.phone||'', digits, createdAt:new Date().toISOString(), read:false,
-        });
+        await sendPersonalNotification(digits,'❌ Compra de GB$ Negada','Sua solicitação foi negada. Motivo: '+reason.trim());
       }
       showToast('Compra negada.','red');
     } catch(e){ showToast('Erro: '+e.message,'red'); }
@@ -3686,11 +3671,7 @@
         const cur = walSnap.exists() ? (walSnap.data().balance||0) : 0;
         await setDoc(walRef,{ balance:cur+sub.gbMonthly, phone:sub.phone, digits, updatedAt:now },{merge:true});
         // Notificar
-        await setDoc(doc(db,'push_notifications',digits+'_monthly_gb_'+Date.now()),{
-          title:'🪙 +'+sub.gbMonthly+' GB$ mensais!',
-          body:'Seus GB$ mensais do plano foram creditados. Bom proveito!',
-          phone:sub.phone, digits, createdAt:now, read:false, pending:true,
-        });
+        await sendPersonalNotification(digits,'🪙 +'+sub.gbMonthly+' GB$ mensais!','Seus GB$ mensais do plano foram creditados. Bom proveito!');
         // Atualizar próxima data
         await setDoc(doc(db,'subscriptions',d.id),{ nextGbAt: getNextMonthISO() },{merge:true});
         console.log('Monthly GB$ credited to', sub.phone, '+'+sub.gbMonthly);
@@ -3772,11 +3753,7 @@
         const newBal = isAdd ? cur+amount : Math.max(0, cur-amount);
         await setDoc(walRef,{ balance:newBal, digits, updatedAt:new Date().toISOString() },{merge:true});
         if(isAdd){
-          await setDoc(doc(db,'push_notifications',digits+'_credit_'+Date.now()),{
-            title:'🪙 +'+amount+' GB$ creditados!',
-            body:'Gabriel adicionou '+amount+' GB$ à sua carteira. Aproveite!',
-            digits, createdAt:new Date().toISOString(), read:false, pending:true,
-          });
+          await sendPersonalNotification(digits,'🪙 +'+amount+' GB$ creditados!','Gabriel adicionou '+amount+' GB$ à sua carteira. Aproveite!');
         }
         document.body.removeChild(modal);
         showToast(label+' '+(isAdd?'creditados':'removidos')+' para '+esc(clientName||digits)+'!', isAdd?'green':'red');
@@ -3784,6 +3761,21 @@
     };
     modal.onclick = e=>{ if(e.target===modal) document.body.removeChild(modal); };
   };
+
+
+
+  // ─── Notificação pessoal para um cliente específico ───
+  async function sendPersonalNotification(digits, title, body){
+    try {
+      const ref = doc(db,'push_notifications_personal',digits);
+      const snap = await getDoc(ref);
+      const list = snap.exists() ? (snap.data().list||[]) : [];
+      list.push({ id:'n_'+Date.now(), title, body, createdAt:new Date().toISOString(), read:false });
+      // Keep only last 20
+      if(list.length > 20) list.splice(0, list.length-20);
+      await setDoc(ref,{ list },{merge:true});
+    } catch(e){ console.warn('sendPersonalNotification:',e); }
+  }
 
 
 </script>
