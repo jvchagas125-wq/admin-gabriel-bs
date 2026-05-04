@@ -2467,18 +2467,21 @@
   // ═══════════════════════════════════════
   async function sendPushNotification(title, body){
     try {
-      // Salva no Firestore — o site do cliente lê e envia via FCM
-      // Isso evita CORS pois o admin só escreve no Firestore
+      // Salva no Firestore para clientes com site aberto verem
       const notifId = 'notif_' + Date.now();
       await setDoc(doc(db,'push_notifications', notifId),{
         title, body,
         icon: 'https://i.postimg.cc/FFpNdnLT/Design-sem-nome.png',
         createdAt: new Date().toISOString(),
         sentBy: currentAdmin||'admin',
-        pending: true,
-        broadcast: true, // mostrar para todos os clientes
+        broadcast: true,
       });
-      showToast('Notificação agendada para os clientes! 🔔','green');
+      // Chama API diretamente para enviar FCM a todos (app fechado)
+      fetch('https://gabriel-barber-studio.vercel.app/api/notify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-notify-secret': 'gbs-notify-2026' },
+        body: JSON.stringify({ title, body, icon: 'https://i.postimg.cc/FFpNdnLT/Design-sem-nome.png' }),
+      }).then(r=>r.json()).then(d=>console.log('FCM broadcast:',d)).catch(()=>{});
     } catch(e){
       console.warn('sendPushNotification error:',e);
     }
@@ -3843,13 +3846,12 @@
       list.push({ id:'n_'+Date.now(), title, body, createdAt:new Date().toISOString(), read:false });
       if(list.length > 20) list.splice(0, list.length-20);
       await setDoc(ref,{ list },{merge:true});
-
-      // 2. Enviar FCM pessoal (app fechado) via API do site cliente
+      // 2. Enviar FCM pessoal diretamente (app fechado)
       fetch('https://gabriel-barber-studio.vercel.app/api/notify',{
         method:'POST',
-        headers:{'Content-Type':'application/json','x-notify-secret': (typeof process!=='undefined'&&process.env?.NOTIFY_SECRET)||'gbs-notify-2026'},
+        headers:{'Content-Type':'application/json','x-notify-secret':'gbs-notify-2026'},
         body: JSON.stringify({ title, body, digits }),
-      }).catch(()=>{});
+      }).then(r=>r.json()).then(d=>console.log('FCM personal:',d)).catch(()=>{});
     } catch(e){ console.warn('sendPersonalNotification:',e); }
   }
 
