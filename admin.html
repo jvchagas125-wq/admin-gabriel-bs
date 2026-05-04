@@ -556,10 +556,20 @@
       <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;background:linear-gradient(135deg,#c9a84c,#f0d78c,#c9a84c);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">💰 Faturamento</div>
 
     </div>
-    <div style="display:flex;justify-content:center;margin-bottom:22px;">
-      <div style="background:var(--bg3);border:1px solid rgba(201,168,76,0.2);border-radius:10px;padding:16px 40px;text-align:center;">
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px;">
+      <div style="background:var(--bg3);border:1px solid rgba(201,168,76,0.2);border-radius:10px;padding:16px;text-align:center;">
+        <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px;">Hoje</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--gold);" id="rev-day-val">R$ 0,00</div>
+        <div style="font-size:12px;color:var(--text-dim);margin-top:2px;" id="rev-day-count">0 atendimentos</div>
+      </div>
+      <div style="background:var(--bg3);border:1px solid rgba(201,168,76,0.2);border-radius:10px;padding:16px;text-align:center;">
+        <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px;">Este Mês</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--gold);" id="rev-month-val">R$ 0,00</div>
+        <div style="font-size:12px;color:var(--text-dim);margin-top:2px;" id="rev-month-count">0 atendimentos</div>
+      </div>
+      <div style="background:var(--bg3);border:1px solid rgba(201,168,76,0.2);border-radius:10px;padding:16px;text-align:center;">
         <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px;">Este Ano</div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--gold);" id="rev-year-val">R$ 0,00</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--gold);" id="rev-year-val">R$ 0,00</div>
         <div style="font-size:12px;color:var(--text-dim);margin-top:2px;" id="rev-year-count">0 atendimentos</div>
       </div>
     </div>
@@ -1885,12 +1895,20 @@
   function updateRevenueCards(){
     const priceMap=getServicePriceMap();
     const today=getTodayStr();
-    const yr=today.slice(0,4);
-    const yrD=allData.filter(a=>a.date.startsWith(yr)&&a.status!=='Bloqueado'&&(a.date<=today||a.done===true));
-    const yrCount=yrD.length;
+    const ym=today.slice(0,7), yr=today.slice(0,4);
+    // Filtro base: realizados (passados + concluídos + hoje)
+    const base=a=>a.status!=='Bloqueado'&&(a.date<=today||a.done===true);
+    const dayD =allData.filter(a=>a.date===today&&base(a));
+    const monD =allData.filter(a=>a.date.startsWith(ym)&&base(a));
+    const yrD  =allData.filter(a=>a.date.startsWith(yr)&&base(a));
     const setEl=(id,v)=>{ const el=document.getElementById(id); if(el) el.textContent=v; };
-    setEl('rev-year-val', formatBRL(calcRevenue(yrD,priceMap)));
-    setEl('rev-year-count', yrCount+(yrCount===1?' atendimento':' atendimentos'));
+    const cnt=(d)=>d.length+(d.length===1?' atendimento':' atendimentos');
+    setEl('rev-day-val',   formatBRL(calcRevenue(dayD,priceMap)));
+    setEl('rev-day-count', cnt(dayD));
+    setEl('rev-month-val', formatBRL(calcRevenue(monD,priceMap)));
+    setEl('rev-month-count', cnt(monD));
+    setEl('rev-year-val',  formatBRL(calcRevenue(yrD,priceMap)));
+    setEl('rev-year-count', cnt(yrD));
     drawRevenueChart('year');
   }
 
