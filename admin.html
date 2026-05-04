@@ -1095,7 +1095,7 @@
   function subscribeData(){
     onSnapshot(collection(db,COL),snap=>{
       allData=snap.docs.map(d=>({id:d.id,...d.data()}));
-      updateStats(); renderTable(); updateRevenueCards();
+      updateStats(); renderTable(); updateRevenueCards(); drawRevenueChart('year');
     });
   }
 
@@ -1888,7 +1888,7 @@
     const ym=today.slice(0,7), yr=today.slice(0,4);
     const dayD=allData.filter(a=>a.date===today);
     const monD=allData.filter(a=>a.date.startsWith(ym));
-    const yrD =allData.filter(a=>a.date.startsWith(yr));
+    const yrD =allData.filter(a=>a.date.startsWith(yr)&&a.status!=='Bloqueado'&&(a.date<=today||a.done===true));
     const fn=d=>d.filter(a=>a.status!=='Bloqueado').length;
     document.getElementById('rev-day-val').textContent  =formatBRL(calcRevenue(dayD,priceMap));
     document.getElementById('rev-month-val').textContent=formatBRL(calcRevenue(monD,priceMap));
@@ -1925,7 +1925,8 @@
       });
       labelText='Faturamento por dia — '+ym.slice(5)+'/'+yr;
     } else {
-      const d=allData.filter(a=>a.date.startsWith(yr)&&a.status!=='Bloqueado');
+      // Incluir: passados + concluídos + hoje (excluir Bloqueado)
+      const d=allData.filter(a=>a.date.startsWith(yr)&&a.status!=='Bloqueado'&&(a.date<=today||a.done===true));
       labels=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
       values=labels.map((_,i)=>{
         const m=String(i+1).padStart(2,'0');
