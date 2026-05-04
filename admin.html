@@ -554,31 +554,17 @@
   <div style="background:var(--bg2);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:24px;margin-bottom:28px;" id="revenue-block">
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px;">
       <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;background:linear-gradient(135deg,#c9a84c,#f0d78c,#c9a84c);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">💰 Faturamento</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <button onclick="setRevPeriod('day')" id="rev-btn-day" class="rev-period-btn active-period">Hoje</button>
-        <button onclick="setRevPeriod('month')" id="rev-btn-month" class="rev-period-btn">Este Mês</button>
-        <button onclick="setRevPeriod('year')" id="rev-btn-year" class="rev-period-btn">Este Ano</button>
-      </div>
+
     </div>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px;">
-      <div style="background:var(--bg3);border:1px solid rgba(201,168,76,0.2);border-radius:10px;padding:16px;text-align:center;">
-        <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px;">Hoje</div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--gold);" id="rev-day-val">R$ 0,00</div>
-        <div style="font-size:12px;color:var(--text-dim);margin-top:2px;" id="rev-day-count">0 atendimentos</div>
-      </div>
-      <div style="background:var(--bg3);border:1px solid rgba(201,168,76,0.2);border-radius:10px;padding:16px;text-align:center;">
-        <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px;">Este Mês</div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--gold);" id="rev-month-val">R$ 0,00</div>
-        <div style="font-size:12px;color:var(--text-dim);margin-top:2px;" id="rev-month-count">0 atendimentos</div>
-      </div>
-      <div style="background:var(--bg3);border:1px solid rgba(201,168,76,0.2);border-radius:10px;padding:16px;text-align:center;">
+    <div style="display:flex;justify-content:center;margin-bottom:22px;">
+      <div style="background:var(--bg3);border:1px solid rgba(201,168,76,0.2);border-radius:10px;padding:16px 40px;text-align:center;">
         <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px;">Este Ano</div>
         <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--gold);" id="rev-year-val">R$ 0,00</div>
         <div style="font-size:12px;color:var(--text-dim);margin-top:2px;" id="rev-year-count">0 atendimentos</div>
       </div>
     </div>
     <canvas id="revenue-chart" height="160" style="width:100%;display:block;"></canvas>
-    <div style="font-size:11px;color:var(--text-dim);text-align:center;margin-top:8px;" id="rev-chart-label">Faturamento por serviço — hoje</div>
+    <div style="font-size:11px;color:var(--text-dim);text-align:center;margin-top:8px;" id="rev-chart-label">Faturamento mensal — este ano</div>
   </div>
   <div class="toolbar">
     <div class="toolbar-title">Agendamentos</div>
@@ -1877,7 +1863,7 @@
   // ═══════════════════════════════════════
   // FATURAMENTO / RECEITA
   // ═══════════════════════════════════════
-  let currentRevPeriod = 'day';
+  let currentRevPeriod = 'year';
   let revenueChartInstance = null;
 
   function getServicePriceMap(){
@@ -1910,15 +1896,12 @@
     document.getElementById('rev-day-count').textContent  =fn(dayD)+(fn(dayD)===1?' atendimento':' atendimentos');
     document.getElementById('rev-month-count').textContent=fn(monD)+(fn(monD)===1?' atendimento':' atendimentos');
     document.getElementById('rev-year-count').textContent =fn(yrD )+(fn(yrD )===1?' atendimento':' atendimentos');
-    drawRevenueChart(currentRevPeriod);
+    drawRevenueChart('year');
   }
 
   window.setRevPeriod=function(period){
-    currentRevPeriod=period;
-    document.querySelectorAll('.rev-period-btn').forEach(b=>b.classList.remove('active-period'));
-    const btn=document.getElementById('rev-btn-'+period);
-    if(btn) btn.classList.add('active-period');
-    drawRevenueChart(period);
+    currentRevPeriod='year';
+    drawRevenueChart('year');
   };
 
   function drawRevenueChart(period){
@@ -1963,8 +1946,19 @@
         type:'bar',
         data:{labels,datasets:[{label:'R$',data:values,backgroundColor:'rgba(201,168,76,0.55)',borderColor:'#c9a84c',borderWidth:1,borderRadius:5}]},
         options:{responsive:true,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>formatBRL(c.parsed.y)}}},
-          scales:{x:{ticks:{color:'#666',font:{size:10}},grid:{color:'rgba(255,255,255,0.04)'}},
-                  y:{ticks:{color:'#666',font:{size:10},callback:v=>formatBRL(v)},grid:{color:'rgba(255,255,255,0.04)'}}}}
+          scales:{
+            x:{ticks:{color:'#888',font:{size:10}},grid:{color:'rgba(255,255,255,0.04)'}},
+            y:{
+              min:0, max:3000,
+              ticks:{
+                color:'#888',font:{size:10},
+                stepSize:500,
+                callback:v=>'R$'+v.toLocaleString('pt-BR')
+              },
+              grid:{color:'rgba(255,255,255,0.05)'}
+            }
+          }
+        }
       });
     } else {
       // fallback canvas manual
