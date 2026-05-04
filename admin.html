@@ -621,23 +621,6 @@
   </div>
   </div>
 
-  <!-- CANCELADOS — dentro da aba Agendamentos -->
-  <div id="tab-cancelled" style="display:none;margin-top:32px;">
-    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;background:linear-gradient(135deg,#dc2626,#f87171);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">
-        🚫 Cancelados <span id="cancelled-badge" style="display:none;background:#dc2626;color:#fff;border-radius:10px;font-size:12px;padding:2px 8px;margin-left:4px;font-weight:700;vertical-align:middle;"></span>
-      </div>
-      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-        <input class="search-input" type="search" id="cancelled-search" placeholder="Buscar nome ou telefone..." oninput="filterCancelled()" style="width:200px;">
-        <button class="clear-btn" onclick="clearAllCancelled()" title="Limpar toda a lista" style="white-space:nowrap;">🗑️ Limpar tudo</button>
-      </div>
-    </div>
-    <div style="font-size:12px;color:var(--text-dim);margin-bottom:12px;">Agendamentos cancelados pelo cliente ou pelo admin.</div>
-    <div id="cancelled-list" class="table-wrap fade-in">
-      <div style="text-align:center;padding:40px 0;"><div class="spinner" style="margin:0 auto;"></div></div>
-    </div>
-  </div>
-
   <!-- CONCLUÍDOS — dentro da aba Agendamentos -->
   <div id="tab-done" style="display:none;margin-top:32px;">
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
@@ -651,6 +634,23 @@
     </div>
     <div style="font-size:12px;color:var(--text-dim);margin-bottom:12px;">Atendimentos marcados como concluídos por Gabriel.</div>
     <div id="done-list" class="table-wrap fade-in">
+      <div style="text-align:center;padding:40px 0;"><div class="spinner" style="margin:0 auto;"></div></div>
+    </div>
+  </div>
+
+  <!-- CANCELADOS — dentro da aba Agendamentos -->
+  <div id="tab-cancelled" style="display:none;margin-top:32px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;background:linear-gradient(135deg,#dc2626,#f87171);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">
+        🚫 Cancelados <span id="cancelled-badge" style="display:none;background:#dc2626;color:#fff;border-radius:10px;font-size:12px;padding:2px 8px;margin-left:4px;font-weight:700;vertical-align:middle;"></span>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <input class="search-input" type="search" id="cancelled-search" placeholder="Buscar nome ou telefone..." oninput="filterCancelled()" style="width:200px;">
+        <button class="clear-btn" onclick="clearAllCancelled()" title="Limpar toda a lista" style="white-space:nowrap;">🗑️ Limpar tudo</button>
+      </div>
+    </div>
+    <div style="font-size:12px;color:var(--text-dim);margin-bottom:12px;">Agendamentos cancelados pelo cliente ou pelo admin.</div>
+    <div id="cancelled-list" class="table-wrap fade-in">
       <div style="text-align:center;padding:40px 0;"><div class="spinner" style="margin:0 auto;"></div></div>
     </div>
   </div>
@@ -1136,7 +1136,7 @@
     const search=document.getElementById("search").value.toLowerCase().trim();
     const fStatus=document.getElementById("filter-status").value;
     const fSvc=document.getElementById("filter-service").value;
-    let data=allData.filter(a=>a.status!=='Bloqueado');
+    let data=allData.filter(a=>a.status!=='Bloqueado' && !a.done);
     if(search) data=data.filter(a=>a.name.toLowerCase().includes(search)||a.phone.includes(search));
     if(fStatus) data=data.filter(a=>getStatusType(a)===fStatus);
     if(fSvc) data=data.filter(a=>a.service===fSvc);
@@ -3688,8 +3688,8 @@
       await setDoc(doc(db,'config','schedule'),{ ...current, buffer, slotInterval });
       // Update local
       adminServices = services;
-      SCHEDULE.buffer = buffer;
-      SCHEDULE.slotInterval = slotInterval;
+      currentSettings.buffer = buffer;
+      currentSettings.slotInterval = slotInterval;
       showToast('Serviços e intervalos salvos!','green');
     } catch(e){ showToast('Erro: '+e.message,'red'); }
   };
