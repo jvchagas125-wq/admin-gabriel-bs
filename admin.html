@@ -638,6 +638,23 @@
     </div>
   </div>
 
+  <!-- CONCLUÍDOS — dentro da aba Agendamentos -->
+  <div id="tab-done" style="display:none;margin-top:32px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;background:linear-gradient(135deg,#16a34a,#4ade80);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">
+        ✅ Concluídos <span id="done-badge" style="display:none;background:#16a34a;color:#fff;border-radius:10px;font-size:12px;padding:2px 8px;margin-left:4px;font-weight:700;vertical-align:middle;"></span>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <input class="search-input" type="search" id="done-search" placeholder="Buscar nome ou telefone..." oninput="filterDone()" style="width:200px;">
+        <button class="clear-btn" onclick="clearAllDone()" title="Limpar toda a lista de concluídos" style="white-space:nowrap;">🗑️ Limpar tudo</button>
+      </div>
+    </div>
+    <div style="font-size:12px;color:var(--text-dim);margin-bottom:12px;">Atendimentos marcados como concluídos por Gabriel.</div>
+    <div id="done-list" class="table-wrap fade-in">
+      <div style="text-align:center;padding:40px 0;"><div class="spinner" style="margin:0 auto;"></div></div>
+    </div>
+  </div>
+
 
   <!-- ABA PRODUTOS / LOJA GB$ -->
   <div id="tab-store" style="display:none;">
@@ -1176,6 +1193,11 @@
         updatedAt: new Date().toISOString(),
       },{merge:true});
       showToast('Atendimento concluído! +'+coinsPerApt+' GB$ para '+name,'green');
+      // Scroll para a seção concluídos
+      setTimeout(()=>{
+        const doneDiv = document.getElementById('tab-done');
+        if(doneDiv) doneDiv.scrollIntoView({behavior:'smooth', block:'start'});
+      }, 600);
     } catch(e){
       console.error(e);
       showToast('Erro: '+e.message,'red');
@@ -1777,7 +1799,7 @@
   };
 
   window.switchTab = function(tab){
-    ['appointments','sessions','cancelled','subscriptions','gbstore','store','gbcoins','svcadmin','avisos','reviews','settings'].forEach(t=>{
+    ['appointments','sessions','cancelled','done','subscriptions','gbstore','store','gbcoins','svcadmin','avisos','reviews','settings'].forEach(t=>{
       const el=document.getElementById('tab-'+t);
       if(el) el.style.display=t===tab?'block':'none';
     });
@@ -1797,8 +1819,11 @@
     if(tab==='subscriptions') { loadSubscriptions(); loadAdminPlans(); }
     if(tab==='appointments'){
       loadCancelledTab();
+      loadDoneTab();
       const cancelledDiv = document.getElementById('tab-cancelled');
       if(cancelledDiv) cancelledDiv.style.display = 'block';
+      const doneDiv = document.getElementById('tab-done');
+      if(doneDiv) doneDiv.style.display = 'block';
     } else {
       const cancelledDiv = document.getElementById('tab-cancelled');
       if(cancelledDiv) cancelledDiv.style.display = 'none';
@@ -1838,7 +1863,8 @@
         loadAdminPlans();
         loadAdminServices();
         loadAdminBanners();
-        loadCancelledTab(); // Carrega dados mas não mostra ainda — switchTab controla visibilidade
+        loadCancelledTab();
+        loadDoneTab(); // Carrega concluídos
         // Inicializa a aba padrão corretamente
         setTimeout(()=>switchTab('appointments'), 100);
       } else {
@@ -3873,6 +3899,81 @@
       adminReviews = list;
       if(!silent) showToast('Comentários salvos!','green');
     } catch(e){ if(!silent) showToast('Erro: '+e.message,'red'); }
+  };
+
+
+
+  // ═══════════════════════════════════════
+  // CONCLUÍDOS — ABA AGENDAMENTOS
+  // ═══════════════════════════════════════
+  let doneUnsubscribe = null;
+  let allDone = [];
+
+  function loadDoneTab(){
+    const el = document.getElementById('done-list');
+    if(!el) return;
+    if(doneUnsubscribe){
+      renderDoneList(allDone);
+      return;
+    }
+    el.innerHTML = '<div style="text-align:center;padding:40px 0;"><div class="spinner" style="margin:0 auto;"></div></div>';
+    doneUnsubscribe = onSnapshot(
+      query(collection(db, COL), where('done','==',true)),
+      snap => {
+        allDone = snap.docs.map(d=>({id:d.id,...d.data()}))
+          .sort((a,b)=>(b.date+b.time||'').localeCompare(a.date+a.time||''));
+        // Update badge
+        const badge = document.getElementById('done-badge');
+        if(badge){ badge.textContent=allDone.length; badge.style.display=allDone.length?'inline':'none'; }
+        renderDoneList(allDone);
+      },
+      e => console.warn('loadDoneTab:',e)
+    );
+  }
+
+  function renderDoneList(list){
+    const el = document.getElementById('done-list');
+    if(!el) return;
+    const q = (document.getElementById('done-search')?.value||'').toLowerCase();
+    const filtered = q ? list.filter(a=>(a.name||'').toLowerCase().includes(q)||(a.phone||'').includes(q)) : list;
+    if(!filtered.length){
+      el.innerHTML='<div style="padding:20px;text-align:center;color:var(--text-dim);font-size:13px);">Nenhum atendimento concluído.</div>';
+      return;
+    }
+    el.innerHTML = `<table class="apt-table"><thead><tr>
+      <th>Cliente</th><th>Telefone</th><th>Serviço</th><th>Data</th><th>Hora</th><th>Ação</th>
+    </tr></thead><tbody>` +
+    filtered.map(a=>{
+      const dt = a.date ? new Date(a.date+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}) : '—';
+      return `<tr>
+        <td style="font-weight:600;">${esc(a.name||'—')}</td>
+        <td>${esc(a.phone||'—')}</td>
+        <td>${esc(a.service||'—')}</td>
+        <td>${dt}</td>
+        <td>${esc(a.time||'—')}</td>
+        <td><button onclick="removeDoneApt('${a.id}')" style="padding:4px 8px;border-radius:6px;border:1px solid rgba(220,38,38,.3);background:none;color:#f87171;font-size:11px;cursor:pointer;">🗑️</button></td>
+      </tr>`;
+    }).join('') + '</tbody></table>';
+  }
+
+  window.filterDone = function(){
+    renderDoneList(allDone);
+  };
+
+  window.removeDoneApt = async function(id){
+    if(!confirm('Remover este atendimento da lista de concluídos?')) return;
+    try {
+      await setDoc(doc(db,COL,id),{done:false},{merge:true});
+      showToast('Removido da lista de concluídos.','green');
+    } catch(e){ showToast('Erro: '+e.message,'red'); }
+  };
+
+  window.clearAllDone = async function(){
+    if(!confirm('Limpar toda a lista de concluídos?')) return;
+    try {
+      await Promise.all(allDone.map(a=>setDoc(doc(db,COL,a.id),{done:false},{merge:true})));
+      showToast('Lista de concluídos limpa.','green');
+    } catch(e){ showToast('Erro: '+e.message,'red'); }
   };
 
 
