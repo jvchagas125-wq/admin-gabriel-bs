@@ -646,12 +646,13 @@
       </div>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
         <input class="search-input" type="search" id="cancelled-search" placeholder="Buscar nome ou telefone..." oninput="filterCancelled()" style="width:200px;">
-        <button class="clear-btn" onclick="clearAllCancelled()" title="Limpar toda a lista" style="white-space:nowrap;">🗑️ Limpar tudo</button>
+        <button class="clear-btn" onclick="clearAllCancelled()" title="Limpar lista local" style="white-space:nowrap;">🗑️ Limpar lista</button>
+        <button class="clear-btn" onclick="clearAllCancelledFirestore()" title="Zerar banco de dados" style="white-space:nowrap;border-color:rgba(220,38,38,0.5);color:#f87171;">🗑️ Zerar banco</button>
       </div>
     </div>
     <div style="font-size:12px;color:var(--text-dim);margin-bottom:12px;">Agendamentos cancelados pelo cliente ou pelo admin.</div>
     <div id="cancelled-list" class="table-wrap fade-in">
-      <div style="text-align:center;padding:40px 0;"><div class="spinner" style="margin:0 auto;"></div></div>
+      <div style="text-align:center;padding:20px;color:var(--text-dim);font-size:13px;">Nenhum agendamento cancelado.</div>
     </div>
   </div>
 
@@ -2620,12 +2621,11 @@
       cancelledUnsubscribe();
       cancelledUnsubscribe = null;
     }
-    allCancelled = []; // Reset sempre para garantir dados frescos do Firestore
+    allCancelled = [];
     el.innerHTML = '<div style="text-align:center;padding:40px 0;"><div class="spinner" style="margin:0 auto;"></div></div>';
     cancelledUnsubscribe = onSnapshot(
       collection(db,'cancelled_appointments'),
       snap => {
-        // Reconstrói a lista completa a cada snapshot
         allCancelled = snap.docs.map(d=>({id:d.id,...d.data()}));
         allCancelled.sort((a,b)=>(b.cancelledAt||'').localeCompare(a.cancelledAt||''));
         updateCancelledBadge();
@@ -2708,6 +2708,18 @@
       if(cancelledUnsubscribe){ cancelledUnsubscribe(); cancelledUnsubscribe=null; }
       loadCancelledTab();
     }
+  };
+
+  window.clearAllCancelledFirestore = async function(){
+    // Apaga TODOS os documentos da coleção cancelled_appointments (reset completo)
+    if(!confirm('Isso irá apagar TODOS os cancelamentos do banco de dados permanentemente. Confirmar?')) return;
+    try {
+      const snap = await getDocs(collection(db,'cancelled_appointments'));
+      await Promise.all(snap.docs.map(d=>deleteDoc(doc(db,'cancelled_appointments',d.id))));
+      allCancelled = [];
+      renderCancelledList([]);
+      showToast('Banco de cancelamentos limpo!','green');
+    } catch(e){ showToast('Erro: '+e.message,'red'); }
   };
 
   window.clearAllCancelled = async function(){
