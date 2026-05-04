@@ -1101,7 +1101,7 @@
   };
 
   window.doLogout = async function(){
-    if(!confirm("Deseja sair do painel?")) return;
+    if(!(await showGBConfirm("Sair do Painel","Deseja realmente sair do painel admin?","Sim, sair","Cancelar","red"))) return;
     await signOut(auth);
     location.reload();
   };
@@ -1173,7 +1173,7 @@
     const phone = btn.dataset.phone;
     const name  = btn.dataset.name;
     if(!id || !phone) return;
-    if(!confirm('Marcar atendimento de "'+name+'" como concluído e dar 1 GB$ ao cliente?')) return;
+    if(!(await showGBConfirm('✅ Concluir Atendimento','Marcar atendimento de <strong>'+name+'</strong> como concluído e creditar GB$ ao cliente?','Sim, concluir','Cancelar','green'))) return;
     const digits = phone.replace(/\D/g,'');
     try {
       // Marcar agendamento como concluído
@@ -1208,7 +1208,7 @@
   window.deleteApt = async function(id){
     const apt=allData.find(a=>a.id===id);
     if(!apt) return;
-    if(!confirm("Cancelar agendamento de "+apt.name+"?")) return;
+    if(!(await showGBConfirm('🚫 Cancelar Agendamento','Deseja cancelar o agendamento de <strong>'+apt.name+'</strong>?','Sim, cancelar','Voltar','red'))) return;
     try{
       // Salvar no histórico de cancelados antes de deletar
       const cancelId = 'cancel_' + id + '_' + Date.now();
@@ -1363,8 +1363,8 @@
     setTimeout(()=>{ const el=document.getElementById('svc-name-'+(adminServices.length-1)); if(el){el.focus();el.select();} },50);
   };
 
-  window.removeSvc = function(i){
-    if(!confirm('Remover o serviço "'+adminServices[i].name+'"?')) return;
+  window.removeSvc = async function(i){
+    if(!(await showGBConfirm('🗑️ Remover Serviço','Deseja remover o serviço <strong>'+adminServices[i].name+'</strong>?','Sim, remover','Cancelar','red'))) return;
     adminServices.splice(i,1);
     renderServicesAdminUI();
   };
@@ -1713,8 +1713,8 @@
     renderAdminPlans();
   };
 
-  window.removePlan = function(i){
-    if(!confirm('Remover este plano?')) return;
+  window.removePlan = async function(i){
+    if(!(await showGBConfirm('🗑️ Remover Plano','Deseja remover este plano de assinatura?','Sim, remover','Cancelar','red'))) return;
     adminPlans.splice(i,1);
     renderAdminPlans();
   };
@@ -2104,7 +2104,7 @@
   }
 
   window.activateVip=async function(pendingId,phone,planName,email,mpLink){
-    if(!confirm('Ativar VIP para '+phone+' — Plano '+planName+'?')) return;
+    if(!(await showGBConfirm('👑 Ativar VIP','Ativar VIP para <strong>'+phone+'</strong> no plano <strong>'+planName+'</strong>?','Sim, ativar','Cancelar','green'))) return;
     try{
       const planSnap=await getDocs(collection(db,'plans'));
       const planDoc=planSnap.docs.map(d=>d.data()).find(p=>p.name===planName);
@@ -2156,7 +2156,7 @@
   };
 
   window.revokeVip=async function(subId,phone,planName){
-    if(!confirm('Revogar VIP de '+phone+' — Plano '+planName+'?')) return;
+    if(!(await showGBConfirm('❌ Revogar VIP','Revogar VIP de <strong>'+phone+'</strong> — plano <strong>'+planName+'</strong>?','Sim, revogar','Cancelar','red'))) return;
     try{
       await deleteDoc(doc(db,'subscriptions',subId));
       showToast('VIP revogado para '+phone,'red');
@@ -2165,7 +2165,7 @@
   };
 
   window.deletePending=async function(id){
-    if(!confirm('Remover este pedido pendente?')) return;
+    if(!(await showGBConfirm('🗑️ Remover Pedido','Deseja remover este pedido pendente?','Sim, remover','Cancelar','red'))) return;
     try{
       await deleteDoc(doc(db,'pending_subscriptions',id));
       showToast('Pedido removido','red');
@@ -2228,7 +2228,7 @@
   };
 
   window.revokeVipFromCancel=async function(cancelId,phone,planName){
-    if(!confirm('Revogar VIP de '+phone+' e confirmar cancelamento?')) return;
+    if(!(await showGBConfirm('❌ Confirmar Cancelamento','Revogar VIP de <strong>'+phone+'</strong> e confirmar o cancelamento?','Sim, cancelar VIP','Voltar','red'))) return;
     try{
       // Revogar VIP
       const subId=phone.replace(/\D/g,'');
@@ -2577,7 +2577,7 @@
 
 
   window.deleteClient = async function(digits, name){
-    if(!confirm('Excluir o cliente "'+name+'"? Esta ação não pode ser desfeita.')) return;
+    if(!(await showGBConfirm('🗑️ Excluir Cliente','Deseja excluir o cliente <strong>'+name+'</strong>? Esta ação não pode ser desfeita.','Sim, excluir','Cancelar','red'))) return;
     try {
       await deleteDoc(doc(db,'clients',digits));
       // Zerar carteira GB$ (remove saldo e flags de bônus)
@@ -2692,7 +2692,7 @@
 
   window.removeCancelledEntry = async function(id){
     if(!id){ showToast('ID inválido','red'); return; }
-    if(!confirm('Remover este registro da lista de cancelados?')) return;
+    if(!(await showGBConfirm('🗑️ Remover Registro','Deseja remover este registro da lista de cancelados?','Sim, remover','Cancelar','red'))) return;
     try {
       // Remove localmente IMEDIATAMENTE para feedback instantâneo
       allCancelled = allCancelled.filter(c => c.id !== id);
@@ -2712,7 +2712,7 @@
 
   window.clearAllCancelledFirestore = async function(){
     // Apaga TODOS os documentos da coleção cancelled_appointments (reset completo)
-    if(!confirm('Isso irá apagar TODOS os cancelamentos do banco de dados permanentemente. Confirmar?')) return;
+    if(!(await showGBConfirm('🗑️ Zerar Banco','Isso irá apagar TODOS os cancelamentos do banco de dados permanentemente. Esta ação não pode ser desfeita.','Sim, zerar','Cancelar','red'))) return;
     try {
       const snap = await getDocs(collection(db,'cancelled_appointments'));
       await Promise.all(snap.docs.map(d=>deleteDoc(doc(db,'cancelled_appointments',d.id))));
@@ -2724,7 +2724,7 @@
 
   window.clearAllCancelled = async function(){
     if(!allCancelled.length){ showToast('Lista já está vazia!','green'); return; }
-    if(!confirm('Limpar TODOS os '+allCancelled.length+' registros de cancelados? Esta ação não pode ser desfeita.')) return;
+    if(!(await showGBConfirm('🗑️ Limpar Lista','Limpar todos os '+allCancelled.length+' registros de cancelados? Esta ação não pode ser desfeita.','Sim, limpar','Cancelar','red'))) return;
     try {
       // Snapshot local dos IDs antes de limpar
       const toDelete = [...allCancelled];
@@ -2876,7 +2876,7 @@
   };
 
   window.deleteRedemption = async function(id){
-    if(!confirm('Remover este registro de resgate?')) return;
+    if(!(await showGBConfirm('🗑️ Remover Resgate','Deseja remover este registro de resgate?','Sim, remover','Cancelar','red'))) return;
     try { await deleteDoc(doc(db,'redemptions',id)); showToast('Removido!','green'); }
     catch(e){ showToast('Erro: '+e.message,'red'); }
   };
@@ -3000,7 +3000,7 @@
   };
 
   window.deleteStoreProduct = async function(id, name){
-    if(!confirm('Excluir o produto "'+name+'"?')) return;
+    if(!(await showGBConfirm('🗑️ Excluir Produto','Deseja excluir o produto <strong>'+name+'</strong>?','Sim, excluir','Cancelar','red'))) return;
     try { await deleteDoc(doc(db,'store_products',id)); showToast('Produto removido!','green'); }
     catch(e){ showToast('Erro: '+e.message,'red'); }
   };
@@ -3175,7 +3175,7 @@
   };
 
   window.removeImgUpload = function(prevId, hiddenId, dzId){
-    if(!confirm('Remover esta imagem?')) return;
+    if(!(await showGBConfirm('🗑️ Remover Imagem','Deseja remover esta imagem?','Sim, remover','Cancelar','red'))) return;
     const hid = document.getElementById(hiddenId); if(hid) hid.value = '';
     const prev = document.getElementById(prevId);
     if(prev){ prev.src=''; prev.classList.remove('show'); }
@@ -3662,8 +3662,8 @@
     renderSvcAdminList();
   };
 
-  window.removeSvcAdmin = function(i){
-    if(!confirm('Remover este serviço?')) return;
+  window.removeSvcAdmin = async function(i){
+    if(!(await showGBConfirm('🗑️ Remover Serviço','Deseja remover este serviço?','Sim, remover','Cancelar','red'))) return;
     adminServices.splice(i,1);
     renderSvcAdminList();
   };
@@ -3891,7 +3891,7 @@
     document.getElementById('reviews-admin-list')?.lastElementChild?.scrollIntoView({behavior:'smooth',block:'nearest'});
   };
 
-  window.removeReview = function(i){
+  window.removeReview = async function(i){
     adminReviews.splice(i,1);
     renderReviewsAdmin();
   };
@@ -3973,7 +3973,7 @@
   };
 
   window.removeDoneApt = async function(id){
-    if(!confirm('Remover este atendimento da lista de concluídos?')) return;
+    if(!(await showGBConfirm('🗑️ Remover da Lista','Deseja remover este atendimento da lista de concluídos?','Sim, remover','Cancelar','red'))) return;
     try {
       await setDoc(doc(db,COL,id),{done:false},{merge:true});
       showToast('Removido da lista de concluídos.','green');
@@ -3981,7 +3981,7 @@
   };
 
   window.clearAllDone = async function(){
-    if(!confirm('Limpar toda a lista de concluídos?')) return;
+    if(!(await showGBConfirm('🗑️ Limpar Concluídos','Deseja limpar toda a lista de concluídos?','Sim, limpar','Cancelar','red'))) return;
     try {
       await Promise.all(allDone.map(a=>setDoc(doc(db,COL,a.id),{done:false},{merge:true})));
       showToast('Lista de concluídos limpa.','green');
