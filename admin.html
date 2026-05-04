@@ -3174,7 +3174,7 @@
     } catch(e){ console.error('autoSaveSvcImage:',e); showToast('Erro ao salvar imagem: '+e.message,'red'); }
   };
 
-  window.removeImgUpload = function(prevId, hiddenId, dzId){
+  window.removeImgUpload = async function(prevId, hiddenId, dzId){
     if(!(await showGBConfirm('🗑️ Remover Imagem','Deseja remover esta imagem?','Sim, remover','Cancelar','red'))) return;
     const hid = document.getElementById(hiddenId); if(hid) hid.value = '';
     const prev = document.getElementById(prevId);
