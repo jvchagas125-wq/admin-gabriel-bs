@@ -1577,7 +1577,8 @@
     });
 
     try {
-      // Collect specific breaks
+      // Sync DOM changes to memory then collect
+      syncSpecificBreaksFromDOM();
       s.specificBreaks = collectSpecificBreaks();
       specificBreaks = s.specificBreaks;
       await setDoc(doc(db,'config','schedule'), s);
@@ -4059,19 +4060,45 @@
     document.getElementById('specific-breaks-config')?.lastElementChild?.scrollIntoView({behavior:'smooth',block:'nearest'});
   };
 
+  function syncSpecificBreaksFromDOM(){
+    for(let i=0; i<specificBreaks.length; i++){
+      const d = document.getElementById('sb-date-'+i);
+      const s = document.getElementById('sb-start-'+i);
+      const e = document.getElementById('sb-end-'+i);
+      const r = document.getElementById('sb-reason-'+i);
+      if(d) specificBreaks[i].date   = d.value.trim();
+      if(s) specificBreaks[i].start  = s.value;
+      if(e) specificBreaks[i].end    = e.value;
+      if(r) specificBreaks[i].reason = r.value.trim();
+    }
+  }
+
   window.removeSpecificBreak = async function(i){
     if(!(await showGBConfirm('🗑️ Remover Intervalo','Deseja remover este intervalo específico?','Sim, remover','Cancelar','red'))) return;
+    syncSpecificBreaksFromDOM();
     specificBreaks.splice(i,1);
     renderSpecificBreaks();
   };
 
   function collectSpecificBreaks(){
-    return specificBreaks.map((_,i)=>({
-      date:   (document.getElementById('sb-date-'+i)?.value||'').trim(),
-      start:  document.getElementById('sb-start-'+i)?.value||'10:00',
-      end:    document.getElementById('sb-end-'+i)?.value||'11:00',
-      reason: (document.getElementById('sb-reason-'+i)?.value||'').trim(),
-    })).filter(b=>b.date);
+    // Try to read from DOM first (user may have edited fields)
+    const result = [];
+    for(let i=0; i<specificBreaks.length; i++){
+      const dateEl   = document.getElementById('sb-date-'+i);
+      const startEl  = document.getElementById('sb-start-'+i);
+      const endEl    = document.getElementById('sb-end-'+i);
+      const reasonEl = document.getElementById('sb-reason-'+i);
+      // If DOM elements exist, use their values; otherwise use in-memory
+      const entry = {
+        date:   dateEl   ? dateEl.value.trim()   : specificBreaks[i].date||'',
+        start:  startEl  ? startEl.value         : specificBreaks[i].start||'10:00',
+        end:    endEl    ? endEl.value            : specificBreaks[i].end||'11:00',
+        reason: reasonEl ? reasonEl.value.trim()  : specificBreaks[i].reason||'',
+      };
+      if(entry.date) result.push(entry);
+    }
+    console.log('collectSpecificBreaks:', result);
+    return result;
   }
 
 
