@@ -942,7 +942,7 @@
           <div class="cfg-subtitle">📅 Fechar Agenda</div>
           <div class="cfg-hint" style="margin-bottom:12px;">Bloqueie horários em dias específicos (ex: palestra, compromisso). O cliente verá a justificativa ao tentar agendar nesse horário.</div>
           <div id="specific-breaks-config" style="display:flex;flex-direction:column;gap:10px;"></div>
-          <button class="cfg-add-btn" onclick="addSpecificBreak()" style="margin-top:8px;">+ Adicionar intervalo específico</button>
+          <button class="cfg-add-btn" onclick="addSpecificBreak()" style="margin-top:8px;">+ Adicionar fechamento de agenda</button>
         </div>
       </div>
 
@@ -4021,7 +4021,7 @@
     el.innerHTML = specificBreaks.map((b,i)=>`
       <div style="background:var(--bg3);border-radius:10px;padding:14px;border:1px solid rgba(255,255,255,0.06);">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
-          <span style="font-family:'Bebas Neue',sans-serif;font-size:15px;color:var(--gold);">Intervalo Específico ${i+1}</span>
+          <span style="font-family:'Bebas Neue',sans-serif;font-size:15px;color:var(--gold);">Fechar Agenda ${i+1}</span>
           <button onclick="removeSpecificBreak(${i})" style="padding:4px 10px;border-radius:6px;border:1px solid rgba(220,38,38,0.3);background:none;color:#f87171;font-size:11px;font-weight:600;cursor:pointer;">🗑️ Remover</button>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px;">
