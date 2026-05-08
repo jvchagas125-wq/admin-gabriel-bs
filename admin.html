@@ -4027,7 +4027,10 @@
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px;">
           <div>
             <span class="plan-admin-label">Data</span>
-            <input type="date" class="plan-admin-input" id="sb-date-${i}" value="${b.date||''}" style="width:100%;">
+            <button type="button" onclick="openAdminCal(${i})" id="sb-date-btn-${i}" style="width:100%;padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:var(--bg2);color:${b.date?'var(--text)':'var(--text-dim)'};font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;text-align:left;">
+              📅 ${b.date ? formatDateBR(b.date) : 'Selecionar data'}
+            </button>
+            <input type="hidden" id="sb-date-${i}" value="${b.date||''}">
           </div>
           <div>
             <span class="plan-admin-label">Início</span>
@@ -4092,6 +4095,73 @@
   }
 
 
+
+  // ─── Calendário admin para Fechar Agenda ───
+  let adminCalTargetIdx = 0;
+  let adminCalDate = new Date();
+
+  function formatDateBR(dateStr){
+    if(!dateStr) return '';
+    const [y,m,d] = dateStr.split('-');
+    return d+'/'+m+'/'+y;
+  }
+
+  window.openAdminCal = function(idx){
+    adminCalTargetIdx = idx;
+    const cur = document.getElementById('sb-date-'+idx)?.value;
+    adminCalDate = cur ? new Date(cur+'T12:00:00') : new Date();
+    document.getElementById('admin-cal-overlay').style.display = 'flex';
+    renderAdminCal();
+  };
+
+  window.closeAdminCal = function(){
+    document.getElementById('admin-cal-overlay').style.display = 'none';
+  };
+
+  window.adminCalNav = function(dir){
+    adminCalDate = new Date(adminCalDate.getFullYear(), adminCalDate.getMonth()+dir, 1);
+    renderAdminCal();
+  };
+
+  function renderAdminCal(){
+    const months = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+    const y = adminCalDate.getFullYear();
+    const m = adminCalDate.getMonth();
+    document.getElementById('admin-cal-title').textContent = months[m]+' '+y;
+
+    const grid = document.getElementById('admin-cal-grid');
+    const firstDay = new Date(y, m, 1).getDay();
+    const daysInMonth = new Date(y, m+1, 0).getDate();
+    const today = new Date();
+    const todayStr = today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
+    const curVal = document.getElementById('sb-date-'+adminCalTargetIdx)?.value||'';
+
+    let html = '';
+    // Empty cells before first day
+    for(let i=0; i<firstDay; i++) html += '<div></div>';
+    for(let d=1; d<=daysInMonth; d++){
+      const dateStr = y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+      const isSelected = dateStr === curVal;
+      const isToday = dateStr === todayStr;
+      html += `<button type="button" onclick="selectAdminCalDate('${dateStr}')" style="
+        padding:6px 2px;border-radius:6px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:${isToday?'700':'400'};
+        background:${isSelected?'var(--gold)':isToday?'rgba(201,168,76,0.15)':'transparent'};
+        color:${isSelected?'#111':isToday?'var(--gold)':'var(--text)'};
+        outline:${isSelected?'2px solid var(--gold)':'none'};
+      ">${d}</button>`;
+    }
+    grid.innerHTML = html;
+  }
+
+  window.selectAdminCalDate = function(dateStr){
+    const hiddenInput = document.getElementById('sb-date-'+adminCalTargetIdx);
+    const btn = document.getElementById('sb-date-btn-'+adminCalTargetIdx);
+    if(hiddenInput) hiddenInput.value = dateStr;
+    if(btn){ btn.textContent = '📅 '+formatDateBR(dateStr); btn.style.color='var(--text)'; }
+    closeAdminCal();
+  };
+
+
 </script>
 
 <!-- Botão instalar PWA Admin -->
@@ -4106,5 +4176,29 @@
   <button onclick="document.getElementById('pwa-install-banner').style.display='none';localStorage.setItem('gbs_pwa_admin_dismissed','1')" style="position:absolute;top:-8px;right:-8px;width:22px;height:22px;border-radius:50%;border:1px solid rgba(255,255,255,0.15);background:#111;color:#888;font-size:11px;cursor:pointer;">✕</button>
 </div>
 
+
+<!-- Calendário Admin para Fechar Agenda -->
+<div id="admin-cal-overlay" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);align-items:center;justify-content:center;" onclick="if(event.target===this)closeAdminCal()">
+  <div style="background:#1a1a1a;border:1px solid var(--gold-border);border-radius:16px;padding:20px;width:320px;max-width:95vw;animation:slideUp .25s ease-out;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <button onclick="adminCalNav(-1)" style="background:none;border:none;color:var(--gold);font-size:20px;cursor:pointer;padding:4px 10px;">‹</button>
+      <div id="admin-cal-title" style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--gold);"></div>
+      <button onclick="adminCalNav(1)" style="background:none;border:none;color:var(--gold);font-size:20px;cursor:pointer;padding:4px 10px;">›</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:8px;">
+      <div style="text-align:center;font-size:11px;color:var(--text-dim);padding:4px;">D</div>
+      <div style="text-align:center;font-size:11px;color:var(--text-dim);padding:4px;">S</div>
+      <div style="text-align:center;font-size:11px;color:var(--text-dim);padding:4px;">T</div>
+      <div style="text-align:center;font-size:11px;color:var(--text-dim);padding:4px;">Q</div>
+      <div style="text-align:center;font-size:11px;color:var(--text-dim);padding:4px;">Q</div>
+      <div style="text-align:center;font-size:11px;color:var(--text-dim);padding:4px;">S</div>
+      <div style="text-align:center;font-size:11px;color:var(--text-dim);padding:4px;">S</div>
+    </div>
+    <div id="admin-cal-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;"></div>
+    <div style="display:flex;justify-content:flex-end;margin-top:12px;">
+      <button onclick="closeAdminCal()" style="padding:7px 16px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:none;color:var(--text-muted);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;">Cancelar</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
