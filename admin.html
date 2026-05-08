@@ -936,6 +936,14 @@
           <div id="breaks-config"></div>
           <button class="cfg-add-btn" onclick="addBreak()">+ Adicionar intervalo</button>
         </div>
+
+        <!-- Intervalos em datas específicas -->
+        <div style="margin-top:24px;">
+          <div class="cfg-subtitle">📅 Intervalos em Datas Específicas</div>
+          <div class="cfg-hint" style="margin-bottom:12px;">Bloqueie horários em dias específicos (ex: palestra, compromisso). O cliente verá a justificativa ao tentar agendar nesse horário.</div>
+          <div id="specific-breaks-config" style="display:flex;flex-direction:column;gap:10px;"></div>
+          <button class="cfg-add-btn" onclick="addSpecificBreak()" style="margin-top:8px;">+ Adicionar intervalo específico</button>
+        </div>
       </div>
 
       <!-- SERVIÇOS -->
@@ -1461,6 +1469,9 @@
 
   function renderSettingsUI(){
     const s = currentSettings;
+    // Load specific breaks
+    specificBreaks = s.specificBreaks||[];
+    renderSpecificBreaks();
 
     // Dias
     document.getElementById('days-config').innerHTML = DAYS.map(d=>{
@@ -1566,6 +1577,9 @@
     });
 
     try {
+      // Collect specific breaks
+      s.specificBreaks = collectSpecificBreaks();
+      specificBreaks = s.specificBreaks;
       await setDoc(doc(db,'config','schedule'), s);
       currentSettings = s;
       showToast('Configurações salvas!','green');
@@ -3997,6 +4011,68 @@
       showToast('Lista de concluídos limpa.','green');
     } catch(e){ showToast('Erro: '+e.message,'red'); }
   };
+
+
+
+  // ═══════════════════════════════════════
+  // INTERVALOS EM DATAS ESPECÍFICAS
+  // ═══════════════════════════════════════
+  let specificBreaks = []; // [{date, start, end, reason}]
+
+  function renderSpecificBreaks(){
+    const el = document.getElementById('specific-breaks-config');
+    if(!el) return;
+    if(!specificBreaks.length){
+      el.innerHTML = '<div style="color:var(--text-dim);font-size:13px;padding:8px 0;">Nenhum intervalo específico cadastrado.</div>';
+      return;
+    }
+    el.innerHTML = specificBreaks.map((b,i)=>`
+      <div style="background:var(--bg3);border-radius:10px;padding:14px;border:1px solid rgba(255,255,255,0.06);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+          <span style="font-family:'Bebas Neue',sans-serif;font-size:15px;color:var(--gold);">Intervalo Específico ${i+1}</span>
+          <button onclick="removeSpecificBreak(${i})" style="padding:4px 10px;border-radius:6px;border:1px solid rgba(220,38,38,0.3);background:none;color:#f87171;font-size:11px;font-weight:600;cursor:pointer;">🗑️ Remover</button>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px;">
+          <div>
+            <span class="plan-admin-label">Data</span>
+            <input type="date" class="plan-admin-input" id="sb-date-${i}" value="${b.date||''}" style="width:100%;">
+          </div>
+          <div>
+            <span class="plan-admin-label">Início</span>
+            <input type="time" class="plan-admin-input" id="sb-start-${i}" value="${b.start||'10:00'}" style="width:100%;">
+          </div>
+          <div>
+            <span class="plan-admin-label">Fim</span>
+            <input type="time" class="plan-admin-input" id="sb-end-${i}" value="${b.end||'11:00'}" style="width:100%;">
+          </div>
+        </div>
+        <div>
+          <span class="plan-admin-label">Justificativa (visível para o cliente)</span>
+          <input class="plan-admin-input" id="sb-reason-${i}" value="${esc(b.reason||'')}" placeholder="Ex: Palestra, Compromisso pessoal..." style="width:100%;">
+        </div>
+      </div>`).join('');
+  }
+
+  window.addSpecificBreak = function(){
+    specificBreaks.push({ date:'', start:'10:00', end:'11:00', reason:'' });
+    renderSpecificBreaks();
+    document.getElementById('specific-breaks-config')?.lastElementChild?.scrollIntoView({behavior:'smooth',block:'nearest'});
+  };
+
+  window.removeSpecificBreak = async function(i){
+    if(!(await showGBConfirm('🗑️ Remover Intervalo','Deseja remover este intervalo específico?','Sim, remover','Cancelar','red'))) return;
+    specificBreaks.splice(i,1);
+    renderSpecificBreaks();
+  };
+
+  function collectSpecificBreaks(){
+    return specificBreaks.map((_,i)=>({
+      date:   (document.getElementById('sb-date-'+i)?.value||'').trim(),
+      start:  document.getElementById('sb-start-'+i)?.value||'10:00',
+      end:    document.getElementById('sb-end-'+i)?.value||'11:00',
+      reason: (document.getElementById('sb-reason-'+i)?.value||'').trim(),
+    })).filter(b=>b.date);
+  }
 
 
 </script>
