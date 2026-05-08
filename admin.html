@@ -2482,7 +2482,8 @@
   // ═══════════════════════════════════════
   async function sendPushNotification(title, body){
     try {
-      // Salva no Firestore para clientes com site aberto verem
+      // Salva no Firestore com pending:true — o service worker do site cliente envia o FCM
+      // Evita CORS pois o admin não chama a API do site cliente diretamente
       const notifId = 'notif_' + Date.now();
       await setDoc(doc(db,'push_notifications', notifId),{
         title, body,
@@ -2490,13 +2491,8 @@
         createdAt: new Date().toISOString(),
         sentBy: currentAdmin||'admin',
         broadcast: true,
+        pending: true,
       });
-      // Chama API diretamente para enviar FCM a todos (app fechado)
-      fetch('https://gabriel-barber-studio.vercel.app/api/notify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-notify-secret': 'gbs-notify-2026' },
-        body: JSON.stringify({ title, body, icon: 'https://i.postimg.cc/FFpNdnLT/Design-sem-nome.png' }),
-      }).then(r=>r.json()).then(d=>console.log('FCM broadcast:',d)).catch(()=>{});
     } catch(e){
       console.warn('sendPushNotification error:',e);
     }
@@ -3854,19 +3850,14 @@
   // ─── Notificação pessoal para um cliente específico ───
   async function sendPersonalNotification(digits, title, body){
     try {
-      // 1. Salvar no Firestore (in-app / site aberto)
+      // Salva no Firestore (in-app / site aberto)
       const ref = doc(db,'push_notifications_personal',digits);
       const snap = await getDoc(ref);
       const list = snap.exists() ? (snap.data().list||[]) : [];
-      list.push({ id:'n_'+Date.now(), title, body, createdAt:new Date().toISOString(), read:false });
+      list.push({ id:'n_'+Date.now(), title, body, createdAt:new Date().toISOString(), read:false, pending:true });
       if(list.length > 20) list.splice(0, list.length-20);
-      await setDoc(ref,{ list },{merge:true});
-      // 2. Enviar FCM pessoal diretamente (app fechado)
-      fetch('https://gabriel-barber-studio.vercel.app/api/notify',{
-        method:'POST',
-        headers:{'Content-Type':'application/json','x-notify-secret':'gbs-notify-2026'},
-        body: JSON.stringify({ title, body, digits }),
-      }).then(r=>r.json()).then(d=>console.log('FCM personal:',d)).catch(()=>{});
+      await setDoc(ref,{ list, pendingFCM:{ title, body, digits, createdAt:new Date().toISOString() } },{merge:true});
+      // O site do cliente lê pendingFCM e chama a API sem CORS
     } catch(e){ console.warn('sendPersonalNotification:',e); }
   }
 
@@ -4097,7 +4088,6 @@
       };
       if(entry.date) result.push(entry);
     }
-    console.log('collectSpecificBreaks:', result);
     return result;
   }
 
