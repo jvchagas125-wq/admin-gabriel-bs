@@ -4045,6 +4045,20 @@
           <span class="plan-admin-label">Justificativa (visível para o cliente)</span>
           <input class="plan-admin-input" id="sb-reason-${i}" value="${esc(b.reason||'')}" placeholder="Ex: Palestra, Compromisso pessoal..." style="width:100%;">
         </div>
+        <div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.07);">
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+            <div style="position:relative;width:40px;height:22px;flex-shrink:0;">
+              <input type="checkbox" id="sb-repeat-${i}" ${b.repeatWeekly?'checked':''} style="opacity:0;width:0;height:0;" onchange="toggleRepeatWeekly(${i},this.checked)">
+              <div id="sb-repeat-track-${i}" style="position:absolute;inset:0;border-radius:11px;background:${b.repeatWeekly?'var(--gold)':'rgba(255,255,255,0.15)'};transition:background .2s;cursor:pointer;" onclick="document.getElementById('sb-repeat-${i}').click()">
+                <div style="position:absolute;top:3px;left:${b.repeatWeekly?'21':'3'}px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .2s;" id="sb-repeat-thumb-${i}"></div>
+              </div>
+            </div>
+            <div>
+              <div style="font-size:13px;font-weight:600;color:var(--text);">Repetir todo(a) <span id="sb-repeat-label-${i}" style="color:var(--gold);">${b.date ? getDayNameFromDate(b.date) : 'semana'}</span></div>
+              <div style="font-size:11px;color:var(--text-dim);margin-top:1px;">Ativa o mesmo fechamento toda semana até desativar</div>
+            </div>
+          </label>
+        </div>
       </div>`).join('');
   }
 
@@ -4083,11 +4097,13 @@
       const endEl    = document.getElementById('sb-end-'+i);
       const reasonEl = document.getElementById('sb-reason-'+i);
       // If DOM elements exist, use their values; otherwise use in-memory
+      const repeatEl = document.getElementById('sb-repeat-'+i);
       const entry = {
-        date:   dateEl   ? dateEl.value.trim()   : specificBreaks[i].date||'',
-        start:  startEl  ? startEl.value         : specificBreaks[i].start||'10:00',
-        end:    endEl    ? endEl.value            : specificBreaks[i].end||'11:00',
-        reason: reasonEl ? reasonEl.value.trim()  : specificBreaks[i].reason||'',
+        date:         dateEl   ? dateEl.value.trim()   : specificBreaks[i].date||'',
+        start:        startEl  ? startEl.value         : specificBreaks[i].start||'10:00',
+        end:          endEl    ? endEl.value            : specificBreaks[i].end||'11:00',
+        reason:       reasonEl ? reasonEl.value.trim()  : specificBreaks[i].reason||'',
+        repeatWeekly: repeatEl ? repeatEl.checked       : specificBreaks[i].repeatWeekly||false,
       };
       if(entry.date) result.push(entry);
     }
@@ -4159,6 +4175,27 @@
     if(hiddenInput) hiddenInput.value = dateStr;
     if(btn){ btn.textContent = '📅 '+formatDateBR(dateStr); btn.style.color='var(--text)'; }
     closeAdminCal();
+  };
+
+
+
+  // ─── Repetir fechamento de agenda semanalmente ───
+  const DAY_NAMES_PT = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
+
+  function getDayNameFromDate(dateStr){
+    if(!dateStr) return 'semana';
+    const d = new Date(dateStr+'T12:00:00');
+    return DAY_NAMES_PT[d.getDay()];
+  }
+
+  window.toggleRepeatWeekly = function(i, checked){
+    // Animate toggle
+    const track = document.getElementById('sb-repeat-track-'+i);
+    const thumb = document.getElementById('sb-repeat-thumb-'+i);
+    if(track) track.style.background = checked ? 'var(--gold)' : 'rgba(255,255,255,0.15)';
+    if(thumb) thumb.style.left = checked ? '21px' : '3px';
+    // Update in-memory
+    if(specificBreaks[i]) specificBreaks[i].repeatWeekly = checked;
   };
 
 
