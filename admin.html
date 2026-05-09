@@ -4047,11 +4047,8 @@
         </div>
         <div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.07);">
           <div style="display:flex;align-items:center;gap:10px;">
-            <div style="position:relative;width:40px;height:22px;flex-shrink:0;cursor:pointer;user-select:none;" id="sb-repeat-wrap-${i}" onclick="toggleRepeatWeeklyClick(${i})">
-              <input type="checkbox" id="sb-repeat-${i}" ${b.repeatWeekly?'checked':''} style="position:absolute;opacity:0;width:40px;height:22px;cursor:pointer;margin:0;z-index:2;">
-              <div id="sb-repeat-track-${i}" style="position:absolute;inset:0;border-radius:11px;background:${b.repeatWeekly?'var(--gold)':'rgba(255,255,255,0.15)'};transition:background .2s;pointer-events:none;">
-                <div style="position:absolute;top:3px;left:${b.repeatWeekly?'21':'3'}px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .2s;pointer-events:none;" id="sb-repeat-thumb-${i}"></div>
-              </div>
+            <div onclick="toggleRepeatWeeklyClick(${i})" style="flex-shrink:0;width:44px;height:24px;border-radius:12px;background:${b.repeatWeekly?'var(--gold)':'rgba(255,255,255,0.15)'};cursor:pointer;position:relative;transition:background .25s;user-select:none;" id="sb-repeat-track-${i}">
+              <div style="position:absolute;top:3px;left:${b.repeatWeekly?'23':'3'}px;width:18px;height:18px;border-radius:50%;background:#fff;transition:left .25s;box-shadow:0 1px 3px rgba(0,0,0,.3);" id="sb-repeat-thumb-${i}"></div>
             </div>
             <div>
               <div style="font-size:13px;font-weight:600;color:var(--text);">Repetir todo(a) <span id="sb-repeat-label-${i}" style="color:var(--gold);">${b.date ? getDayNameFromDate(b.date) : 'semana'}</span></div>
@@ -4097,7 +4094,7 @@
       const endEl    = document.getElementById('sb-end-'+i);
       const reasonEl = document.getElementById('sb-reason-'+i);
       // If DOM elements exist, use their values; otherwise use in-memory
-      const repeatEl = document.getElementById('sb-repeat-'+i);
+      const repeatEl = {checked: specificBreaks[i]?.repeatWeekly||false}; // stored in memory
       const entry = {
         date:         dateEl   ? dateEl.value.trim()   : specificBreaks[i].date||'',
         start:        startEl  ? startEl.value         : specificBreaks[i].start||'10:00',
@@ -4189,20 +4186,17 @@
   }
 
   window.toggleRepeatWeeklyClick = function(i){
-    const cb = document.getElementById('sb-repeat-'+i);
-    if(!cb) return;
-    const newVal = !cb.checked;
-    cb.checked = newVal;
+    const current = specificBreaks[i]?.repeatWeekly||false;
+    const newVal = !current;
+    if(specificBreaks[i]) specificBreaks[i].repeatWeekly = newVal;
     toggleRepeatWeekly(i, newVal);
   };
 
   window.toggleRepeatWeekly = function(i, checked){
-    // Animate toggle
     const track = document.getElementById('sb-repeat-track-'+i);
     const thumb = document.getElementById('sb-repeat-thumb-'+i);
     if(track) track.style.background = checked ? 'var(--gold)' : 'rgba(255,255,255,0.15)';
-    if(thumb) thumb.style.left = checked ? '21px' : '3px';
-    // Update in-memory
+    if(thumb) thumb.style.left = checked ? '23px' : '3px';
     if(specificBreaks[i]) specificBreaks[i].repeatWeekly = checked;
   };
 
