@@ -4169,8 +4169,11 @@
   window.selectAdminCalDate = function(dateStr){
     const hiddenInput = document.getElementById('sb-date-'+adminCalTargetIdx);
     const btn = document.getElementById('sb-date-btn-'+adminCalTargetIdx);
+    const repeatLabel = document.getElementById('sb-repeat-label-'+adminCalTargetIdx);
     if(hiddenInput) hiddenInput.value = dateStr;
     if(btn){ btn.textContent = '📅 '+formatDateBR(dateStr); btn.style.color='var(--text)'; }
+    if(repeatLabel) repeatLabel.textContent = getDayNameFromDate(dateStr);
+    if(specificBreaks[adminCalTargetIdx]) specificBreaks[adminCalTargetIdx].date = dateStr;
     closeAdminCal();
   };
 
