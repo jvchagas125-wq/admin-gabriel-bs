@@ -1516,7 +1516,7 @@
         <div class="cfg-break-row-days" style="margin-bottom:10px;">
           ${DAYS.map(d=>`<label style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--text-muted);cursor:pointer;">
             <input type="checkbox" id="break-day-${i}-${d.key}" ${(b.days||[]).includes(d.key)?'checked':''} style="accent-color:var(--gold)"> ${d.label.split('-')[0].trim()}
-          </label>`).join('')}
+          </div>`).join('')}
         </div>
         <div class="cfg-break-row-times">
           <span style="font-size:12px;color:var(--text-dim);min-width:40px;">Início</span>
@@ -1657,13 +1657,13 @@
           <label class="plan-admin-toggle">
             <input type="checkbox" id="p-featured-${i}" ${p.featured?'checked':''}>
             Destacar como "Mais Popular"
-          </label>
+          </div>
         </div>
         <div style="margin-bottom:10px;">
           <label class="plan-admin-toggle">
             <input type="checkbox" id="p-bestvalue-${i}" ${p.bestValue?'checked':''}>
             Destacar como "Melhor Custo-Benefício"
-          </label>
+          </div>
         </div>
 
         <div>
@@ -1687,7 +1687,7 @@
             <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:8px;">
               <input type="checkbox" id="p-gb-signup-active-${i}" ${p.gbSignup?'checked':''} onchange="toggleGBField('p-gb-signup-val-${i}',this.checked)" style="accent-color:var(--gold);width:15px;height:15px;">
               <span style="font-size:13px;font-weight:600;color:var(--text);">Ganhar GB$ no ato da assinatura</span>
-            </label>
+            </div>
             <div id="p-gb-signup-val-${i}" style="${p.gbSignup?'':'display:none;'}">
               <div style="display:flex;align-items:center;gap:8px;">
                 <input type="number" class="plan-admin-input" id="p-gb-signup-${i}" value="${p.gbSignup||0}" min="0" step="1" placeholder="Ex: 20" style="width:110px;">
@@ -1701,7 +1701,7 @@
             <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:8px;">
               <input type="checkbox" id="p-gb-monthly-active-${i}" ${p.gbMonthly?'checked':''} onchange="toggleGBField('p-gb-monthly-val-${i}',this.checked)" style="accent-color:var(--gold);width:15px;height:15px;">
               <span style="font-size:13px;font-weight:600;color:var(--text);">Ganhar GB$ por mês</span>
-            </label>
+            </div>
             <div id="p-gb-monthly-val-${i}" style="${p.gbMonthly?'':'display:none;'}">
               <div style="display:flex;align-items:center;gap:8px;">
                 <input type="number" class="plan-admin-input" id="p-gb-monthly-${i}" value="${p.gbMonthly||0}" min="0" step="1" placeholder="Ex: 10" style="width:110px;">
@@ -2039,7 +2039,7 @@
           <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-muted);cursor:pointer;">
             <input type="checkbox" id="ban-active-${i}" ${b.active!==false?'checked':''} style="accent-color:var(--gold);width:15px;height:15px;">
             Ativo
-          </label>
+          </div>
           <button onclick="removeBanner(${i})" class="cfg-rm-btn" style="margin-left:auto;">Remover</button>
         </div>
         <input class="plan-admin-input" id="ban-text-${i}" value="${esc(b.text||'')}" placeholder="Texto do aviso, promoção ou oferta...">
@@ -2925,7 +2925,7 @@
             <button onclick="deleteStoreProduct('${p.id}','${esc(p.name||'')}')" style="padding:5px 10px;border-radius:7px;border:1px solid rgba(220,38,38,.25);background:none;color:#f87171;font-size:11px;font-weight:700;cursor:pointer;">🗑️</button>
             <label style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-muted);cursor:pointer;">
               <input type="checkbox" ${p.active!==false?'checked':''} onchange="toggleStoreProductActive('${p.id}',this.checked)" style="accent-color:var(--gold);width:15px;height:15px;"> Ativo
-            </label>
+            </div>
           </div>
         </div>
       </div>`).join('');
@@ -3289,7 +3289,7 @@
             </select>
             <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-muted);cursor:pointer;">
               <input type="checkbox" id="notice-active-${page}-${i}" ${n.active!==false?'checked':''} style="accent-color:var(--gold);width:14px;height:14px;"> Ativo
-            </label>
+            </div>
           </div>
           <button onclick="removeNotice('${page}',${i})" style="padding:4px 10px;border-radius:6px;border:1px solid rgba(220,38,38,0.3);background:none;color:#f87171;font-size:11px;font-weight:600;cursor:pointer;">🗑️ Remover</button>
         </div>
@@ -3361,7 +3361,7 @@
           <div style="display:flex;align-items:center;gap:8px;">
             <label style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text-muted);cursor:pointer;">
               <input type="checkbox" id="pkg-active-${i}" ${p.active!==false?'checked':''} style="accent-color:var(--gold);"> Ativo
-            </label>
+            </div>
             <button onclick="removeGBPackage(${i})" style="padding:3px 8px;border-radius:6px;border:1px solid rgba(220,38,38,0.3);background:none;color:#f87171;font-size:11px;cursor:pointer;">🗑️</button>
           </div>
         </div>
@@ -4046,18 +4046,18 @@
           <input class="plan-admin-input" id="sb-reason-${i}" value="${esc(b.reason||'')}" placeholder="Ex: Palestra, Compromisso pessoal..." style="width:100%;">
         </div>
         <div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.07);">
-          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
-            <div style="position:relative;width:40px;height:22px;flex-shrink:0;">
-              <input type="checkbox" id="sb-repeat-${i}" ${b.repeatWeekly?'checked':''} style="opacity:0;width:0;height:0;" onchange="toggleRepeatWeekly(${i},this.checked)">
-              <div id="sb-repeat-track-${i}" style="position:absolute;inset:0;border-radius:11px;background:${b.repeatWeekly?'var(--gold)':'rgba(255,255,255,0.15)'};transition:background .2s;cursor:pointer;" onclick="document.getElementById('sb-repeat-${i}').click()">
+          <div style="display:flex;align-items:center;gap:10px;cursor:pointer;" onclick="toggleRepeatWeeklyClick(${i})">
+            <div style="position:relative;width:40px;height:22px;flex-shrink:0;cursor:pointer;" onclick="toggleRepeatWeeklyClick(${i})">
+              <input type="checkbox" id="sb-repeat-${i}" ${b.repeatWeekly?'checked':''} style="display:none;">
+              <div id="sb-repeat-track-${i}" style="position:absolute;inset:0;border-radius:11px;background:${b.repeatWeekly?'var(--gold)':'rgba(255,255,255,0.15)'};transition:background .2s;">
                 <div style="position:absolute;top:3px;left:${b.repeatWeekly?'21':'3'}px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .2s;" id="sb-repeat-thumb-${i}"></div>
               </div>
             </div>
-            <div>
+            <div onclick="event.stopPropagation();">
               <div style="font-size:13px;font-weight:600;color:var(--text);">Repetir todo(a) <span id="sb-repeat-label-${i}" style="color:var(--gold);">${b.date ? getDayNameFromDate(b.date) : 'semana'}</span></div>
               <div style="font-size:11px;color:var(--text-dim);margin-top:1px;">Ativa o mesmo fechamento toda semana até desativar</div>
             </div>
-          </label>
+          </div>
         </div>
       </div>`).join('');
   }
@@ -4187,6 +4187,14 @@
     const d = new Date(dateStr+'T12:00:00');
     return DAY_NAMES_PT[d.getDay()];
   }
+
+  window.toggleRepeatWeeklyClick = function(i){
+    const cb = document.getElementById('sb-repeat-'+i);
+    if(!cb) return;
+    const newVal = !cb.checked;
+    cb.checked = newVal;
+    toggleRepeatWeekly(i, newVal);
+  };
 
   window.toggleRepeatWeekly = function(i, checked){
     // Animate toggle
