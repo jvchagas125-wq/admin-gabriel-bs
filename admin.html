@@ -1516,7 +1516,7 @@
         <div class="cfg-break-row-days" style="margin-bottom:10px;">
           ${DAYS.map(d=>`<label style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--text-muted);cursor:pointer;">
             <input type="checkbox" id="break-day-${i}-${d.key}" ${(b.days||[]).includes(d.key)?'checked':''} style="accent-color:var(--gold)"> ${d.label.split('-')[0].trim()}
-          </div>`).join('')}
+          </label>`).join('')}
         </div>
         <div class="cfg-break-row-times">
           <span style="font-size:12px;color:var(--text-dim);min-width:40px;">Início</span>
@@ -4046,14 +4046,14 @@
           <input class="plan-admin-input" id="sb-reason-${i}" value="${esc(b.reason||'')}" placeholder="Ex: Palestra, Compromisso pessoal..." style="width:100%;">
         </div>
         <div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.07);">
-          <div style="display:flex;align-items:center;gap:10px;cursor:pointer;" onclick="toggleRepeatWeeklyClick(${i})">
-            <div style="position:relative;width:40px;height:22px;flex-shrink:0;cursor:pointer;" onclick="toggleRepeatWeeklyClick(${i})">
-              <input type="checkbox" id="sb-repeat-${i}" ${b.repeatWeekly?'checked':''} style="display:none;">
-              <div id="sb-repeat-track-${i}" style="position:absolute;inset:0;border-radius:11px;background:${b.repeatWeekly?'var(--gold)':'rgba(255,255,255,0.15)'};transition:background .2s;">
-                <div style="position:absolute;top:3px;left:${b.repeatWeekly?'21':'3'}px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .2s;" id="sb-repeat-thumb-${i}"></div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="position:relative;width:40px;height:22px;flex-shrink:0;cursor:pointer;user-select:none;" id="sb-repeat-wrap-${i}" onclick="toggleRepeatWeeklyClick(${i})">
+              <input type="checkbox" id="sb-repeat-${i}" ${b.repeatWeekly?'checked':''} style="position:absolute;opacity:0;width:40px;height:22px;cursor:pointer;margin:0;z-index:2;">
+              <div id="sb-repeat-track-${i}" style="position:absolute;inset:0;border-radius:11px;background:${b.repeatWeekly?'var(--gold)':'rgba(255,255,255,0.15)'};transition:background .2s;pointer-events:none;">
+                <div style="position:absolute;top:3px;left:${b.repeatWeekly?'21':'3'}px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .2s;pointer-events:none;" id="sb-repeat-thumb-${i}"></div>
               </div>
             </div>
-            <div onclick="event.stopPropagation();">
+            <div>
               <div style="font-size:13px;font-weight:600;color:var(--text);">Repetir todo(a) <span id="sb-repeat-label-${i}" style="color:var(--gold);">${b.date ? getDayNameFromDate(b.date) : 'semana'}</span></div>
               <div style="font-size:11px;color:var(--text-dim);margin-top:1px;">Ativa o mesmo fechamento toda semana até desativar</div>
             </div>
