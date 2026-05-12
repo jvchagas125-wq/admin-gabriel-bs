@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <!-- PWA Admin -->
-  <link rel="manifest" href="/api/manifest?admin=1">
+  <link rel="manifest" href="/manifest-admin.json">
   <meta name="theme-color" content="#c9a84c">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -4366,6 +4366,13 @@
 </script>
 
 <!-- Botão instalar PWA Admin -->
+<!-- Banner iOS -->
+<div id="ios-install-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:300;background:#1a1a1a;border-top:1px solid var(--gold-border);padding:14px 16px 20px;animation:slideInUp .4s ease-out;">
+  <button onclick="document.getElementById('ios-install-banner').style.display='none';localStorage.setItem('gbs_ios_banner_dismissed','1')" style="position:absolute;top:10px;right:12px;background:none;border:none;color:#888;font-size:16px;cursor:pointer;">✕</button>
+  <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--gold);margin-bottom:6px;">📱 Instalar App Admin</div>
+  <div style="font-size:13px;color:var(--text-muted);line-height:1.5;">Toque em <strong style="color:var(--text);">Compartilhar</strong> <span style="font-size:16px;">⬆️</span> no Safari e depois em <strong style="color:var(--text);">"Adicionar à Tela Início"</strong> para instalar o app.</div>
+</div>
+
 <div id="pwa-install-banner" style="display:none;position:fixed;bottom:20px;right:20px;z-index:300;animation:slideInUp .4s ease-out;">
   <button id="pwa-install-btn" onclick="installPWA()" style="display:flex;align-items:center;gap:10px;padding:12px 18px;border-radius:14px;border:1px solid var(--gold-border);background:#1a1a1a;color:var(--gold);font-family:'DM Sans',sans-serif;font-weight:700;font-size:13px;cursor:pointer;box-shadow:0 8px 28px rgba(0,0,0,.5);">
     <span style="font-size:20px;">📲</span>
@@ -4406,6 +4413,19 @@
   if('serviceWorker' in navigator){
     navigator.serviceWorker.register('/sw-admin.js').catch(()=>{});
   }
+  // iOS install banner
+  (function(){
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    const isSafari = /Safari/i.test(navigator.userAgent) && !/CriOS|FxiOS|OPiOS/i.test(navigator.userAgent);
+    const isStandalone = window.navigator.standalone === true;
+    const dismissed = localStorage.getItem('gbs_ios_banner_dismissed');
+    if(isIOS && isSafari && !isStandalone && !dismissed){
+      setTimeout(()=>{
+        const b = document.getElementById('ios-install-banner');
+        if(b) b.style.display='block';
+      }, 2500);
+    }
+  })();
 </script>
 </body>
 </html>
