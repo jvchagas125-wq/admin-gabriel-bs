@@ -10,13 +10,13 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "/api/icon?size=192",
+      "src": "https://res.cloudinary.com/dcvhqnr1c/image/upload/v1778594906/zgjaazjvo4mkbywi2gon.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/api/icon?size=512",
+      "src": "https://res.cloudinary.com/dcvhqnr1c/image/upload/v1778594906/zgjaazjvo4mkbywi2gon.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
