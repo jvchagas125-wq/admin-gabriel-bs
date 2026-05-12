@@ -4286,7 +4286,7 @@
   function applyAdminPwaIcon(url){
     if(!url) return;
     document.querySelectorAll('link[rel="apple-touch-icon"],link[rel="icon"]').forEach(el=>{ el.href=url; });
-    // manifest served dynamically by /api/manifest?admin=1
+    document.querySelectorAll('link[rel="apple-touch-icon"],link[rel="icon"]').forEach(el=>{ el.href=url; });
   }
 
   window.savePwaIcon = async function(){
