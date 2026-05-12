@@ -1,6 +1,7 @@
 {
   "rewrites": [
     { "source": "/api/manifest", "destination": "/api/manifest.js" },
+    { "source": "/api/icon", "destination": "/api/icon.js" },
     { "source": "/", "destination": "/admin.html" }
   ],
   "headers": [
@@ -9,12 +10,22 @@
       "headers": [
         { "key": "Content-Type", "value": "application/javascript" },
         { "key": "Service-Worker-Allowed", "value": "/" },
+        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
+      ]
+    },
+    {
+      "source": "/manifest-admin.json",
+      "headers": [
+        { "key": "Content-Type", "value": "application/manifest+json" },
         { "key": "Cache-Control", "value": "no-cache" }
       ]
     },
     {
       "source": "/api/manifest",
-      "headers": [{ "key": "Content-Type", "value": "application/manifest+json" }]
+      "headers": [
+        { "key": "Content-Type", "value": "application/manifest+json" },
+        { "key": "Cache-Control", "value": "no-cache" }
+      ]
     }
   ]
 }
