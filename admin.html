@@ -856,6 +856,94 @@
   </div>
 
   <!-- ABA CONFIGURAÇÕES -->
+
+  <div id="tab-subscriptions" style="display:none;">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;background:linear-gradient(135deg,#c9a84c,#f0d78c,#c9a84c);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">&#128081; Assinaturas VIP</div>
+      <button onclick="loadSubscriptions()" style="padding:8px 16px;border-radius:8px;border:1px solid var(--gold-border);background:var(--gold-dim);color:var(--gold);font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">&#8635; Atualizar</button>
+    </div>
+    <div class="cfg-card" style="margin-bottom:20px;">
+      <div class="cfg-title">&#9203; Pagamentos Pendentes</div>
+      <div class="cfg-hint">Clientes que iniciaram o processo de assinatura. Apos confirmar o pagamento no Mercado Pago, clique em "Ativar VIP".</div>
+      <div id="pending-subs-list"><div style="text-align:center;padding:32px 0;"><div class="spinner" style="margin:0 auto;"></div></div></div>
+    </div>
+    <!-- Solicitações de Cancelamento -->
+    <div class="cfg-card" style="margin-bottom:20px;border-color:rgba(220,38,38,0.3);">
+      <div class="cfg-title" style="color:#f87171;">⚠️ Solicitações de Cancelamento</div>
+      <div class="cfg-hint">Clientes que solicitaram o cancelamento da assinatura. Cancele o plano no Mercado Pago e clique em "Revogar VIP" para confirmar.</div>
+      <div id="cancel-requests-list"><div style="text-align:center;padding:24px 0;"><div class="spinner" style="margin:0 auto;"></div></div></div>
+    </div>
+
+    <div class="cfg-card">
+      <div class="cfg-title">&#9989; Assinantes Ativos</div>
+      <div class="cfg-hint">Clientes com acesso VIP ativo. Clique em "Revogar" para cancelar o acesso.</div>
+      <div id="active-subs-list"><div style="text-align:center;padding:32px 0;"><div class="spinner" style="margin:0 auto;"></div></div></div>
+    </div>
+
+    <!-- Planos de Assinatura -->
+    <div class="cfg-card" style="margin-top:20px;">
+      <div class="cfg-title">💎 Planos de Assinatura</div>
+      <div class="cfg-hint">Adicione, edite ou remova os planos exibidos no site. As alterações são refletidas imediatamente para os clientes.</div>
+      <div id="plans-admin-list"></div>
+      <button class="cfg-add-btn" onclick="addPlan()" style="margin-top:12px;">+ Adicionar plano</button>
+    </div>
+    <button class="cfg-save-btn" onclick="savePlans()" style="background:#1a6634;margin-top:8px;">💾 Salvar Planos</button>
+  </div>
+
+  <div id="tab-sessions" style="display:none;">
+
+    <!-- TOP 3 EM DESTAQUE -->
+    <div style="margin-bottom:24px;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;background:linear-gradient(135deg,#c9a84c,#f0d78c,#c9a84c);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:14px;">🏆 Top 3 em Destaque</div>
+      <div id="top3-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;">
+        <div style="text-align:center;padding:20px 16px;background:var(--bg2);border-radius:12px;border:1px solid rgba(255,215,0,0.3);">
+          <div style="font-size:36px;margin-bottom:8px;">🥇</div>
+          <div id="top1-name" style="font-weight:700;font-size:14px;color:#FFD700;">—</div>
+          <div id="top1-count" style="font-size:12px;color:var(--text-muted);margin-top:4px;">—</div>
+          <div id="top1-phone" style="font-size:11px;color:var(--text-dim);margin-top:2px;">—</div>
+        </div>
+        <div style="text-align:center;padding:20px 16px;background:var(--bg2);border-radius:12px;border:1px solid rgba(192,192,192,0.3);">
+          <div style="font-size:36px;margin-bottom:8px;">🥈</div>
+          <div id="top2-name" style="font-weight:700;font-size:14px;color:#C0C0C0;">—</div>
+          <div id="top2-count" style="font-size:12px;color:var(--text-muted);margin-top:4px;">—</div>
+          <div id="top2-phone" style="font-size:11px;color:var(--text-dim);margin-top:2px;">—</div>
+        </div>
+        <div style="text-align:center;padding:20px 16px;background:var(--bg2);border-radius:12px;border:1px solid rgba(205,127,50,0.3);">
+          <div style="font-size:36px;margin-bottom:8px;">🥉</div>
+          <div id="top3-name" style="font-weight:700;font-size:14px;color:#CD7F32;">—</div>
+          <div id="top3-count" style="font-size:12px;color:var(--text-muted);margin-top:4px;">—</div>
+          <div id="top3-phone" style="font-size:11px;color:var(--text-dim);margin-top:2px;">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOP 30 LISTA COMPLETA -->
+    <div style="margin-bottom:28px;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--gold);margin-bottom:10px;">📊 Ranking Completo — Top 30</div>
+      <div id="top30-list" style="background:var(--bg2);border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,0.06);"></div>
+    </div>
+
+    <!-- Lista de clientes -->
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;background:linear-gradient(135deg,#c9a84c,#f0d78c,#c9a84c);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">👥 Todos os Clientes</div>
+      <input class="search-input" type="search" id="sessions-search" placeholder="Buscar cliente..." oninput="filterSessions()" style="width:220px;">
+    </div>
+    <div id="sessions-list" class="table-wrap fade-in">
+      <div style="text-align:center;padding:40px 0;"><div class="spinner" style="margin:0 auto;"></div></div>
+    </div>
+
+    <!-- Modal detalhe do cliente -->
+    <div id="client-modal" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.8);align-items:center;justify-content:center;">
+      <div style="width:100%;max-width:500px;margin:16px;background:#1a1a1a;border:1px solid var(--gold-border);border-radius:16px;padding:28px;box-shadow:0 24px 80px rgba(0,0,0,.8);animation:slideUp .3s ease-out;max-height:80vh;overflow-y:auto;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--gold);" id="modal-client-name">—</div>
+          <button onclick="closeClientModal()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer;padding:4px;">✕</button>
+        </div>
+        <div id="modal-client-info"></div>
+      </div>
+    </div>
+  </div>
+
   <div id="tab-settings" style="display:none;">
     <div style="max-width:720px;">
 
@@ -1008,94 +1096,9 @@
 
 
   <!-- ABA ASSINATURAS -->
-  <div id="tab-subscriptions" style="display:none;">
-    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px;">
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;background:linear-gradient(135deg,#c9a84c,#f0d78c,#c9a84c);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">&#128081; Assinaturas VIP</div>
-      <button onclick="loadSubscriptions()" style="padding:8px 16px;border-radius:8px;border:1px solid var(--gold-border);background:var(--gold-dim);color:var(--gold);font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">&#8635; Atualizar</button>
-    </div>
-    <div class="cfg-card" style="margin-bottom:20px;">
-      <div class="cfg-title">&#9203; Pagamentos Pendentes</div>
-      <div class="cfg-hint">Clientes que iniciaram o processo de assinatura. Apos confirmar o pagamento no Mercado Pago, clique em "Ativar VIP".</div>
-      <div id="pending-subs-list"><div style="text-align:center;padding:32px 0;"><div class="spinner" style="margin:0 auto;"></div></div></div>
-    </div>
-    <!-- Solicitações de Cancelamento -->
-    <div class="cfg-card" style="margin-bottom:20px;border-color:rgba(220,38,38,0.3);">
-      <div class="cfg-title" style="color:#f87171;">⚠️ Solicitações de Cancelamento</div>
-      <div class="cfg-hint">Clientes que solicitaram o cancelamento da assinatura. Cancele o plano no Mercado Pago e clique em "Revogar VIP" para confirmar.</div>
-      <div id="cancel-requests-list"><div style="text-align:center;padding:24px 0;"><div class="spinner" style="margin:0 auto;"></div></div></div>
-    </div>
-
-    <div class="cfg-card">
-      <div class="cfg-title">&#9989; Assinantes Ativos</div>
-      <div class="cfg-hint">Clientes com acesso VIP ativo. Clique em "Revogar" para cancelar o acesso.</div>
-      <div id="active-subs-list"><div style="text-align:center;padding:32px 0;"><div class="spinner" style="margin:0 auto;"></div></div></div>
-    </div>
-
-    <!-- Planos de Assinatura -->
-    <div class="cfg-card" style="margin-top:20px;">
-      <div class="cfg-title">💎 Planos de Assinatura</div>
-      <div class="cfg-hint">Adicione, edite ou remova os planos exibidos no site. As alterações são refletidas imediatamente para os clientes.</div>
-      <div id="plans-admin-list"></div>
-      <button class="cfg-add-btn" onclick="addPlan()" style="margin-top:12px;">+ Adicionar plano</button>
-    </div>
-    <button class="cfg-save-btn" onclick="savePlans()" style="background:#1a6634;margin-top:8px;">💾 Salvar Planos</button>
-  </div>
 
 
   <!-- ABA SESSÕES -->
-  <div id="tab-sessions" style="display:none;">
-
-    <!-- TOP 3 EM DESTAQUE -->
-    <div style="margin-bottom:24px;">
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;background:linear-gradient(135deg,#c9a84c,#f0d78c,#c9a84c);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:14px;">🏆 Top 3 em Destaque</div>
-      <div id="top3-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;">
-        <div style="text-align:center;padding:20px 16px;background:var(--bg2);border-radius:12px;border:1px solid rgba(255,215,0,0.3);">
-          <div style="font-size:36px;margin-bottom:8px;">🥇</div>
-          <div id="top1-name" style="font-weight:700;font-size:14px;color:#FFD700;">—</div>
-          <div id="top1-count" style="font-size:12px;color:var(--text-muted);margin-top:4px;">—</div>
-          <div id="top1-phone" style="font-size:11px;color:var(--text-dim);margin-top:2px;">—</div>
-        </div>
-        <div style="text-align:center;padding:20px 16px;background:var(--bg2);border-radius:12px;border:1px solid rgba(192,192,192,0.3);">
-          <div style="font-size:36px;margin-bottom:8px;">🥈</div>
-          <div id="top2-name" style="font-weight:700;font-size:14px;color:#C0C0C0;">—</div>
-          <div id="top2-count" style="font-size:12px;color:var(--text-muted);margin-top:4px;">—</div>
-          <div id="top2-phone" style="font-size:11px;color:var(--text-dim);margin-top:2px;">—</div>
-        </div>
-        <div style="text-align:center;padding:20px 16px;background:var(--bg2);border-radius:12px;border:1px solid rgba(205,127,50,0.3);">
-          <div style="font-size:36px;margin-bottom:8px;">🥉</div>
-          <div id="top3-name" style="font-weight:700;font-size:14px;color:#CD7F32;">—</div>
-          <div id="top3-count" style="font-size:12px;color:var(--text-muted);margin-top:4px;">—</div>
-          <div id="top3-phone" style="font-size:11px;color:var(--text-dim);margin-top:2px;">—</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- TOP 30 LISTA COMPLETA -->
-    <div style="margin-bottom:28px;">
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--gold);margin-bottom:10px;">📊 Ranking Completo — Top 30</div>
-      <div id="top30-list" style="background:var(--bg2);border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,0.06);"></div>
-    </div>
-
-    <!-- Lista de clientes -->
-    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;background:linear-gradient(135deg,#c9a84c,#f0d78c,#c9a84c);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">👥 Todos os Clientes</div>
-      <input class="search-input" type="search" id="sessions-search" placeholder="Buscar cliente..." oninput="filterSessions()" style="width:220px;">
-    </div>
-    <div id="sessions-list" class="table-wrap fade-in">
-      <div style="text-align:center;padding:40px 0;"><div class="spinner" style="margin:0 auto;"></div></div>
-    </div>
-
-    <!-- Modal detalhe do cliente -->
-    <div id="client-modal" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.8);align-items:center;justify-content:center;">
-      <div style="width:100%;max-width:500px;margin:16px;background:#1a1a1a;border:1px solid var(--gold-border);border-radius:16px;padding:28px;box-shadow:0 24px 80px rgba(0,0,0,.8);animation:slideUp .3s ease-out;max-height:80vh;overflow-y:auto;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--gold);" id="modal-client-name">—</div>
-          <button onclick="closeClientModal()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer;padding:4px;">✕</button>
-        </div>
-        <div id="modal-client-info"></div>
-      </div>
-    </div>
-  </div>
 
 </main>
 
