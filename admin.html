@@ -4325,10 +4325,9 @@
   window.addEventListener('beforeinstallprompt', e=>{
     e.preventDefault();
     deferredAdminInstallPrompt = e;
-    const dismissed = localStorage.getItem('gbs_pwa_admin_dismissed');
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
     if(!isStandalone) localStorage.removeItem('gbs_pwa_admin_installed');
-    if(!isStandalone && !dismissed){
+    if(!isStandalone){
       setTimeout(()=>{
         const banner = document.getElementById('pwa-install-banner');
         if(banner) banner.style.display = 'block';
@@ -4402,5 +4401,11 @@
     </div>
   </div>
 </div>
+
+<script>
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('/sw-admin.js').catch(()=>{});
+  }
+</script>
 </body>
 </html>
