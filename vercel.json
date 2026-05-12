@@ -1,6 +1,6 @@
 {
   "rewrites": [
-    { "source": "/api/manifest", "destination": "/api/manifest.js" },
+    { "source": "/api/manifest", "destination": "/api/manifest-admin.js" },
     { "source": "/api/icon", "destination": "/api/icon.js" },
     { "source": "/", "destination": "/admin.html" }
   ],
