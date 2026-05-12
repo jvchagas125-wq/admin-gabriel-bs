@@ -617,23 +617,6 @@
   </div>
   </div>
 
-  <!-- CONCLUÍDOS — dentro da aba Agendamentos -->
-  <div id="tab-done" style="display:none;margin-top:32px;">
-    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;background:linear-gradient(135deg,#16a34a,#4ade80);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">
-        ✅ Concluídos <span id="done-badge" style="display:none;background:#16a34a;color:#fff;border-radius:10px;font-size:12px;padding:2px 8px;margin-left:4px;font-weight:700;vertical-align:middle;"></span>
-      </div>
-      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-        <input class="search-input" type="search" id="done-search" placeholder="Buscar nome ou telefone..." oninput="filterDone()" style="width:200px;">
-        <button class="clear-btn" onclick="clearAllDone()" title="Limpar toda a lista de concluídos" style="white-space:nowrap;">🗑️ Limpar tudo</button>
-      </div>
-    </div>
-    <div style="font-size:12px;color:var(--text-dim);margin-bottom:12px;">Atendimentos marcados como concluídos por Gabriel.</div>
-    <div id="done-list" class="table-wrap fade-in">
-      <div style="text-align:center;padding:40px 0;"><div class="spinner" style="margin:0 auto;"></div></div>
-    </div>
-  </div>
-
   <!-- CANCELADOS — dentro da aba Agendamentos -->
   <div id="tab-cancelled" style="display:none;margin-top:32px;">
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
@@ -649,6 +632,23 @@
     <div style="font-size:12px;color:var(--text-dim);margin-bottom:12px;">Agendamentos cancelados pelo cliente ou pelo admin.</div>
     <div id="cancelled-list" class="table-wrap fade-in">
       <div style="text-align:center;padding:20px;color:var(--text-dim);font-size:13px;">Nenhum agendamento cancelado.</div>
+    </div>
+  </div>
+
+  <!-- CONCLUÍDOS — dentro da aba Agendamentos -->
+  <div id="tab-done" style="display:none;margin-top:32px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;background:linear-gradient(135deg,#16a34a,#4ade80);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">
+        ✅ Concluídos <span id="done-badge" style="display:none;background:#16a34a;color:#fff;border-radius:10px;font-size:12px;padding:2px 8px;margin-left:4px;font-weight:700;vertical-align:middle;"></span>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <input class="search-input" type="search" id="done-search" placeholder="Buscar nome ou telefone..." oninput="filterDone()" style="width:200px;">
+        <button class="clear-btn" onclick="clearAllDone()" title="Limpar toda a lista de concluídos" style="white-space:nowrap;">🗑️ Limpar tudo</button>
+      </div>
+    </div>
+    <div style="font-size:12px;color:var(--text-dim);margin-bottom:12px;">Atendimentos marcados como concluídos por Gabriel.</div>
+    <div id="done-list" class="table-wrap fade-in">
+      <div style="text-align:center;padding:40px 0;"><div class="spinner" style="margin:0 auto;"></div></div>
     </div>
   </div>
 
