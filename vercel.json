@@ -1,5 +1,20 @@
 {
   "rewrites": [
+    { "source": "/api/manifest", "destination": "/api/manifest.js" },
     { "source": "/", "destination": "/admin.html" }
+  ],
+  "headers": [
+    {
+      "source": "/sw-admin.js",
+      "headers": [
+        { "key": "Content-Type", "value": "application/javascript" },
+        { "key": "Service-Worker-Allowed", "value": "/" },
+        { "key": "Cache-Control", "value": "no-cache" }
+      ]
+    },
+    {
+      "source": "/api/manifest",
+      "headers": [{ "key": "Content-Type", "value": "application/manifest+json" }]
+    }
   ]
 }
