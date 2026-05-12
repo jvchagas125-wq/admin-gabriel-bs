@@ -1930,6 +1930,7 @@
         loadAdminServices();
         loadAdminBanners();
         loadCancelledTab();
+        applyAdminIconOnLoad();
         loadDoneTab(); // Carrega concluídos
         // Inicializa a aba padrão corretamente
         setTimeout(()=>switchTab('appointments'), 100);
@@ -4285,7 +4286,11 @@
 
   function applyAdminPwaIcon(url){
     if(!url) return;
+    // Update favicon and apple-touch-icon immediately
     document.querySelectorAll('link[rel="apple-touch-icon"],link[rel="icon"]').forEach(el=>{ el.href=url; });
+    // Force favicon refresh
+    const link = document.querySelector('link[rel="icon"]');
+    if(link){ const tmp=link.href; link.href=''; link.href=tmp; }
     document.querySelectorAll('link[rel="apple-touch-icon"],link[rel="icon"]').forEach(el=>{ el.href=url; });
   }
 
@@ -4311,6 +4316,52 @@
       showToast('Ícone do app admin salvo!','green');
     } catch(e){ showToast('Erro: '+e.message,'red'); }
   };
+
+
+
+  // ─── PWA Install — Admin ───
+  let deferredAdminInstallPrompt = null;
+
+  window.addEventListener('beforeinstallprompt', e=>{
+    e.preventDefault();
+    deferredAdminInstallPrompt = e;
+    const dismissed = localStorage.getItem('gbs_pwa_admin_dismissed');
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+    if(!isStandalone) localStorage.removeItem('gbs_pwa_admin_installed');
+    if(!isStandalone && !dismissed){
+      setTimeout(()=>{
+        const banner = document.getElementById('pwa-install-banner');
+        if(banner) banner.style.display = 'block';
+      }, 2000);
+    }
+  });
+
+  window.installPWA = async function(){
+    if(!deferredAdminInstallPrompt) return;
+    deferredAdminInstallPrompt.prompt();
+    const { outcome } = await deferredAdminInstallPrompt.userChoice;
+    if(outcome === 'accepted'){
+      localStorage.setItem('gbs_pwa_admin_installed','1');
+      document.getElementById('pwa-install-banner').style.display='none';
+    }
+    deferredAdminInstallPrompt = null;
+  };
+
+  window.addEventListener('appinstalled', ()=>{
+    localStorage.setItem('gbs_pwa_admin_installed','1');
+    const banner = document.getElementById('pwa-install-banner');
+    if(banner) banner.style.display='none';
+  });
+
+  // ─── Aplicar ícone admin ao carregar ───
+  async function applyAdminIconOnLoad(){
+    try {
+      const snap = await getDoc(doc(db,'config','appearance'));
+      if(!snap.exists()) return;
+      const url = snap.data().pwaAdminIcon || snap.data().pwaIcon || '';
+      if(url) applyAdminPwaIcon(url);
+    } catch(e){ console.warn('applyAdminIconOnLoad:',e); }
+  }
 
 
 </script>
