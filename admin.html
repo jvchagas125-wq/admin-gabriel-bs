@@ -1151,7 +1151,14 @@
       document.getElementById("login-screen").style.display="none";
       document.getElementById("admin-user-label").textContent=currentAdmin;
       subscribeData();
+      loadSettings();
+      loadAdminPlans();
+      loadAdminServices();
       loadAdminBanners();
+      loadCancelledTab();
+      loadDoneTab();
+      applyAdminIconOnLoad();
+      setTimeout(()=>switchTab('appointments'), 100);
     } catch(err){
       errEl.style.display="block";
       document.getElementById("inp-pass").value="";
