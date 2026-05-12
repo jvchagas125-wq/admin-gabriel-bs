@@ -862,10 +862,15 @@
 
 
 
-      <!-- ÍCONE DO APP (PWA) -->
+      <!-- ÍCONE DOS APPS (PWA) -->
       <div class="cfg-card" style="margin-bottom:18px;">
-        <div class="cfg-title">📱 Ícone do App</div>
-        <div class="cfg-hint" style="margin-bottom:14px;">Ícone exibido quando o app é instalado no celular. Use uma imagem quadrada <strong style="color:var(--gold);">512×512px</strong> em PNG com fundo sólido.</div>
+        <div class="cfg-title">📱 Ícone dos Apps</div>
+        <div class="cfg-hint" style="margin-bottom:14px;">Ícone exibido quando os apps são instalados no celular. Use imagens quadradas <strong style="color:var(--gold);">512×512px</strong> em PNG com fundo sólido (sem transparência).</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:4px;">
+
+          <!-- Ícone site do cliente -->
+          <div>
+            <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px;">🛍️ App do Cliente</div>
         <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
           <div style="text-align:center;">
             <img id="pwa-icon-preview" src="https://i.postimg.cc/FFpNdnLT/Design-sem-nome.png" alt="Ícone atual" style="width:80px;height:80px;border-radius:16px;object-fit:cover;border:2px solid var(--gold-border);background:#222;display:block;margin-bottom:6px;">
@@ -879,9 +884,32 @@
             <img id="prev-pwa-icon" class="img-upload-preview" src="" alt="" style="display:none;">
             <div id="up-pwa-icon" class="img-uploading">⏳ Enviando...</div>
             <input type="hidden" id="pwa-icon-url" value="">
-            <div style="font-size:11px;color:var(--text-dim);margin-top:8px;">✅ Tamanho ideal: <strong>512×512px</strong> · PNG quadrado · fundo sólido (sem transparência)</div>
+            <div style="font-size:11px;color:var(--text-dim);margin-top:8px;">✅ Tamanho ideal: <strong>512×512px</strong> · PNG quadrado</div>
           </div>
-        </div>
+          </div><!-- end client icon -->
+
+          <!-- Ícone painel admin -->
+          <div>
+            <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px;">⚙️ App do Admin</div>
+            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+              <div style="text-align:center;">
+                <img id="pwa-admin-icon-preview" src="https://i.postimg.cc/FFpNdnLT/Design-sem-nome.png" alt="" style="width:64px;height:64px;border-radius:14px;object-fit:cover;border:2px solid var(--gold-border);background:#222;display:block;margin-bottom:4px;">
+                <div style="font-size:10px;color:var(--text-dim);">Pré-visualização</div>
+              </div>
+              <div style="flex:1;min-width:140px;">
+                <div class="img-dropzone" id="dz-pwa-admin-icon" onclick="document.getElementById('fi-pwa-admin-icon').click()" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="dzDrop(event,'fi-pwa-admin-icon','prev-pwa-admin-icon','up-pwa-admin-icon','pwa-admin-icon-url',()=>savePwaAdminIcon())">
+                  <input type="file" id="fi-pwa-admin-icon" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="dzChange(this,'prev-pwa-admin-icon','up-pwa-admin-icon','pwa-admin-icon-url',()=>savePwaAdminIcon())">
+                  <div class="img-dropzone-label" style="font-size:11px;">⚙️ Ícone do admin</div>
+                </div>
+                <img id="prev-pwa-admin-icon" class="img-upload-preview" src="" alt="" style="display:none;">
+                <div id="up-pwa-admin-icon" class="img-uploading">⏳ Enviando...</div>
+                <input type="hidden" id="pwa-admin-icon-url" value="">
+                <div style="font-size:11px;color:var(--text-dim);margin-top:6px;">✅ <strong>512×512px</strong> · PNG</div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- end grid -->
       </div>
 
       <!-- CONFIGURAÇÕES DO SITE -->
@@ -4233,27 +4261,66 @@
 
 
 
-  // ─── Ícone PWA ───
+  // ─── Ícones PWA ───
   async function loadPwaIconAdmin(){
     try {
       const snap = await getDoc(doc(db,'config','appearance'));
-      const url = snap.exists() ? (snap.data().pwaIcon||snap.data().bgImage||'') : '';
-      const current = url || 'https://i.postimg.cc/FFpNdnLT/Design-sem-nome.png';
-      const preview = document.getElementById('pwa-icon-preview');
-      const hidden = document.getElementById('pwa-icon-url');
-      if(preview) preview.src = current;
-      if(hidden) hidden.value = current;
+      const d = snap.exists() ? snap.data() : {};
+      // Client icon
+      const clientUrl = d.pwaIcon || 'https://i.postimg.cc/FFpNdnLT/Design-sem-nome.png';
+      const p1 = document.getElementById('pwa-icon-preview');
+      const h1 = document.getElementById('pwa-icon-url');
+      if(p1) p1.src = clientUrl;
+      if(h1) h1.value = clientUrl;
+      // Admin icon
+      const adminUrl = d.pwaAdminIcon || 'https://i.postimg.cc/FFpNdnLT/Design-sem-nome.png';
+      const p2 = document.getElementById('pwa-admin-icon-preview');
+      const h2 = document.getElementById('pwa-admin-icon-url');
+      if(p2) p2.src = adminUrl;
+      if(h2) h2.value = adminUrl;
+      // Apply admin icon immediately
+      applyAdminPwaIcon(adminUrl);
     } catch(e){ console.warn('loadPwaIconAdmin:',e); }
+  }
+
+  function applyAdminPwaIcon(url){
+    if(!url) return;
+    document.querySelectorAll('link[rel="apple-touch-icon"],link[rel="icon"]').forEach(el=>{ el.href=url; });
+    const manifest = {
+      name:'Gabriel Barber Admin', short_name:'GBS Admin',
+      start_url:'/', display:'standalone',
+      background_color:'#111111', theme_color:'#c9a84c', orientation:'portrait',
+      icons:[
+        {src:url, sizes:'192x192', type:'image/png', purpose:'any maskable'},
+        {src:url, sizes:'512x512', type:'image/png', purpose:'any maskable'}
+      ]
+    };
+    const blob = new Blob([JSON.stringify(manifest)],{type:'application/json'});
+    const mUrl = URL.createObjectURL(blob);
+    const mLink = document.querySelector('link[rel="manifest"]');
+    if(mLink) mLink.href = mUrl;
   }
 
   window.savePwaIcon = async function(){
     const url = document.getElementById('pwa-icon-url')?.value?.trim();
     if(!url) return;
     try {
-      await setDoc(doc(db,'config','appearance'),{ pwaIcon: url },{ merge:true });
-      const preview = document.getElementById('pwa-icon-preview');
-      if(preview) preview.src = url;
-      showToast('Ícone do app salvo!','green');
+      await setDoc(doc(db,'config','appearance'),{ pwaIcon: url },{merge:true});
+      const p = document.getElementById('pwa-icon-preview');
+      if(p) p.src = url;
+      showToast('Ícone do app do cliente salvo!','green');
+    } catch(e){ showToast('Erro: '+e.message,'red'); }
+  };
+
+  window.savePwaAdminIcon = async function(){
+    const url = document.getElementById('pwa-admin-icon-url')?.value?.trim();
+    if(!url) return;
+    try {
+      await setDoc(doc(db,'config','appearance'),{ pwaAdminIcon: url },{merge:true});
+      const p = document.getElementById('pwa-admin-icon-preview');
+      if(p) p.src = url;
+      applyAdminPwaIcon(url);
+      showToast('Ícone do app admin salvo!','green');
     } catch(e){ showToast('Erro: '+e.message,'red'); }
   };
 
