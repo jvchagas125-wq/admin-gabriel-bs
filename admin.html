@@ -1162,7 +1162,7 @@
       loadCancelledTab();
       loadDoneTab();
       applyAdminIconOnLoad();
-      setTimeout(()=>switchTab('appointments'), 100);
+      setTimeout(()=>{ switchTab('appointments'); restoreListVisibility(); }, 100);
     } catch(err){
       errEl.style.display="block";
       document.getElementById("inp-pass").value="";
@@ -1944,7 +1944,7 @@
         applyAdminIconOnLoad();
         loadDoneTab(); // Carrega concluídos
         // Inicializa a aba padrão corretamente
-        setTimeout(()=>switchTab('appointments'), 100);
+        setTimeout(()=>{ switchTab('appointments'); restoreListVisibility(); }, 100);
       } else {
         document.getElementById("login-screen").style.display="flex";
       }
@@ -2822,10 +2822,12 @@
       list.style.display = '';
       btnHide.style.display = '';
       btnShow.style.display = 'none';
+      localStorage.setItem('gbs_admin_cancelled_hidden', '0');
     } else {
       list.style.display = 'none';
       btnHide.style.display = 'none';
       btnShow.style.display = '';
+      localStorage.setItem('gbs_admin_cancelled_hidden', '1');
     }
   };
 
@@ -2838,12 +2840,20 @@
       list.style.display = '';
       btnHide.style.display = '';
       btnShow.style.display = 'none';
+      localStorage.setItem('gbs_admin_done_hidden', '0');
     } else {
       list.style.display = 'none';
       btnHide.style.display = 'none';
       btnShow.style.display = '';
+      localStorage.setItem('gbs_admin_done_hidden', '1');
     }
   };
+
+  // Restaurar estado oculto ao carregar
+  function restoreListVisibility(){
+    if(localStorage.getItem('gbs_admin_cancelled_hidden') === '1') toggleCancelledList(false);
+    if(localStorage.getItem('gbs_admin_done_hidden') === '1') toggleDoneList(false);
+  }
 
   window.clearAllCancelledFirestore = async function(){
     // Apaga TODOS os documentos da coleção cancelled_appointments (reset completo)
