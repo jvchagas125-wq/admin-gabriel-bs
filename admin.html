@@ -1188,6 +1188,11 @@
       allData=snap.docs.map(d=>({id:d.id,...d.data()}));
       updateStats(); renderTable(); updateRevenueCards(); drawRevenueChart('year');
     });
+    // Listener em tempo real para wallets — atualiza ranking GB$ automaticamente
+    onSnapshot(collection(db,'wallets'), ()=>{
+      const el = document.getElementById('gbs-ranking-list');
+      if(el) renderGBSRanking();
+    });
   }
 
   function updateStats(){
