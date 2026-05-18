@@ -924,6 +924,14 @@
       <div id="top30-list" style="background:var(--bg2);border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,0.06);"></div>
     </div>
 
+    <!-- RANKING GB$ -->
+    <div style="margin-bottom:28px;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--gold);margin-bottom:10px;">🪙 Ranking GB$ — Clientes com Saldo</div>
+      <div id="gbs-ranking-list" style="background:var(--bg2);border-radius:12px;overflow:hidden;border:1px solid rgba(201,168,76,0.2);">
+        <div style="text-align:center;padding:20px;color:var(--text-dim);font-size:13px;">Carregando...</div>
+      </div>
+    </div>
+
     <!-- Lista de clientes -->
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
       <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;background:linear-gradient(135deg,#c9a84c,#f0d78c,#c9a84c);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">👥 Todos os Clientes</div>
@@ -1909,7 +1917,7 @@
     if(tab==='avisos'){ loadAdminBanners(); loadNoticesAdmin(); }
     if(tab==='reviews') loadReviewsAdmin();
     if(tab==='settings') { loadSettings(); loadAdminPlans(); loadNoticesAdmin(); loadSiteConfigAdmin(); loadBgConfigAdmin(); loadPwaIconAdmin(); }
-    if(tab==='sessions') loadSessions();
+    if(tab==='sessions'){ loadSessions(); renderGBSRanking(); }
     if(tab==='store'||tab==='gbstore') loadStoreAdmin();
     if(tab==='gbcoins'){ loadGBConfig(); loadGBPackages(); loadGBPurchases(); }
   };
@@ -2419,7 +2427,55 @@
     } catch(e){ console.warn('saveRanking:',e); }
   }
 
-  function renderSessionsList(clients){
+  async function renderGBSRanking(){
+    const el = document.getElementById('gbs-ranking-list');
+    if(!el) return;
+    try {
+      // Buscar todos os documentos da coleção wallets
+      const snap = await getDocs(collection(db,'wallets'));
+      // Montar lista com balance > 0
+      let entries = [];
+      snap.forEach(d=>{
+        const data = d.data();
+        const balance = data.balance||0;
+        if(balance < 1) return;
+        // Cruzar com allClients para pegar nome e telefone
+        const digits = d.id;
+        const client = allClients.find(c=>c.digits===digits);
+        const name = client ? (client.name||'—') : '—';
+        const phone = client ? (client.phone||digits) : digits;
+        entries.push({ digits, name, phone, balance });
+      });
+      // Ordenar por balance decrescente
+      entries.sort((a,b)=>b.balance - a.balance);
+      if(!entries.length){
+        el.innerHTML='<div style="text-align:center;padding:20px;color:var(--text-dim);font-size:13px;">Nenhum cliente com GB$ no momento.</div>';
+        return;
+      }
+      const medals = ['🥇','🥈','🥉'];
+      let rows = entries.map((e,i)=>{
+        const pos = i < 3 ? medals[i] : (i+1)+'º';
+        return '<tr style="border-bottom:1px solid rgba(255,255,255,0.04);">'
+          +'<td style="padding:11px 16px;font-size:13px;color:var(--text-dim);width:48px;">'+pos+'</td>'
+          +'<td style="padding:11px 16px;font-weight:700;font-size:13px;">'+esc(e.name)+'</td>'
+          +'<td style="padding:11px 16px;font-size:13px;color:var(--text-muted);">'+esc(e.phone)+'</td>'
+          +'<td style="padding:11px 16px;text-align:right;font-family:Bebas Neue,sans-serif;font-size:20px;color:var(--gold);">'+e.balance+' <span style="font-size:12px;font-family:DM Sans,sans-serif;color:var(--text-muted);">GB$</span></td>'
+          +'</tr>';
+      }).join('');
+      el.innerHTML='<table style="width:100%;border-collapse:collapse;">'
+        +'<thead><tr style="background:var(--bg2);">'
+        +'<th style="padding:10px 16px;text-align:left;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);">#</th>'
+        +'<th style="padding:10px 16px;text-align:left;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);">Cliente</th>'
+        +'<th style="padding:10px 16px;text-align:left;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);">Telefone</th>'
+        +'<th style="padding:10px 16px;text-align:right;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);">Saldo</th>'
+        +'</tr></thead><tbody>'+rows+'</tbody></table>';
+    } catch(e){
+      console.warn('renderGBSRanking erro:',e);
+      el.innerHTML='<div style="text-align:center;padding:20px;color:var(--text-dim);font-size:13px;">Erro ao carregar ranking.</div>';
+    }
+  }
+
+    function renderSessionsList(clients){
     const el = document.getElementById('sessions-list');
     if(!el) return;
     if(!clients.length){
