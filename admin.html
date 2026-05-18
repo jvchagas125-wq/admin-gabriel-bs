@@ -625,8 +625,8 @@
       </div>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
         <input class="search-input" type="search" id="cancelled-search" placeholder="Buscar nome ou telefone..." oninput="filterCancelled()" style="width:200px;">
-        <button class="clear-btn" onclick="clearAllCancelled()" title="Limpar lista local" style="white-space:nowrap;">🗑️ Limpar lista</button>
-        <button class="clear-btn" onclick="clearAllCancelledFirestore()" title="Zerar banco de dados" style="white-space:nowrap;border-color:rgba(220,38,38,0.5);color:#f87171;">🗑️ Zerar banco</button>
+        <button id="btn-hide-cancelled" onclick="toggleCancelledList(false)" style="padding:6px 14px;border-radius:8px;border:1px solid rgba(220,38,38,0.4);background:none;color:#f87171;font-size:12px;font-weight:700;cursor:pointer;">🙈 Ocultar</button>
+        <button id="btn-show-cancelled" onclick="toggleCancelledList(true)" style="display:none;padding:6px 14px;border-radius:8px;border:1px solid rgba(220,38,38,0.4);background:none;color:#f87171;font-size:12px;font-weight:700;cursor:pointer;">👁️ Mostrar</button>
       </div>
     </div>
     <div style="font-size:12px;color:var(--text-dim);margin-bottom:12px;">Agendamentos cancelados pelo cliente ou pelo admin.</div>
@@ -643,7 +643,8 @@
       </div>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
         <input class="search-input" type="search" id="done-search" placeholder="Buscar nome ou telefone..." oninput="filterDone()" style="width:200px;">
-        <button class="clear-btn" onclick="clearAllDone()" title="Limpar toda a lista de concluídos" style="white-space:nowrap;">🗑️ Limpar tudo</button>
+        <button id="btn-hide-done" onclick="toggleDoneList(false)" style="padding:6px 14px;border-radius:8px;border:1px solid rgba(22,163,74,0.4);background:none;color:#4ade80;font-size:12px;font-weight:700;cursor:pointer;">🙈 Ocultar</button>
+        <button id="btn-show-done" onclick="toggleDoneList(true)" style="display:none;padding:6px 14px;border-radius:8px;border:1px solid rgba(22,163,74,0.4);background:none;color:#4ade80;font-size:12px;font-weight:700;cursor:pointer;">👁️ Mostrar</button>
       </div>
     </div>
     <div style="font-size:12px;color:var(--text-dim);margin-bottom:12px;">Atendimentos marcados como concluídos por Gabriel.</div>
@@ -2808,6 +2809,39 @@
       // Recarrega em caso de erro para manter sincronizado
       if(cancelledUnsubscribe){ cancelledUnsubscribe(); cancelledUnsubscribe=null; }
       loadCancelledTab();
+    }
+  };
+
+
+  window.toggleCancelledList = function(show){
+    const list = document.getElementById('cancelled-list');
+    const btnHide = document.getElementById('btn-hide-cancelled');
+    const btnShow = document.getElementById('btn-show-cancelled');
+    if(!list) return;
+    if(show){
+      list.style.display = '';
+      btnHide.style.display = '';
+      btnShow.style.display = 'none';
+    } else {
+      list.style.display = 'none';
+      btnHide.style.display = 'none';
+      btnShow.style.display = '';
+    }
+  };
+
+  window.toggleDoneList = function(show){
+    const list = document.getElementById('done-list');
+    const btnHide = document.getElementById('btn-hide-done');
+    const btnShow = document.getElementById('btn-show-done');
+    if(!list) return;
+    if(show){
+      list.style.display = '';
+      btnHide.style.display = '';
+      btnShow.style.display = 'none';
+    } else {
+      list.style.display = 'none';
+      btnHide.style.display = 'none';
+      btnShow.style.display = '';
     }
   };
 
