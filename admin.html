@@ -2455,19 +2455,20 @@
       const medals = ['🥇','🥈','🥉'];
       let rows = entries.map((e,i)=>{
         const pos = i < 3 ? medals[i] : (i+1)+'º';
-        return '<tr style="border-bottom:1px solid rgba(255,255,255,0.04);">'
-          +'<td style="padding:11px 16px;font-size:13px;color:var(--text-dim);width:48px;">'+pos+'</td>'
-          +'<td style="padding:11px 16px;font-weight:700;font-size:13px;">'+esc(e.name)+'</td>'
-          +'<td style="padding:11px 16px;font-size:13px;color:var(--text-muted);">'+esc(e.phone)+'</td>'
-          +'<td style="padding:11px 16px;text-align:right;font-family:Bebas Neue,sans-serif;font-size:20px;color:var(--gold);">'+e.balance+' <span style="font-size:12px;font-family:DM Sans,sans-serif;color:var(--text-muted);">GB$</span></td>'
+        const highlight = i < 3 ? 'background:rgba(201,168,76,0.06);' : '';
+        return '<tr style="border-bottom:1px solid rgba(255,255,255,0.04);'+highlight+'">'
+          +'<td style="padding:10px 14px;font-size:13px;color:var(--text-muted);">'+pos+'</td>'
+          +'<td style="padding:10px 14px;font-weight:700;font-size:13px;">'+esc(e.name)+'</td>'
+          +'<td style="padding:10px 14px;font-size:12px;color:var(--text-muted);">'+esc(e.phone)+'</td>'
+          +'<td style="padding:10px 14px;text-align:center;font-family:Bebas Neue,sans-serif;font-size:20px;color:var(--gold);">'+e.balance+'</td>'
           +'</tr>';
       }).join('');
       el.innerHTML='<table style="width:100%;border-collapse:collapse;">'
         +'<thead><tr style="background:var(--bg2);">'
-        +'<th style="padding:10px 16px;text-align:left;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);">#</th>'
-        +'<th style="padding:10px 16px;text-align:left;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);">Cliente</th>'
-        +'<th style="padding:10px 16px;text-align:left;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);">Telefone</th>'
-        +'<th style="padding:10px 16px;text-align:right;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);">Saldo</th>'
+        +'<th style="padding:10px 14px;text-align:left;font-size:11px;color:var(--text-dim);font-weight:700;letter-spacing:1px;">#</th>'
+        +'<th style="padding:10px 14px;text-align:left;font-size:11px;color:var(--text-dim);font-weight:700;letter-spacing:1px;">CLIENTE</th>'
+        +'<th style="padding:10px 14px;text-align:left;font-size:11px;color:var(--text-dim);font-weight:700;letter-spacing:1px;">TELEFONE</th>'
+        +'<th style="padding:10px 14px;text-align:center;font-size:11px;color:var(--text-dim);font-weight:700;letter-spacing:1px;">AGEND.</th>'
         +'</tr></thead><tbody>'+rows+'</tbody></table>';
     } catch(e){
       console.warn('renderGBSRanking erro:',e);
