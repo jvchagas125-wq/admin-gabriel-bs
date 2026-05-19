@@ -396,6 +396,31 @@
         grid-template-columns: 1fr !important;
       }
 
+      /* ── HEADER — esconder "Ver site" no mobile, manter compacto ── */
+      a[href*="gabriel-barber-studio.vercel.app"] {
+        display: none !important;
+      }
+
+      /* ── TABELA CLIENTES — ocultar colunas menos importantes ── */
+      #sessions-list table { min-width: unset !important; width: 100%; }
+      #sessions-list thead th:nth-child(5),
+      #sessions-list tbody td:nth-child(5) { display: none; } /* Último acesso */
+
+      /* ── RANKING GB$ — tabela sem min-width fixo ── */
+      #gbs-ranking-list table { min-width: unset !important; width: 100%; }
+      #gbs-ranking-list thead th:nth-child(3),
+      #gbs-ranking-list tbody td:nth-child(3) { display: none; } /* Telefone */
+
+      /* ── RANKING TOP30 — tabela sem min-width fixo ── */
+      #top30-list table { min-width: unset !important; width: 100%; }
+      #top30-list thead th:nth-child(3),
+      #top30-list tbody td:nth-child(3) { display: none; } /* Telefone */
+
+      /* ── TABELAS AGENDAMENTOS — scroll horizontal mantido ── */
+      .table-wrap { overflow-x: auto !important; }
+      #done-list table,
+      #cancelled-list table { min-width: 500px; }
+
     }
 
     /* ===== UPLOAD DE IMAGEM ===== */
@@ -480,6 +505,9 @@
     <img src="https://i.imgur.com/vcPQoRh.png" style="height:28px;object-fit:contain;" onerror="this.style.display='none'">
     <span style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);background:var(--gold-dim);border:1px solid var(--gold-border);padding:3px 8px;border-radius:20px;">Admin</span>
   </div>
+  <a href="https://gabriel-barber-studio.vercel.app" target="_blank" rel="noopener" onclick="closeAdminMobMenu()" style="display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid rgba(255,255,255,0.05);color:var(--gold);text-decoration:none;font-size:14px;font-weight:600;font-family:'DM Sans',sans-serif;">
+    <span style="font-size:18px;width:24px;text-align:center;">🌐</span> Ver site do cliente
+  </a>
   <div style="display:flex;flex-direction:column;padding:8px 0;flex:1;">
     <button class="admin-mob-item active" data-tab="appointments" onclick="adminMobNav('appointments')" style="display:flex;align-items:center;gap:12px;padding:14px 18px;background:none;border:none;color:var(--text-muted);font-size:14px;font-weight:600;cursor:pointer;text-align:left;font-family:'DM Sans',sans-serif;transition:background .15s,color .15s;">
       <span style="font-size:18px;width:24px;text-align:center;">📋</span> Agendamentos
