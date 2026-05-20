@@ -2427,12 +2427,12 @@
       saveRankingToFirestore([]);
       return;
     }
-    listEl.innerHTML = '<table style="width:100%;border-collapse:collapse;">'
+    listEl.innerHTML = '<table style="width:100%;border-collapse:collapse;table-layout:fixed;">'
       +'<thead><tr style="background:var(--bg2);">'
-      +'<th style="padding:10px 14px;text-align:left;font-size:11px;color:var(--text-dim);font-weight:700;letter-spacing:1px;">#</th>'
+      +'<th style="padding:10px 14px;text-align:left;font-size:11px;color:var(--text-dim);font-weight:700;letter-spacing:1px;width:40px;">#</th>'
       +'<th style="padding:10px 14px;text-align:left;font-size:11px;color:var(--text-dim);font-weight:700;letter-spacing:1px;">CLIENTE</th>'
-      +'<th style="padding:10px 14px;text-align:left;font-size:11px;color:var(--text-dim);font-weight:700;letter-spacing:1px;">TELEFONE</th>'
-      +'<th style="padding:10px 14px;text-align:center;font-size:11px;color:#4ade80;font-weight:700;letter-spacing:1px;">At. Concluídos</th>'
+      +'<th style="padding:10px 14px;text-align:left;font-size:11px;color:var(--text-dim);font-weight:700;letter-spacing:1px;width:160px;">TELEFONE</th>'
+      +'<th style="padding:10px 14px;text-align:center;font-size:11px;color:#4ade80;font-weight:700;letter-spacing:1px;width:130px;">At. Concluídos</th>'
       +'</tr></thead><tbody>'
       + top30.map(([digits, count], i)=>{
           const pos = i+1;
@@ -2499,12 +2499,12 @@
           +'<td style="padding:10px 14px;text-align:center;font-family:Bebas Neue,sans-serif;font-size:20px;color:var(--gold);">'+e.balance+'</td>'
           +'</tr>';
       }).join('');
-      el.innerHTML='<table style="width:100%;border-collapse:collapse;">'
+      el.innerHTML='<table style="width:100%;border-collapse:collapse;table-layout:fixed;">'
         +'<thead><tr style="background:var(--bg2);">'
-        +'<th style="padding:10px 14px;text-align:left;font-size:11px;color:var(--text-dim);font-weight:700;letter-spacing:1px;">#</th>'
+        +'<th style="padding:10px 14px;text-align:left;font-size:11px;color:var(--text-dim);font-weight:700;letter-spacing:1px;width:40px;">#</th>'
         +'<th style="padding:10px 14px;text-align:left;font-size:11px;color:var(--text-dim);font-weight:700;letter-spacing:1px;">CLIENTE</th>'
-        +'<th style="padding:10px 14px;text-align:left;font-size:11px;color:var(--text-dim);font-weight:700;letter-spacing:1px;">TELEFONE</th>'
-        +'<th style="padding:10px 14px;text-align:center;font-size:11px;color:var(--gold);font-weight:700;letter-spacing:1px;">SALDO</th>'
+        +'<th style="padding:10px 14px;text-align:left;font-size:11px;color:var(--text-dim);font-weight:700;letter-spacing:1px;width:160px;">TELEFONE</th>'
+        +'<th style="padding:10px 14px;text-align:center;font-size:11px;color:var(--gold);font-weight:700;letter-spacing:1px;width:130px;">SALDO</th>'
         +'</tr></thead><tbody>'+rows+'</tbody></table>';
     } catch(e){
       console.warn('renderGBSRanking erro:',e);
