@@ -2432,7 +2432,7 @@
       +'<th style="padding:10px 14px;text-align:left;font-size:11px;color:var(--text-dim);font-weight:700;letter-spacing:1px;">#</th>'
       +'<th style="padding:10px 14px;text-align:left;font-size:11px;color:var(--text-dim);font-weight:700;letter-spacing:1px;">CLIENTE</th>'
       +'<th style="padding:10px 14px;text-align:left;font-size:11px;color:var(--text-dim);font-weight:700;letter-spacing:1px;">TELEFONE</th>'
-      +'<th style="padding:10px 14px;text-align:center;font-size:11px;color:var(--text-dim);font-weight:700;letter-spacing:1px;">AGEND.</th>'
+      +'<th style="padding:10px 14px;text-align:center;font-size:11px;color:#4ade80;font-weight:700;letter-spacing:1px;">At. Concluídos</th>'
       +'</tr></thead><tbody>'
       + top30.map(([digits, count], i)=>{
           const pos = i+1;
@@ -2442,7 +2442,7 @@
             +'<td style="padding:10px 14px;font-size:13px;color:var(--text-muted);">'+medal+(medal?'':pos+'º')+'</td>'
             +'<td style="padding:10px 14px;font-weight:700;font-size:13px;">'+esc(names[digits]||'—')+'</td>'
             +'<td style="padding:10px 14px;font-size:12px;color:var(--text-muted);">'+esc(phones[digits]||'—')+'</td>'
-            +'<td style="padding:10px 14px;text-align:center;font-family:Bebas Neue,sans-serif;font-size:20px;color:var(--gold);">'+count+'</td>'
+            +'<td style="padding:10px 14px;text-align:center;font-family:Bebas Neue,sans-serif;font-size:20px;color:#4ade80;">'+count+'</td>'
             +'</tr>';
         }).join('')
       +'</tbody></table>';
