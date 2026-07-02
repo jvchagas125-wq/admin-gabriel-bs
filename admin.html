@@ -1760,6 +1760,19 @@
           <input class="plan-admin-input" id="p-link-${i}" value="${esc(p.mpLink||'')}" placeholder="https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=...">
         </div>
 
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+          <div>
+            <span class="plan-admin-label">Texto do botão</span>
+            <input class="plan-admin-input" id="p-btntext-${i}" value="${esc(p.btnText||'')}" placeholder="Assinar agora">
+          </div>
+          <div style="display:flex;flex-direction:column;justify-content:flex-end;padding-bottom:4px;">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+              <input type="checkbox" id="p-showprice-${i}" ${p.showPrice!==false?'checked':''} style="accent-color:var(--gold);width:15px;height:15px;">
+              <span style="font-size:12px;font-weight:600;color:var(--text);">Mostrar preço no card</span>
+            </label>
+          </div>
+        </div>
+
         <div style="margin-bottom:8px;">
           <label class="plan-admin-toggle">
             <input type="checkbox" id="p-featured-${i}" ${p.featured?'checked':''}>
@@ -1890,6 +1903,9 @@
                        ? (parseInt(document.getElementById('p-gb-signup-'+i)?.value)||0) : 0,
       gbMonthly:     document.getElementById('p-gb-monthly-active-'+i)?.checked
                        ? (parseInt(document.getElementById('p-gb-monthly-'+i)?.value)||0) : 0,
+      btnText:       (document.getElementById('p-btntext-'+i)?.value||'').trim(),
+      showPrice:     document.getElementById('p-showprice-'+i)?.checked !== false
+                       ? (document.getElementById('p-showprice-'+i)?.checked ?? true) : false,
     }));
   }
 
