@@ -1467,24 +1467,28 @@
       : `<span style="font-size:10px;color:var(--text-dim);text-align:center;padding:4px;">sem img</span>`;
   };
 
+  function renderAllSvcUI(){
+    renderServicesAdminUI();
+    renderSvcAdminList();
+    setTimeout(()=>{ const el=document.getElementById('svc-name-'+(adminServices.length-1)); if(el){el.focus();el.select();el.scrollIntoView({behavior:'smooth',block:'center'});} },80);
+  }
+
   window.addService = function(){
     adminServices.push({name:'Novo Serviço', price:'0,00', duration:15});
-    renderServicesAdminUI();
-    // Foca no nome do novo serviço
-    setTimeout(()=>{ const el=document.getElementById('svc-name-'+(adminServices.length-1)); if(el){el.focus();el.select();} },50);
+    renderAllSvcUI();
   };
 
   window.removeSvc = async function(i){
     if(!(await showGBConfirm('🗑️ Remover Serviço','Deseja remover o serviço <strong>'+adminServices[i].name+'</strong>?','Sim, remover','Cancelar','red'))) return;
     adminServices.splice(i,1);
-    renderServicesAdminUI();
+    renderAllSvcUI();
   };
 
   window.moveSvc = function(i, dir){
     const j=i+dir;
     if(j<0||j>=adminServices.length) return;
     [adminServices[i],adminServices[j]]=[adminServices[j],adminServices[i]];
-    renderServicesAdminUI();
+    renderAllSvcUI();
   };
 
   function collectSvcFeatures(i){
@@ -1502,11 +1506,11 @@
     adminServices[i] = Object.assign({}, adminServices[i]);
     adminServices[i].features = collectSvcFeatures(i);
     adminServices[i].features.push('');
-    renderServicesAdminUI();
+    renderAllSvcUI();
     setTimeout(()=>{
       const all=document.querySelectorAll('[id^="svc-ft-'+i+'-"]');
       if(all.length) all[all.length-1].focus();
-    },50);
+    },80);
   };
 
   window.removeSvcFeature = function(i,fi){
