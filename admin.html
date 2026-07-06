@@ -757,6 +757,14 @@
             </div>
           </div>
         </div>
+        <div style="margin-top:16px;">
+          <label class="cfg-label" style="margin-bottom:6px;display:block;">⏰ Antecedência mínima para agendamento</label>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <input type="number" id="svc-min-advance" min="0" max="72" step="1" value="12" class="cfg-input" style="width:90px;">
+            <span style="font-size:13px;color:var(--text-muted);">horas antes do horário</span>
+          </div>
+          <div style="font-size:11px;color:var(--text-dim);margin-top:4px;">Ex: 12h → cliente tem até 21:30 para agendar o horário de 09:30 do dia seguinte. Use 0 para sem limite.</div>
+        </div>
       </div>
 
       <button class="cfg-save-btn" onclick="saveSvcAdminSettings()">💾 Salvar Serviços e Intervalos</button>
@@ -3861,6 +3869,10 @@
             const intEl = document.getElementById('svc-slot-interval');
             if(intEl) intEl.value = d.slotInterval;
           }
+          if(d.minAdvanceHours !== undefined){
+            const advEl = document.getElementById('svc-min-advance');
+            if(advEl) advEl.value = d.minAdvanceHours;
+          }
         }
       } catch(e){ console.warn('loadSvcAdminTab:',e); }
       svcAdminLoaded = true;
@@ -3951,17 +3963,19 @@
     const services = collectSvcAdminData();
     const buffer = parseInt(document.getElementById('svc-buffer')?.value)||5;
     const slotInterval = parseInt(document.getElementById('svc-slot-interval')?.value)||15;
+    const minAdvanceHours = parseInt(document.getElementById('svc-min-advance')?.value)||0;
     try {
       // Save services
       await setDoc(doc(db,'config','services'),{ list: services });
       // Save schedule settings
       const schSnap = await getDoc(doc(db,'config','schedule'));
       const current = schSnap.exists() ? schSnap.data() : {};
-      await setDoc(doc(db,'config','schedule'),{ ...current, buffer, slotInterval });
+      await setDoc(doc(db,'config','schedule'),{ ...current, buffer, slotInterval, minAdvanceHours });
       // Update local
       adminServices = services;
       currentSettings.buffer = buffer;
       currentSettings.slotInterval = slotInterval;
+      currentSettings.minAdvanceHours = minAdvanceHours;
       showToast('Serviços e intervalos salvos!','green');
     } catch(e){ showToast('Erro: '+e.message,'red'); }
   };
