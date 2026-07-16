@@ -759,24 +759,19 @@
         </div>
         <div style="margin-top:16px;border-top:1px solid rgba(255,255,255,0.06);padding-top:16px;">
           <label class="cfg-label" style="margin-bottom:10px;display:block;">⏰ Antecedência mínima para agendamento</label>
-          <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start;">
-            <div>
-              <div style="font-size:11px;color:var(--text-dim);margin-bottom:5px;">Horas de antecedência</div>
-              <div style="display:flex;align-items:center;gap:8px;">
-                <input type="number" id="svc-min-advance" min="0" max="72" step="1" value="0" class="cfg-input" style="width:80px;">
-                <span style="font-size:13px;color:var(--text-muted);">horas  (0 = sem limite)</span>
-              </div>
-            </div>
-            <div style="flex:1;min-width:200px;">
-              <div style="font-size:11px;color:var(--text-dim);margin-bottom:5px;">Período de aplicação</div>
-              <select id="svc-advance-period" class="cfg-input" style="width:100%;">
-                <option value="all">Todos os horários</option>
-                <option value="morning">Apenas manhã (09:00 – 12:00)</option>
-                <option value="afternoon">Apenas tarde (12:00 – 23:00)</option>
-              </select>
-            </div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+            <input type="number" id="svc-min-advance" min="0" max="72" step="1" value="0" class="cfg-input" style="width:80px;">
+            <span style="font-size:13px;color:var(--text-muted);">horas antes do horário (0 = sem limite)</span>
           </div>
-          <div style="font-size:11px;color:var(--text-dim);margin-top:8px;">Ex: 12h + Apenas manhã → cliente tem até 21:30 do dia anterior para agendar qualquer horário da manhã.</div>
+          <div style="margin-bottom:6px;">
+            <label class="cfg-label" style="margin-bottom:6px;display:block;">Período de aplicação</label>
+            <select id="svc-advance-period" class="cfg-input" style="width:100%;max-width:340px;">
+              <option value="all">Todos os horários</option>
+              <option value="morning">Apenas manhã (09:00 – 12:00)</option>
+              <option value="afternoon">Apenas tarde (12:00 – 23:00)</option>
+            </select>
+          </div>
+          <div style="font-size:11px;color:var(--text-dim);margin-top:4px;">Ex: 12h + Apenas manhã → cliente tem até 21:30 do dia anterior para agendar qualquer horário da manhã.</div>
         </div>
       </div>
 
