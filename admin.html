@@ -1668,6 +1668,8 @@
     const curBuffer = currentSettings.buffer||5;
     const curSlotInterval = currentSettings.slotInterval||15;
     const curServices = currentSettings.services||{};
+    const curMinAdvanceHours = currentSettings.minAdvanceHours !== undefined ? currentSettings.minAdvanceHours : 0;
+    const curMinAdvancePeriod = currentSettings.minAdvancePeriod || 'all';
 
     const s = {
       days:{},
@@ -1675,6 +1677,8 @@
       services: curServices,
       buffer: curBuffer,
       slotInterval: curSlotInterval,
+      minAdvanceHours: curMinAdvanceHours,
+      minAdvancePeriod: curMinAdvancePeriod,
     };
 
     // Lê dias
