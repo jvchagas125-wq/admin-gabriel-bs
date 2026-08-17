@@ -3190,13 +3190,26 @@
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
           <div>
-            <label class="plan-admin-label">Custo em GB$</label>
-            <input type="number" class="plan-admin-input" id="sp-cost" value="${p.cost||1}" min="1" step="1" placeholder="Ex: 3">
+            <label class="plan-admin-label">Tipo de custo</label>
+            <select id="sp-cost-type" class="plan-admin-input" onchange="toggleSpCostType()" style="cursor:pointer;">
+              <option value="gbs" ${(!p.costType||p.costType==='gbs')?'selected':''}>💰 GB$</option>
+              <option value="brl" ${p.costType==='brl'?'selected':''}>💳 R$ (Pagamento)</option>
+            </select>
           </div>
           <div>
             <label class="plan-admin-label">Emoji (ícone)</label>
             <input class="plan-admin-input" id="sp-emoji" value="${esc(p.emoji||'🎁')}" maxlength="4" placeholder="🎁">
           </div>
+        </div>
+        <div id="sp-gbs-field" style="display:${(!p.costType||p.costType==='gbs')?'block':'none'};">
+          <label class="plan-admin-label">Custo em GB$</label>
+          <input type="number" class="plan-admin-input" id="sp-cost" value="${p.cost||1}" min="1" step="1" placeholder="Ex: 3">
+        </div>
+        <div id="sp-brl-field" style="display:${p.costType==='brl'?'block':'none'};">
+          <label class="plan-admin-label">Preço em R$</label>
+          <input type="number" class="plan-admin-input" id="sp-price-brl" value="${p.priceBrl||0}" min="0" step="0.01" placeholder="Ex: 29,90">
+          <label class="plan-admin-label" style="margin-top:10px;display:block;">Link de pagamento (Mercado Pago)</label>
+          <input class="plan-admin-input" id="sp-payment-link" value="${esc(p.paymentLink||'')}" placeholder="https://mpago.la/...">
         </div>
         <div>
           <label class="plan-admin-label">Categoria (para filtro)</label>
@@ -3230,10 +3243,20 @@
     document.body.appendChild(modal);
   }
 
+  window.toggleSpCostType = function(){
+    const t = document.getElementById('sp-cost-type')?.value;
+    document.getElementById('sp-gbs-field').style.display = t==='gbs' ? 'block' : 'none';
+    document.getElementById('sp-brl-field').style.display = t==='brl' ? 'block' : 'none';
+  };
+
   window.saveStoreProduct = async function(id){
+    const costType = document.getElementById('sp-cost-type')?.value || 'gbs';
     const data = {
       name:        (document.getElementById('sp-name')?.value||'').trim(),
-      cost:        parseInt(document.getElementById('sp-cost')?.value||'1')||1,
+      costType,
+      cost:        costType==='gbs' ? (parseInt(document.getElementById('sp-cost')?.value||'1')||1) : 0,
+      priceBrl:    costType==='brl' ? (parseFloat(document.getElementById('sp-price-brl')?.value||'0')||0) : 0,
+      paymentLink: costType==='brl' ? (document.getElementById('sp-payment-link')?.value||'').trim() : '',
       emoji:       (document.getElementById('sp-emoji')?.value||'🎁').trim(),
       category:    (document.getElementById('sp-category')?.value||'Geral').trim(),
       imageUrl:    (document.getElementById('sp-image')?.value||'').trim(),
