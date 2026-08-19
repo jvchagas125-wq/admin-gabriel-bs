@@ -1753,7 +1753,8 @@
         </div>
 
         <div style="margin-bottom:10px;">
-
+          <span class="plan-admin-label">Link personalizado <span style="color:var(--text-dim);font-weight:400;font-size:10px;">— opcional, use para redirecionar o botão "Assinar" a um link específico (ex: checkout do Mercado Pago, WhatsApp, formulário, etc). Se vazio, usa o fluxo padrão de assinatura.</span></span>
+          <input class="plan-admin-input" id="p-mplink-${i}" value="${esc(p.mpLink||'')}" placeholder="https://...">
         </div>
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
@@ -1891,6 +1892,7 @@
       price:         (document.getElementById('p-price-'+i)?.value||'').trim(),
       originalPrice: (document.getElementById('p-original-'+i)?.value||'').trim(),
       discount:      (document.getElementById('p-discount-'+i)?.value||'').trim(),
+      mpLink:        (document.getElementById('p-mplink-'+i)?.value||'').trim(),
 
       featured:      document.getElementById('p-featured-'+i)?.checked||false,
       bestValue:     document.getElementById('p-bestvalue-'+i)?.checked||false,
