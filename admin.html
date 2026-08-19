@@ -1753,8 +1753,7 @@
         </div>
 
         <div style="margin-bottom:10px;">
-          <span class="plan-admin-label">Link de pagamento</span>
-          <input class="plan-admin-input" id="p-link-${i}" value="${esc(p.mpLink||'')}" placeholder="https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=...">
+
         </div>
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
@@ -1892,7 +1891,7 @@
       price:         (document.getElementById('p-price-'+i)?.value||'').trim(),
       originalPrice: (document.getElementById('p-original-'+i)?.value||'').trim(),
       discount:      (document.getElementById('p-discount-'+i)?.value||'').trim(),
-      mpLink:        (document.getElementById('p-link-'+i)?.value||'').trim(),
+
       featured:      document.getElementById('p-featured-'+i)?.checked||false,
       bestValue:     document.getElementById('p-bestvalue-'+i)?.checked||false,
       benefits:      collectBenefits(i),
@@ -3208,8 +3207,7 @@
         <div id="sp-brl-field" style="display:${p.costType==='brl'?'block':'none'};">
           <label class="plan-admin-label">Preço em R$</label>
           <input type="number" class="plan-admin-input" id="sp-price-brl" value="${p.priceBrl||0}" min="0" step="0.01" placeholder="Ex: 29,90">
-          <label class="plan-admin-label" style="margin-top:10px;display:block;">Link de pagamento (Mercado Pago)</label>
-          <input class="plan-admin-input" id="sp-payment-link" value="${esc(p.paymentLink||'')}" placeholder="https://mpago.la/...">
+
         </div>
         <div>
           <label class="plan-admin-label">Categoria (para filtro)</label>
@@ -3256,7 +3254,7 @@
       costType,
       cost:        costType==='gbs' ? (parseInt(document.getElementById('sp-cost')?.value||'1')||1) : 0,
       priceBrl:    costType==='brl' ? (parseFloat(document.getElementById('sp-price-brl')?.value||'0')||0) : 0,
-      paymentLink: costType==='brl' ? (document.getElementById('sp-payment-link')?.value||'').trim() : '',
+
       emoji:       (document.getElementById('sp-emoji')?.value||'🎁').trim(),
       category:    (document.getElementById('sp-category')?.value||'Geral').trim(),
       imageUrl:    (document.getElementById('sp-image')?.value||'').trim(),
@@ -3626,8 +3624,7 @@
             <input type="number" class="plan-admin-input" id="pkg-coins-${i}" value="${p.coins||0}" min="1"></div>
           <div><span class="plan-admin-label">Bônus GB$</span>
             <input type="number" class="plan-admin-input" id="pkg-bonus-${i}" value="${p.bonus||0}" min="0"></div>
-          <div><span class="plan-admin-label">Link Mercado Pago</span>
-            <input class="plan-admin-input" id="pkg-link-${i}" value="${esc(p.link||'')}"></div>
+
         </div>
       </div>`).join('');
   }
@@ -3649,7 +3646,7 @@
       price:  parseFloat(document.getElementById('pkg-price-'+i)?.value)||0,
       coins:  parseInt(document.getElementById('pkg-coins-'+i)?.value)||0,
       bonus:  parseInt(document.getElementById('pkg-bonus-'+i)?.value)||0,
-      link:   (document.getElementById('pkg-link-'+i)?.value||'').trim(),
+
       active: document.getElementById('pkg-active-'+i)?.checked!==false,
     }));
     try {
