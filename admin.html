@@ -759,7 +759,7 @@
       <div class="cfg-title">🪙 Configurações GB$</div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:14px;margin-top:14px;">
         <div>
-          <span class="plan-admin-label">GB$ por atendimento concluído</span>
+          <span class="plan-admin-label">GB$ padrão por atendimento <span style="font-size:10px;color:var(--text-dim);font-weight:500;text-transform:none;letter-spacing:0;">(usado só se o serviço não tiver valor próprio)</span></span>
           <input type="number" class="plan-admin-input" id="gb-coins-per-apt" placeholder="Ex: 1" value="1" min="1" step="1">
         </div>
         <div>
@@ -1262,31 +1262,56 @@
         : '<td style="color:var(--text-dim);font-size:12px;">—</td>';
       const alreadyDone = apt.done === true;
       const concludeBtn = (st==='passado'||st==='hoje') && !alreadyDone
-        ? '<button data-aid="'+apt.id+'" data-phone="'+(apt.phone||'')+'" data-name="'+(apt.name||'')+'" onclick="concludeApt(this)" style="padding:4px 10px;border-radius:6px;border:1px solid rgba(22,163,74,.3);background:none;color:#4ade80;font-size:11px;font-weight:600;cursor:pointer;margin-right:4px;" title="Marcar como concluído e dar 1 GB$ ao cliente">✅ Concluído</button>'
+        ? '<button data-aid="'+apt.id+'" data-phone="'+(apt.phone||'')+'" data-name="'+(apt.name||'')+'" data-service="'+esc(apt.service||'')+'" onclick="concludeApt(this)" style="padding:4px 10px;border-radius:6px;border:1px solid rgba(22,163,74,.3);background:none;color:#4ade80;font-size:11px;font-weight:600;cursor:pointer;margin-right:4px;" title="Marcar como concluído e creditar GB$ ao cliente">✅ Concluído</button>'
         : (alreadyDone ? '<span style="font-size:11px;color:#4ade80;font-weight:600;">✅ Concluído</span>&nbsp;' : '');
       return '<tr><td><strong>'+esc(apt.name)+'</strong></td><td style="color:var(--text-muted)">'+esc(apt.phone)+'</td><td>'+esc(apt.service)+'</td><td>'+fmtDate+'</td><td style="font-family:Bebas Neue,sans-serif;font-size:15px;color:var(--gold)">'+esc(apt.time)+'</td><td><span class="badge '+badgeClass+'">'+badgeLabel+'</span></td>'+justifyCell+'<td style="white-space:nowrap;">'+concludeBtn+'<button class="del-btn" onclick="deleteApt(\''+apt.id+'\')">Cancelar</button></td></tr>';
     }).join("");
   };
 
+  // Acha o GB$ configurado para um serviço pelo nome (aceita variações de maiúsculas/espaços).
+  // Quando o cliente agenda mais de um serviço na mesma consulta, o nome salvo vem
+  // combinado como "Cabelo + Barba" — nesse caso soma o GB$ de cada serviço encontrado.
+  function findServiceGBReward(serviceName){
+    const norm = s => String(s||'').trim().toLowerCase();
+    const target = norm(serviceName);
+    if(!target) return null;
+    // Tenta achar o serviço com o nome exato primeiro (cobre serviços combinados
+    // cadastrados como um único item, ex: "Cabelo & Barba").
+    const exact = adminServices.find(s => norm(s.name) === target);
+    if(exact) return parseInt(exact.gbReward)||0;
+    // Senão, tenta separar por " + " (formato usado quando o cliente escolhe
+    // múltiplos serviços em um mesmo agendamento) e soma o GB$ de cada parte.
+    if(serviceName.indexOf(' + ') !== -1){
+      const parts = serviceName.split(' + ').map(norm).filter(Boolean);
+      const matched = parts.map(p => adminServices.find(s => norm(s.name) === p)).filter(Boolean);
+      if(matched.length) return matched.reduce((sum,s)=>sum+(parseInt(s.gbReward)||0),0);
+    }
+    return null; // nenhum serviço reconhecido — usa o padrão da aba GB$
+  }
+
   window.concludeApt = async function(btn){
-    const id    = btn.dataset.aid;
-    const phone = btn.dataset.phone;
-    const name  = btn.dataset.name;
+    const id      = btn.dataset.aid;
+    const phone   = btn.dataset.phone;
+    const name    = btn.dataset.name;
+    const service = btn.dataset.service;
     if(!id || !phone) return;
     if(!(await showGBConfirm('✅ Concluir Atendimento','Marcar atendimento de <strong>'+name+'</strong> como concluído e creditar GB$ ao cliente?','Sim, concluir','Cancelar','green'))) return;
     const digits = phone.replace(/\D/g,'');
     try {
       // Marcar agendamento como concluído
       await setDoc(doc(db,COL,id),{done:true},{merge:true});
-      // Adicionar 1 GB$ à carteira do cliente
+      // Adicionar GB$ à carteira do cliente — usa o valor configurado no serviço;
+      // se o serviço não tiver valor próprio definido, usa o padrão da aba GB$.
       const walRef = doc(db,'wallets',digits);
       const walSnap = await getDoc(walRef);
-      // Buscar quantas moedas dar por atendimento
-      let coinsPerApt = 1;
-      try {
-        const cfgSnap = await getDoc(doc(db,'config','gb_store'));
-        if(cfgSnap.exists() && cfgSnap.data().coinsPerApt) coinsPerApt = parseInt(cfgSnap.data().coinsPerApt)||1;
-      } catch(e){}
+      let coinsPerApt = findServiceGBReward(service);
+      if(coinsPerApt === null){
+        coinsPerApt = 1;
+        try {
+          const cfgSnap = await getDoc(doc(db,'config','gb_store'));
+          if(cfgSnap.exists() && cfgSnap.data().coinsPerApt) coinsPerApt = parseInt(cfgSnap.data().coinsPerApt)||1;
+        } catch(e){}
+      }
       const cur = walSnap.exists() ? (walSnap.data().balance||0) : 0;
       await setDoc(walRef,{
         balance: cur + coinsPerApt,
@@ -1377,12 +1402,12 @@
 
   // ===== SERVIÇOS DINÂMICOS =====
   let adminServices = [
-    {name:'Cabelo',        price:'30,00', duration:45},
-    {name:'Barba',         price:'25,00', duration:15},
-    {name:'Pezinho',       price:'15,00', duration:15},
-    {name:'Cabelo & Barba',price:'50,00', duration:70},
-    {name:'Raspar Cabeça', price:'20,00', duration:15},
-    {name:'Sobrancelha',   price:'15,00', duration:15},
+    {name:'Cabelo',        price:'30,00', duration:45, gbReward:35},
+    {name:'Barba',         price:'25,00', duration:15, gbReward:35},
+    {name:'Pezinho',       price:'15,00', duration:15, gbReward:20},
+    {name:'Cabelo & Barba',price:'50,00', duration:70, gbReward:50},
+    {name:'Raspar Cabeça', price:'20,00', duration:15, gbReward:35},
+    {name:'Sobrancelha',   price:'15,00', duration:15, gbReward:20},
   ];
 
   async function loadAdminServices(){
@@ -1463,7 +1488,7 @@
   }
 
   window.addService = function(){
-    adminServices.push({name:'Novo Serviço', price:'0,00', duration:15});
+    adminServices.push({name:'Novo Serviço', price:'0,00', duration:15, gbReward:0});
     renderAllSvcUI();
   };
 
@@ -3907,7 +3932,7 @@
             <button onclick="removeSvcAdmin(${i})" class="cfg-rm-btn">Remover</button>
           </div>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:10px;">
           <div>
             <span class="plan-admin-label">Nome do serviço</span>
             <input class="plan-admin-input" id="svcadm-name-${i}" value="${esc(svc.name||'')}" placeholder="Ex: Cabelo">
@@ -3919,6 +3944,10 @@
           <div>
             <span class="plan-admin-label">Duração (min)</span>
             <input type="number" class="plan-admin-input" id="svcadm-dur-${i}" value="${svc.duration||15}" min="5" max="240" step="5">
+          </div>
+          <div>
+            <span class="plan-admin-label">🪙 GB$ ao concluir</span>
+            <input type="number" class="plan-admin-input" id="svcadm-gb-${i}" value="${svc.gbReward||0}" min="0" step="1" placeholder="Ex: 35">
           </div>
         </div>
         <div style="margin-bottom:8px;">
@@ -3963,6 +3992,7 @@
       name:     (document.getElementById('svcadm-name-'+i)?.value||'').trim(),
       price:    (document.getElementById('svcadm-price-'+i)?.value||'').trim(),
       duration: parseInt(document.getElementById('svcadm-dur-'+i)?.value)||15,
+      gbReward: parseInt(document.getElementById('svcadm-gb-'+i)?.value)||0,
       image:    (document.getElementById('svcadm-img-'+i)?.value||'').trim(),
       features: adminServices[i].features||[],
       emoji:    adminServices[i].emoji||'',
