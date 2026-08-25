@@ -2642,8 +2642,9 @@
       } catch(e){}
     }
 
-    // Buscar saldo GB$ e valor da moeda
+    // Buscar saldo GB$, saldo R$ e valor da moeda
     let gbBalance = 0;
+    let gbBalanceBrl = 0;
     let coinValue = 0.25;
     try {
       const [walSnap, cfgSnap] = await Promise.all([
@@ -2651,6 +2652,7 @@
         getDoc(doc(db,'config','gb_store')),
       ]);
       if(walSnap.exists()) gbBalance = walSnap.data().balance||0;
+      if(walSnap.exists()) gbBalanceBrl = walSnap.data().balanceBrl||0;
       if(cfgSnap.exists() && cfgSnap.data().coinValue) coinValue = parseFloat(cfgSnap.data().coinValue)||0.25;
     } catch(e){ console.warn('wallet fetch:',e); }
     info.innerHTML=
@@ -2670,6 +2672,14 @@
       +'<div style="flex:1;"><div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:2px;">Carteira GB$</div>'
       +'<div style="display:flex;align-items:baseline;gap:8px;"><span style="font-family:Bebas Neue,sans-serif;font-size:26px;color:var(--gold);">'+gbBalance+'</span><span style="font-size:12px;color:var(--text-muted);">GB$</span></div></div>'
       +'<button onclick="openEditGBModal(\'' +digits+ '\',\''+esc(clientData&&clientData.name||name||'')+'\',' +gbBalance+ ')" style="padding:7px 12px;border-radius:8px;border:1px solid var(--gold-border);background:var(--gold-dim);color:var(--gold);font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">🪙 +/− GB$</button>'
+      +'</div>'
+      +'</div>'
+      +'<div style="background:linear-gradient(135deg,#123322,#1a4d33);border:1px solid rgba(74,222,128,0.35);border-radius:10px;padding:12px 14px;margin-bottom:12px;">'
+      +'<div style="display:flex;align-items:center;gap:12px;">'
+      +'<div style="width:36px;height:36px;border-radius:50%;background:rgba(74,222,128,0.15);border:2px solid rgba(74,222,128,0.5);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:17px;">💰</div>'
+      +'<div style="flex:1;"><div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:2px;">Carteira R$ (saldo real)</div>'
+      +'<div style="display:flex;align-items:baseline;gap:8px;"><span style="font-family:Bebas Neue,sans-serif;font-size:26px;color:#4ade80;">R$ '+gbBalanceBrl.toFixed(2).replace('.',',')+'</span></div></div>'
+      +'<button onclick="openEditBrlModal(\'' +digits+ '\',\''+esc(clientData&&clientData.name||name||'')+'\',' +gbBalanceBrl+ ')" style="padding:7px 12px;border-radius:8px;border:1px solid rgba(74,222,128,0.4);background:rgba(74,222,128,0.12);color:#4ade80;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">💰 +/− R$</button>'
       +'</div>'
       +'</div>'
       +'<div style="background:var(--bg3);border-radius:10px;padding:14px;margin-bottom:12px;">'
@@ -4134,6 +4144,85 @@
         }
         document.body.removeChild(modal);
         showToast(label+' '+(isAdd?'creditados':'removidos')+' para '+esc(clientName||digits)+'!', isAdd?'green':'red');
+      } catch(e){ showToast('Erro: '+e.message,'red'); }
+    };
+    modal.onclick = e=>{ if(e.target===modal) document.body.removeChild(modal); };
+  };
+
+
+  // ─── Creditar / Remover saldo R$ manual (depósitos confirmados por fora, ex: Pix combinado) ───
+  window.openEditBrlModal = function(digits, clientName, currentBalance){
+    const modal = document.createElement('div');
+    modal.id = 'credit-brl-modal';
+    modal.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.75);display:flex;align-items:center;justify-content:center;';
+    const bal = parseFloat(currentBalance)||0;
+    modal.innerHTML = `
+      <div style="background:var(--bg2);border:1px solid rgba(74,222,128,0.35);border-radius:18px;padding:28px 24px;width:90%;max-width:360px;animation:slideUp .25s ease-out;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:#4ade80;margin-bottom:4px;">💰 Gerenciar Saldo R$</div>
+        <div style="font-size:13px;color:var(--text-muted);margin-bottom:6px;">Cliente: <strong style="color:var(--text);">${esc(clientName||digits)}</strong></div>
+        <div style="font-size:13px;color:var(--text-muted);margin-bottom:18px;">Saldo atual: <strong style="color:#4ade80;">R$ ${bal.toFixed(2).replace('.',',')}</strong></div>
+
+        <!-- Tipo de operação -->
+        <div style="display:flex;gap:8px;margin-bottom:16px;">
+          <button id="brl-op-add" onclick="setBrlOp('add')" style="flex:1;padding:9px;border-radius:9px;border:2px solid #4ade80;background:rgba(74,222,128,0.12);color:#4ade80;font-family:'DM Sans',sans-serif;font-weight:700;font-size:13px;cursor:pointer;">+ Creditar</button>
+          <button id="brl-op-remove" onclick="setBrlOp('remove')" style="flex:1;padding:9px;border-radius:9px;border:1px solid rgba(220,38,38,0.3);background:none;color:var(--text-muted);font-family:'DM Sans',sans-serif;font-weight:700;font-size:13px;cursor:pointer;">− Remover</button>
+        </div>
+
+        <div style="margin-bottom:8px;">
+          <label style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px;">Valor em R$</label>
+          <input type="number" id="edit-brl-amount" min="0.01" step="0.01" placeholder="Ex: 50,00" style="width:100%;padding:12px 14px;border-radius:10px;background:var(--bg3);border:1px solid rgba(255,255,255,0.1);color:var(--text);font-family:'DM Sans',sans-serif;font-size:16px;box-sizing:border-box;">
+        </div>
+        <div style="font-size:11px;color:var(--text-dim);margin-bottom:16px;line-height:1.5;">Use isto para creditar um depósito confirmado por fora (ex: Pix combinado direto com o cliente) ou corrigir o saldo manualmente.</div>
+        <div style="display:flex;gap:10px;">
+          <button id="edit-brl-cancel" style="flex:1;padding:11px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);background:none;color:var(--text-muted);font-family:'DM Sans',sans-serif;font-weight:600;font-size:14px;cursor:pointer;">Cancelar</button>
+          <button id="edit-brl-confirm" style="flex:1;padding:11px;border-radius:10px;border:none;background:#16a34a;color:#fff;font-family:'DM Sans',sans-serif;font-weight:700;font-size:14px;cursor:pointer;">Confirmar</button>
+        </div>
+      </div>`;
+    document.body.appendChild(modal);
+
+    let brlOp = 'add';
+    window.setBrlOp = function(op){
+      brlOp = op;
+      const addBtn = modal.querySelector('#brl-op-add');
+      const rmBtn  = modal.querySelector('#brl-op-remove');
+      if(op==='add'){
+        addBtn.style.cssText += 'border:2px solid #4ade80;background:rgba(74,222,128,0.12);color:#4ade80;';
+        rmBtn.style.cssText  += 'border:1px solid rgba(220,38,38,0.3);background:none;color:var(--text-muted);';
+      } else {
+        rmBtn.style.cssText  += 'border:2px solid #f87171;background:rgba(220,38,38,0.12);color:#f87171;';
+        addBtn.style.cssText += 'border:1px solid rgba(74,222,128,0.35);background:none;color:var(--text-muted);';
+      }
+    };
+
+    setTimeout(()=>modal.querySelector('#edit-brl-amount').focus(), 100);
+    modal.querySelector('#edit-brl-cancel').onclick = ()=>document.body.removeChild(modal);
+    modal.querySelector('#edit-brl-confirm').onclick = async ()=>{
+      const amount = parseFloat((modal.querySelector('#edit-brl-amount').value||'').replace(',','.'))||0;
+      if(amount<=0){ showToast('Informe um valor válido.','red'); return; }
+      const isAdd = brlOp==='add';
+      const amountFmt = 'R$ '+amount.toFixed(2).replace('.',',');
+      const label = (isAdd?'+':'−')+amountFmt;
+      const confirmed = await showGBConfirm(
+        isAdd ? '💰 Confirmar Crédito' : '💰 Confirmar Remoção',
+        (isAdd
+          ? 'Deseja creditar <strong style="color:#4ade80;">+'+amountFmt+'</strong>'
+          : 'Deseja remover <strong style="color:#f87171;">−'+amountFmt+'</strong>')+
+          ' do saldo R$ de <strong>'+esc(clientName||digits)+'</strong>?',
+        'Sim, confirmar', 'Cancelar',
+        isAdd ? 'green' : 'red'
+      );
+      if(!confirmed) return;
+      try {
+        const walRef = doc(db,'wallets',digits);
+        const walSnap = await getDoc(walRef);
+        const cur = walSnap.exists() ? (walSnap.data().balanceBrl||0) : 0;
+        const newBal = isAdd ? cur+amount : Math.max(0, cur-amount);
+        await setDoc(walRef,{ balanceBrl:newBal, digits, updatedAt:new Date().toISOString() },{merge:true});
+        if(isAdd){
+          await sendPersonalNotification(digits,'💰 '+amountFmt+' creditados!','Gabriel adicionou '+amountFmt+' ao seu saldo. Aproveite na loja!');
+        }
+        document.body.removeChild(modal);
+        showToast(amountFmt+' '+(isAdd?'creditados':'removidos')+' para '+esc(clientName||digits)+'!', isAdd?'green':'red');
       } catch(e){ showToast('Erro: '+e.message,'red'); }
     };
     modal.onclick = e=>{ if(e.target===modal) document.body.removeChild(modal); };
