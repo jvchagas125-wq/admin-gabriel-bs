@@ -72,6 +72,36 @@
     .export-btn{padding:8px 16px;border-radius:8px;border:1px solid var(--gold-border);background:var(--gold-dim);color:var(--gold);font-size:12px;font-weight:700;cursor:pointer;transition:background .15s;white-space:nowrap}
     .export-btn:hover{background:rgba(201,168,76,.25)}
     .table-wrap{overflow-x:auto;border-radius:12px;border:1px solid rgba(255,255,255,0.06)}
+    /* Blocos recolhíveis (lista fechada → abre ao clicar) */
+    .coll{background:var(--bg2);border:1px solid rgba(255,255,255,0.06);border-radius:12px;margin-bottom:22px;overflow:hidden}
+    .coll>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:12px;padding:14px 16px;user-select:none;transition:background .15s}
+    .coll>summary::-webkit-details-marker{display:none}
+    .coll>summary::marker{content:''}
+    .coll>summary:hover{background:rgba(255,255,255,0.03)}
+    .coll[open]>summary{border-bottom:1px solid rgba(255,255,255,0.06)}
+    .coll-title{font-family:"Bebas Neue",sans-serif;font-size:19px;letter-spacing:.3px;color:var(--gold)}
+    .coll-hint{flex:1;text-align:right;font-size:12px;color:var(--text-dim)}
+    .coll-arrow{width:28px;height:28px;border-radius:8px;border:1px solid var(--gold-border);background:var(--gold-dim);color:var(--gold);display:flex;align-items:center;justify-content:center;font-size:14px;line-height:1;transition:transform .2s;flex-shrink:0}
+    .coll[open]>summary .coll-arrow{transform:rotate(180deg)}
+    .coll-body{padding:16px}
+    @media(max-width:600px){
+      .coll>summary{flex-wrap:wrap;row-gap:4px}
+      .coll-title{flex:1}
+      .coll-hint{order:3;flex:1 1 100%;text-align:left}
+    }
+    /* Reserva do administrador */
+    .adm-field-label{display:block;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px}
+    .adm-chip{padding:8px 14px;border-radius:20px;border:1px solid rgba(255,255,255,0.12);background:var(--bg3);color:var(--text);font-size:13px;font-weight:600;font-family:"DM Sans",sans-serif;cursor:pointer;transition:all .15s}
+    .adm-chip span{font-size:11px;color:var(--text-dim);font-weight:500;margin-left:4px}
+    .adm-chip.on{background:var(--gold-dim);border-color:var(--gold);color:var(--gold-light)}
+    .adm-slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:8px}
+    .adm-slot{padding:9px 4px;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:var(--bg3);color:var(--text);font-size:13px;font-weight:600;font-family:"DM Sans",sans-serif;cursor:pointer;transition:all .15s}
+    .adm-slot:hover:not(:disabled){border-color:var(--gold)}
+    .adm-slot.on{background:var(--gold);border-color:var(--gold);color:#1a1a1a}
+    .adm-slot:disabled{opacity:.35;cursor:not-allowed;text-decoration:line-through}
+    .adm-note{font-size:13px;color:var(--text-dim);padding:6px 0}
+    @media(max-width:600px){#adm-book-grid,#adm-client-form{grid-template-columns:1fr!important}}
+    .adm-tag{display:inline-block;white-space:nowrap;margin-top:4px;padding:2px 8px;border-radius:10px;border:1px solid var(--gold-border);background:var(--gold-dim);color:var(--gold-light);font-size:10px;font-weight:700;letter-spacing:.3px}
     table{width:100%;border-collapse:collapse}
     thead{background:var(--bg2)}
     th{padding:12px 16px;text-align:left;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);white-space:nowrap;cursor:pointer;user-select:none;border-bottom:1px solid rgba(255,255,255,0.06)}
@@ -580,6 +610,44 @@
   </div>
 
 
+  <!-- RESERVAR COMO ADMINISTRADOR -->
+  <details class="coll" id="admin-book-card" ontoggle="if(this.open) admInitBookForm()">
+    <summary>
+      <span class="coll-title">📌 Reservar como Administrador</span>
+      <span class="coll-hint">Clique aqui para abrir o formulário</span>
+      <span class="coll-arrow">▾</span>
+    </summary>
+    <div class="coll-body">
+      <div style="font-size:12px;color:var(--text-dim);margin-bottom:14px;line-height:1.5;">Reserva um horário para uma pessoa. O agendamento fica marcado como <strong style="color:var(--gold-light);">reservado pelo administrador</strong> e <strong>não entra no ranking</strong>.</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;" id="adm-book-grid">
+        <div>
+          <label class="adm-field-label" for="adm-book-name">Nome do cliente</label>
+          <input class="plan-admin-input" id="adm-book-name" type="text" placeholder="Nome e sobrenome" autocomplete="off">
+        </div>
+        <div>
+          <label class="adm-field-label" for="adm-book-phone">Telefone <span style="text-transform:none;letter-spacing:0;font-weight:500;color:var(--text-dim);">(opcional)</span></label>
+          <input class="plan-admin-input" id="adm-book-phone" type="tel" placeholder="(22) 99999-9999" inputmode="numeric" oninput="admMaskPhone(this)">
+        </div>
+      </div>
+      <div style="margin-bottom:14px;">
+        <span class="adm-field-label">Serviço(s)</span>
+        <div id="adm-book-services" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+      </div>
+      <div style="margin-bottom:14px;max-width:260px;">
+        <label class="adm-field-label" for="adm-book-date">Data</label>
+        <input class="plan-admin-input" id="adm-book-date" type="date" onchange="admRenderSlots()">
+      </div>
+      <div style="margin-bottom:16px;">
+        <span class="adm-field-label">Horário</span>
+        <div id="adm-book-slots" class="adm-slots"><div class="adm-note" style="grid-column:1/-1;">Escolha a data para ver os horários.</div></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+        <button class="export-btn" id="adm-book-btn" onclick="admSubmitBooking()" style="padding:10px 20px;font-size:13px;">📌 Reservar horário</button>
+        <span id="adm-book-summary" style="font-size:12px;color:var(--text-dim);"></span>
+      </div>
+    </div>
+  </details>
+
   <div class="toolbar">
     <div class="toolbar-title">Agendamentos</div>
     <input class="search-input" type="search" id="search" placeholder="Buscar nome ou telefone..." oninput="renderTable()">
@@ -911,6 +979,34 @@
 
   <div id="tab-sessions" style="display:none;">
 
+    <!-- CADASTRAR CLIENTE -->
+    <div style="margin-bottom:24px;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;background:linear-gradient(135deg,#c9a84c,#f0d78c,#c9a84c);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:14px;">➕ Cadastrar Cliente</div>
+      <div style="background:var(--bg2);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:16px;margin-bottom:12px;">
+        <div style="display:grid;grid-template-columns:1.4fr 1fr auto;gap:12px;align-items:end;" id="adm-client-form">
+          <div>
+            <label class="adm-field-label" for="adm-client-name">Nome e sobrenome</label>
+            <input class="plan-admin-input" id="adm-client-name" type="text" placeholder="Ex: João Silva" autocomplete="off" onkeydown="if(event.key==='Enter') document.getElementById('adm-client-phone').focus()">
+          </div>
+          <div>
+            <label class="adm-field-label" for="adm-client-phone">Telefone</label>
+            <input class="plan-admin-input" id="adm-client-phone" type="tel" placeholder="(22) 99999-9999" inputmode="numeric" oninput="admMaskPhone(this)" onkeydown="if(event.key==='Enter') admRegisterClient()">
+          </div>
+          <button class="export-btn" id="adm-client-btn" onclick="admRegisterClient()" style="padding:10px 18px;font-size:13px;">Cadastrar</button>
+        </div>
+      </div>
+      <details class="coll" style="margin-bottom:0;" ontoggle="if(this.open) renderAdminClientsList()">
+        <summary>
+          <span class="coll-title">📋 Clientes cadastrados por você <span id="adm-clients-count" style="color:var(--text-dim);font-size:14px;"></span></span>
+          <span class="coll-hint">Clique aqui para ver a lista</span>
+          <span class="coll-arrow">▾</span>
+        </summary>
+        <div id="adm-clients-list" style="overflow-x:auto;">
+          <div style="padding:20px;text-align:center;color:var(--text-dim);font-size:13px;">Nenhum cliente cadastrado por você ainda.</div>
+        </div>
+      </details>
+    </div>
+
     <!-- TOP 3 EM DESTAQUE -->
     <div style="margin-bottom:24px;">
       <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;background:linear-gradient(135deg,#c9a84c,#f0d78c,#c9a84c);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:14px;">🏆 Top 3 em Destaque</div>
@@ -936,28 +1032,42 @@
       </div>
     </div>
 
-    <!-- TOP 30 LISTA COMPLETA -->
-    <div style="margin-bottom:28px;">
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--gold);margin-bottom:10px;">📊 Ranking Completo — Top 30</div>
-      <div id="top30-list" style="background:var(--bg2);border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,0.06);"></div>
-    </div>
+    <!-- TOP 30 LISTA COMPLETA (recolhida) -->
+    <details class="coll">
+      <summary>
+        <span class="coll-title">📊 Ranking Completo — Top 30</span>
+        <span class="coll-hint">Clique aqui para ver a lista</span>
+        <span class="coll-arrow">▾</span>
+      </summary>
+      <div id="top30-list" style="overflow-x:auto;"></div>
+    </details>
 
-    <!-- RANKING GB$ -->
-    <div style="margin-bottom:28px;">
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--gold);margin-bottom:10px;">🪙 Ranking GB$ — Clientes com Saldo</div>
-      <div id="gbs-ranking-list" style="background:var(--bg2);border-radius:12px;overflow:hidden;border:1px solid rgba(201,168,76,0.2);">
+    <!-- RANKING GB$ (recolhido) -->
+    <details class="coll">
+      <summary>
+        <span class="coll-title">🪙 Ranking GB$ — Clientes com Saldo</span>
+        <span class="coll-hint">Clique aqui para ver a lista</span>
+        <span class="coll-arrow">▾</span>
+      </summary>
+      <div id="gbs-ranking-list" style="overflow-x:auto;">
         <div style="text-align:center;padding:20px;color:var(--text-dim);font-size:13px;">Carregando...</div>
       </div>
-    </div>
+    </details>
 
-    <!-- Lista de clientes -->
-    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;background:linear-gradient(135deg,#c9a84c,#f0d78c,#c9a84c);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">👥 Todos os Clientes</div>
-      <input class="search-input" type="search" id="sessions-search" placeholder="Buscar cliente..." oninput="filterSessions()" style="width:220px;">
-    </div>
-    <div id="sessions-list" class="table-wrap fade-in">
-      <div style="text-align:center;padding:40px 0;"><div class="spinner" style="margin:0 auto;"></div></div>
-    </div>
+    <!-- Lista de clientes (recolhida) -->
+    <details class="coll">
+      <summary>
+        <span class="coll-title">👥 Todos os Clientes</span>
+        <span class="coll-hint">Clique aqui para ver a lista</span>
+        <span class="coll-arrow">▾</span>
+      </summary>
+      <div style="padding:14px 16px 0;">
+        <input class="search-input" type="search" id="sessions-search" placeholder="Buscar cliente..." oninput="filterSessions()" style="width:100%;max-width:320px;">
+      </div>
+      <div id="sessions-list" class="fade-in" style="overflow-x:auto;padding-top:10px;">
+        <div style="text-align:center;padding:40px 0;"><div class="spinner" style="margin:0 auto;"></div></div>
+      </div>
+    </details>
 
     <!-- Modal detalhe do cliente -->
     <div id="client-modal" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.8);align-items:center;justify-content:center;">
@@ -1133,7 +1243,7 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getFirestore, collection, deleteDoc, doc, onSnapshot, setDoc, getDoc, getDocs, query, orderBy, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot, setDoc, getDoc, getDocs, query, orderBy, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
   import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
   const firebaseConfig = {
@@ -1219,7 +1329,7 @@
     document.getElementById("stat-total").textContent=real.length;
     document.getElementById("stat-today").textContent=real.filter(a=>a.date===today).length;
     document.getElementById("stat-week").textContent=real.filter(a=>a.date>=today&&a.date<=weekEnd).length;
-    document.getElementById("stat-clients").textContent=new Set(real.map(a=>a.phone)).size;
+    document.getElementById("stat-clients").textContent=new Set(real.map(a=>a.phone).filter(Boolean)).size;
     document.getElementById("stat-today-date").textContent=new Date().toLocaleDateString("pt-BR",{weekday:"long",day:"numeric",month:"short"});
   }
 
@@ -1238,7 +1348,7 @@
     const fStatus=document.getElementById("filter-status").value;
     const fSvc=document.getElementById("filter-service").value;
     let data=allData.filter(a=>a.status!=='Bloqueado' && !a.done);
-    if(search) data=data.filter(a=>a.name.toLowerCase().includes(search)||a.phone.includes(search));
+    if(search) data=data.filter(a=>(a.name||'').toLowerCase().includes(search)||(a.phone||'').includes(search));
     if(fStatus) data=data.filter(a=>getStatusType(a)===fStatus);
     if(fSvc) data=data.filter(a=>a.service===fSvc);
     data.sort((a,b)=>{
@@ -1264,7 +1374,8 @@
       const concludeBtn = (st==='passado'||st==='hoje') && !alreadyDone
         ? '<button data-aid="'+apt.id+'" data-phone="'+(apt.phone||'')+'" data-name="'+(apt.name||'')+'" data-service="'+esc(apt.service||'')+'" onclick="concludeApt(this)" style="padding:4px 10px;border-radius:6px;border:1px solid rgba(22,163,74,.3);background:none;color:#4ade80;font-size:11px;font-weight:600;cursor:pointer;margin-right:4px;" title="Marcar como concluído e creditar GB$ ao cliente">✅ Concluído</button>'
         : (alreadyDone ? '<span style="font-size:11px;color:#4ade80;font-weight:600;">✅ Concluído</span>&nbsp;' : '');
-      return '<tr><td><strong>'+esc(apt.name)+'</strong></td><td style="color:var(--text-muted)">'+esc(apt.phone)+'</td><td>'+esc(apt.service)+'</td><td>'+fmtDate+'</td><td style="font-family:Bebas Neue,sans-serif;font-size:15px;color:var(--gold)">'+esc(apt.time)+'</td><td><span class="badge '+badgeClass+'">'+badgeLabel+'</span></td>'+justifyCell+'<td style="white-space:nowrap;">'+concludeBtn+'<button class="del-btn" onclick="deleteApt(\''+apt.id+'\')">Cancelar</button></td></tr>';
+      const adminTag = apt.bookedBy==='admin' ? '<div><span class="adm-tag">👤 Reservado pelo administrador</span></div>' : '';
+      return '<tr><td><strong>'+esc(apt.name)+'</strong>'+adminTag+'</td><td style="color:var(--text-muted)">'+(esc(apt.phone)||'—')+'</td><td>'+esc(apt.service)+'</td><td>'+fmtDate+'</td><td style="font-family:Bebas Neue,sans-serif;font-size:15px;color:var(--gold)">'+esc(apt.time)+'</td><td><span class="badge '+badgeClass+'">'+badgeLabel+'</span></td>'+justifyCell+'<td style="white-space:nowrap;">'+concludeBtn+'<button class="del-btn" onclick="deleteApt(\''+apt.id+'\')">Cancelar</button></td></tr>';
     }).join("");
   };
 
@@ -1294,7 +1405,16 @@
     const phone   = btn.dataset.phone;
     const name    = btn.dataset.name;
     const service = btn.dataset.service;
-    if(!id || !phone) return;
+    if(!id) return;
+    // Reserva do administrador para pessoa sem telefone/perfil: conclui sem creditar GB$
+    if(!phone){
+      if(!(await showGBConfirm('✅ Concluir Atendimento','Marcar atendimento de <strong>'+esc(name)+'</strong> como concluído? Como não há telefone informado, nenhum GB$ será creditado.','Sim, concluir','Cancelar','green'))) return;
+      try {
+        await setDoc(doc(db,COL,id),{done:true},{merge:true});
+        showToast('Atendimento de '+name+' concluído (sem GB$: reserva sem telefone)','green');
+      } catch(e){ console.error(e); showToast('Erro: '+e.message,'red'); }
+      return;
+    }
     if(!(await showGBConfirm('✅ Concluir Atendimento','Marcar atendimento de <strong>'+name+'</strong> como concluído e creditar GB$ ao cliente?','Sim, concluir','Cancelar','green'))) return;
     const digits = phone.replace(/\D/g,'');
     try {
@@ -2412,6 +2532,304 @@
 
 
   // ═══════════════════════════════════════
+  // RANKING — quem fica de fora
+  // ═══════════════════════════════════════
+  // O barbeiro (Gabriel Ferreira) só agenda manualmente para outras pessoas, por isso
+  // não aparece em nenhum ranking. Ele é identificado pelo telefone.
+  // Reservas feitas pelo administrador (bookedBy:'admin') também nunca entram no ranking.
+  const RANKING_EXCLUDED_DIGITS = ['22997035391'];
+  function isRankingExcluded(digits){
+    return RANKING_EXCLUDED_DIGITS.includes(String(digits||'').replace(/\D/g,''));
+  }
+
+  // ═══════════════════════════════════════
+  // RESERVA COMO ADMINISTRADOR
+  // ═══════════════════════════════════════
+  let admSelectedSvcs = [];
+  let admSelectedTime = '';
+
+  function escAttr(s){ return esc(s).replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+
+  // Mesmo formato que o site do cliente grava: (22) 99999-9999
+  function fmtPhoneBR(raw){
+    const d = String(raw||'').replace(/\D/g,'');
+    if(d.length===11) return '('+d.slice(0,2)+') '+d.slice(2,7)+'-'+d.slice(7);
+    if(d.length===10) return '('+d.slice(0,2)+') '+d.slice(2,6)+'-'+d.slice(6);
+    return String(raw||'');
+  }
+
+  window.admMaskPhone = function(el){
+    let v = el.value.replace(/\D/g,''); if(v.length>11) v = v.slice(0,11);
+    let out = '';
+    if(v.length>0) out = '('+v.slice(0,2);
+    if(v.length>=3) out += ') '+v.slice(2, v.length<=10?6:7);
+    if(v.length>=7) out += '-'+v.slice(v.length<=10?6:7);
+    el.value = out;
+  };
+
+  // — horários (mesma regra do site: dias abertos, intervalos, fechamentos pontuais) —
+  const ADM_DOW = {0:'sun',1:'mon',2:'tue',3:'wed',4:'thu',5:'fri',6:'sat'};
+  function admCfg(){ return currentSettings || {}; }
+  function admInterval(){ return parseInt(admCfg().slotInterval) || 15; }
+  function admBuffer(){ return admCfg().buffer || 5; }
+
+  function admMakeSlots(startStr, endStr){
+    const slots = [];
+    const interval = admInterval();
+    let [h,m] = startStr.split(':').map(Number);
+    const [eh,em] = endStr.split(':').map(Number);
+    while(h<eh || (h===eh && m<em)){
+      slots.push(pad(h)+':'+pad(m));
+      m += interval; if(m>=60){ h += Math.floor(m/60); m = m%60; }
+    }
+    return slots;
+  }
+
+  function admSlotsForDate(dateStr){
+    if(!dateStr) return [];
+    const cfg = admCfg();
+    const dow = new Date(dateStr+'T12:00:00').getDay();
+    const key = ADM_DOW[dow];
+    const dayCfg = cfg.days && cfg.days[key];
+    if(!dayCfg || !dayCfg.open) return [];
+    let all = admMakeSlots(dayCfg.start, dayCfg.end);
+    (cfg.breaks||[]).filter(b=>(b.days||[]).includes(key)).forEach(br=>{
+      const brSlots = admMakeSlots(br.start, br.end);
+      all = all.filter(s=>!brSlots.includes(s));
+    });
+    (cfg.specificBreaks||[]).filter(b=>{
+      if(!b.date) return false;
+      if(b.date.trim()===dateStr) return true;
+      if(b.repeatWeekly){
+        return new Date(b.date+'T12:00:00').getDay()===dow && b.date.trim()<=dateStr;
+      }
+      return false;
+    }).forEach(sb=>{
+      const [sh,sm] = sb.start.split(':').map(Number);
+      const [eh,em] = sb.end.split(':').map(Number);
+      all = all.filter(s=>{
+        const [h,m] = s.split(':').map(Number);
+        const t = h*60+m;
+        return t < sh*60+sm || t >= eh*60+em;
+      });
+    });
+    return all;
+  }
+
+  function admExtraSlots(startTime, count){
+    const all = admMakeSlots('00:00','24:00');
+    const idx = all.indexOf(startTime);
+    if(idx<0) return [];
+    return all.slice(idx+1, idx+count+1);
+  }
+
+  function admTotalDuration(){
+    return admSelectedSvcs.reduce((sum,n)=>{
+      const s = adminServices.find(x=>x.name===n);
+      return sum + (s ? (parseInt(s.duration)||15) : 15);
+    }, 0);
+  }
+
+  // Horários já ocupados na data (agendamentos, bloqueios e tempo extra dos serviços)
+  function admBookedTimes(date){
+    const set = new Set();
+    const interval = admInterval(), buf = admBuffer();
+    allData.filter(a=>a.date===date).forEach(a=>{
+      set.add(a.time);
+      (a.extraSlots||[]).forEach(e=>set.add(e));
+      if(a.status!=='Bloqueado'){
+        const s = adminServices.find(x=>x.name===a.service);
+        const d = s ? (parseInt(s.duration)||interval) : interval;
+        const n = d<=interval ? 0 : Math.ceil((d+buf)/interval)-1;
+        if(n>0) admExtraSlots(a.time, n).forEach(e=>set.add(e));
+      }
+    });
+    return set;
+  }
+
+  window.admInitBookForm = function(){
+    const dateEl = document.getElementById('adm-book-date');
+    if(dateEl) dateEl.min = getTodayStr();
+    admRenderChips();
+  };
+
+  function admRenderChips(){
+    const box = document.getElementById('adm-book-services');
+    if(!box) return;
+    admSelectedSvcs = admSelectedSvcs.filter(n=>adminServices.some(s=>s.name===n));
+    box.innerHTML = adminServices.map(s=>
+      '<button type="button" class="adm-chip'+(admSelectedSvcs.includes(s.name)?' on':'')+'" data-name="'+escAttr(s.name)+'" onclick="admToggleSvc(this)">'
+      +esc(s.name)+'<span>'+(parseInt(s.duration)||15)+'min</span></button>'
+    ).join('');
+  }
+
+  window.admToggleSvc = function(btn){
+    const n = btn.dataset.name;
+    const i = admSelectedSvcs.indexOf(n);
+    if(i>=0) admSelectedSvcs.splice(i,1); else admSelectedSvcs.push(n);
+    btn.classList.toggle('on', i<0);
+    admRenderSlots(); // a duração mudou → recalcula quais horários cabem
+  };
+
+  window.admRenderSlots = function(){
+    const box = document.getElementById('adm-book-slots');
+    if(!box) return;
+    const date = (document.getElementById('adm-book-date')||{}).value;
+    admSelectedTime = '';
+    if(!date){
+      box.innerHTML = '<div class="adm-note" style="grid-column:1/-1;">Escolha a data para ver os horários.</div>';
+      admUpdateSummary(); return;
+    }
+    const slots = admSlotsForDate(date);
+    if(!slots.length){
+      box.innerHTML = '<div class="adm-note" style="grid-column:1/-1;">Sem atendimento neste dia (fechado nas Configurações).</div>';
+      admUpdateSummary(); return;
+    }
+    const interval = admInterval();
+    const dur = admSelectedSvcs.length ? admTotalDuration() : interval;
+    const extraCount = dur<=interval ? 0 : Math.ceil((dur+admBuffer())/interval)-1;
+    const booked = admBookedTimes(date);
+    const now = new Date();
+    const nowMin = date===getTodayStr() ? now.getHours()*60+now.getMinutes() : -1;
+    box.innerHTML = slots.map(t=>{
+      const extras = extraCount>0 ? admExtraSlots(t, extraCount) : [];
+      const extrasOk = extras.length===extraCount && extras.every(e=>slots.includes(e));
+      const [h,m] = t.split(':').map(Number);
+      const past = nowMin>=0 && (h*60+m)<=nowMin;
+      const busy = [t,...extras].some(x=>booked.has(x));
+      const off = busy || !extrasOk || past;
+      return '<button type="button" class="adm-slot" data-time="'+t+'"'+(off?' disabled':'')+' onclick="admPickSlot(this)">'+t+'</button>';
+    }).join('');
+    admUpdateSummary();
+  };
+
+  window.admPickSlot = function(btn){
+    admSelectedTime = btn.dataset.time;
+    document.querySelectorAll('#adm-book-slots .adm-slot').forEach(b=>b.classList.toggle('on', b===btn));
+    admUpdateSummary();
+  };
+
+  function admUpdateSummary(){
+    const el = document.getElementById('adm-book-summary');
+    if(!el) return;
+    const date = (document.getElementById('adm-book-date')||{}).value;
+    if(admSelectedTime && date){
+      const d = new Date(date+'T12:00:00').toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'short'});
+      el.textContent = d+' às '+admSelectedTime+(admSelectedSvcs.length?' · '+admTotalDuration()+' min':'');
+    } else {
+      el.textContent = '';
+    }
+  }
+
+  window.admSubmitBooking = async function(){
+    const name   = document.getElementById('adm-book-name').value.trim().replace(/\s+/g,' ');
+    const digits = document.getElementById('adm-book-phone').value.replace(/\D/g,'');
+    const date   = document.getElementById('adm-book-date').value;
+    const time   = admSelectedTime;
+    if(!name){ showToast('Informe o nome do cliente','red'); return; }
+    if(digits && (digits.length<10 || digits.length>11)){ showToast('Telefone inválido — corrija ou deixe em branco','red'); return; }
+    if(!admSelectedSvcs.length){ showToast('Selecione pelo menos um serviço','red'); return; }
+    if(!date){ showToast('Selecione a data','red'); return; }
+    if(!time){ showToast('Selecione o horário','red'); return; }
+
+    const interval = admInterval();
+    const dur = admTotalDuration();
+    const extraCount = dur<=interval ? 0 : Math.ceil((dur+admBuffer())/interval)-1;
+    const extras = extraCount>0 ? admExtraSlots(time, extraCount) : [];
+    // Confere de novo (alguém pode ter agendado enquanto o formulário estava aberto)
+    const booked = admBookedTimes(date);
+    if([time,...extras].some(t=>booked.has(t))){
+      showToast('Esse horário acabou de ser ocupado. Escolha outro.','red');
+      admRenderSlots(); return;
+    }
+
+    const phone   = digits ? fmtPhoneBR(digits) : '';
+    const service = admSelectedSvcs.join(' + ');
+    const btn = document.getElementById('adm-book-btn');
+    btn.disabled = true;
+    try {
+      const nowIso = new Date().toISOString();
+      const data = { name, phone, service, date, time, status:'Confirmado', bookedBy:'admin', createdAt:nowIso };
+      if(extras.length) data.extraSlots = extras;
+      await addDoc(collection(db,COL), data);
+      // Tempo extra do serviço fica bloqueado (mesmo padrão do site do cliente)
+      for(const extra of extras){
+        await addDoc(collection(db,COL), { name, phone, service, date, time:extra, status:'Bloqueado', blockedBy:time, bookedBy:'admin', createdAt:nowIso });
+      }
+      showToast('Reserva criada para '+name+'!','green');
+      document.getElementById('adm-book-name').value = '';
+      document.getElementById('adm-book-phone').value = '';
+      document.getElementById('adm-book-date').value = '';
+      admSelectedSvcs = [];
+      admRenderChips();
+      admRenderSlots();
+    } catch(e){
+      console.error('admSubmitBooking', e);
+      showToast('Erro ao reservar: '+(e.code||e.message),'red');
+    } finally {
+      btn.disabled = false;
+    }
+  };
+
+  // ═══════════════════════════════════════
+  // CADASTRO DE CLIENTES PELO ADMIN
+  // ═══════════════════════════════════════
+  window.admRegisterClient = async function(){
+    const nameEl  = document.getElementById('adm-client-name');
+    const phoneEl = document.getElementById('adm-client-phone');
+    const name    = nameEl.value.trim().replace(/\s+/g,' ');
+    const digits  = phoneEl.value.replace(/\D/g,'');
+    if(name.split(' ').filter(Boolean).length < 2){ showToast('Informe nome e sobrenome','red'); nameEl.focus(); return; }
+    if(digits.length<10 || digits.length>11){ showToast('Informe um telefone válido com DDD','red'); phoneEl.focus(); return; }
+    const btn = document.getElementById('adm-client-btn');
+    btn.disabled = true;
+    try {
+      const ref  = doc(db,'clients',digits);
+      const snap = await getDoc(ref);
+      if(snap.exists()){
+        const prev = snap.data().name;
+        showToast('Este telefone já está cadastrado'+(prev?' ('+prev+')':''),'red');
+        return;
+      }
+      await setDoc(ref,{ name, phone:fmtPhoneBR(digits), digits, createdBy:'admin', createdAt:new Date().toISOString() });
+      showToast('Cliente "'+name+'" cadastrado!','green');
+      nameEl.value = ''; phoneEl.value = '';
+      nameEl.focus();
+    } catch(e){
+      console.error('admRegisterClient', e);
+      showToast('Erro ao cadastrar: '+(e.code||e.message),'red');
+    } finally {
+      btn.disabled = false;
+    }
+  };
+
+  window.renderAdminClientsList = function(){
+    const el  = document.getElementById('adm-clients-list');
+    const cnt = document.getElementById('adm-clients-count');
+    if(!el) return;
+    const list = allClients.filter(c=>c.createdBy==='admin')
+      .sort((a,b)=>(b.createdAt||'').localeCompare(a.createdAt||''));
+    if(cnt) cnt.textContent = list.length ? '('+list.length+')' : '';
+    if(!list.length){
+      el.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-dim);font-size:13px;">Nenhum cliente cadastrado por você ainda.</div>';
+      return;
+    }
+    const th = 'padding:10px 16px;text-align:left;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);';
+    el.innerHTML = '<table style="width:100%;border-collapse:collapse;">'
+      +'<thead><tr style="background:var(--bg2);"><th style="'+th+'">Cliente</th><th style="'+th+'">Telefone</th><th style="'+th+'">Cadastrado em</th><th style="padding:10px 16px;"></th></tr></thead><tbody>'
+      + list.map(c=>{
+          const when = c.createdAt ? new Date(c.createdAt).toLocaleDateString('pt-BR') : '—';
+          return '<tr style="border-bottom:1px solid rgba(255,255,255,0.04);">'
+            +'<td style="padding:11px 16px;font-weight:700;font-size:13px;">'+esc(c.name||'—')+'</td>'
+            +'<td style="padding:11px 16px;font-size:13px;color:var(--text-muted);">'+esc(c.phone||'—')+'</td>'
+            +'<td style="padding:11px 16px;font-size:12px;color:var(--text-dim);">'+when+'</td>'
+            +'<td style="padding:11px 16px;text-align:right;"><button data-d="'+escAttr(c.digits||c.id)+'" data-n="'+escAttr(c.name||'')+'" onclick="deleteClient(this.dataset.d,this.dataset.n)" style="padding:5px 10px;border-radius:6px;border:1px solid rgba(220,38,38,0.3);background:none;color:#f87171;font-size:11px;font-weight:700;cursor:pointer;">🗑️</button></td>'
+            +'</tr>';
+        }).join('')
+      +'</tbody></table>';
+  };
+
+  // ═══════════════════════════════════════
   // SESSÕES / CLIENTES
   // ═══════════════════════════════════════
   let allClients = [];
@@ -2424,6 +2842,7 @@
       allClients = snap.docs.map(d=>({id:d.id,...d.data()}))
         .sort((a,b)=>(a.name||'').localeCompare(b.name||'','pt-BR'));
       renderSessionsList(allClients);
+      renderAdminClientsList();
       renderTop3();
       const gbsEl = document.getElementById('gbs-ranking-list');
       if(gbsEl) renderGBSRanking();
@@ -2436,8 +2855,11 @@
     const phones = {};
     const today  = getTodayStr();
     // Conta apenas agendamentos REALIZADOS (data passada, não bloqueado)
-    allData.filter(a=>a.status!=='Bloqueado' && (a.date < today || a.done===true)).forEach(a=>{
+    // Fora do ranking: reservas feitas pelo administrador e o próprio barbeiro (Gabriel Ferreira).
+    // Só contam clientes com perfil próprio que fizeram a própria reserva.
+    allData.filter(a=>a.status!=='Bloqueado' && a.bookedBy!=='admin' && (a.date < today || a.done===true)).forEach(a=>{
       const d = (a.phone||'').replace(/\D/g,'');
+      if(!d || isRankingExcluded(d)) return;
       counts[d] = (counts[d]||0) + 1;
       if(!names[d]) names[d] = a.name||'—';
       if(!phones[d]) phones[d] = a.phone||'—';
@@ -2516,6 +2938,7 @@
         if(balance < 1) return;
         // Cruzar com allClients para pegar nome e telefone
         const digits = d.id;
+        if(isRankingExcluded(digits)) return; // o barbeiro não aparece no ranking
         const client = allClients.find(c=>c.digits===digits);
         const name = client ? (client.name||'—') : '—';
         const phone = client ? (client.phone||digits) : digits;
@@ -2839,6 +3262,7 @@
       // Recarregar lista
       allClients = allClients.filter(c=>c.digits!==digits);
       renderSessionsList(allClients);
+      renderAdminClientsList();
       renderTop3();
     } catch(e){
       console.error(e);
