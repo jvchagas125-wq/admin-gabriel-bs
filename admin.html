@@ -102,6 +102,35 @@
     .adm-note{font-size:13px;color:var(--text-dim);padding:6px 0}
     @media(max-width:600px){#adm-book-grid,#adm-client-form{grid-template-columns:1fr!important}}
     .adm-tag{display:inline-block;white-space:nowrap;margin-top:4px;padding:2px 8px;border-radius:10px;border:1px solid var(--gold-border);background:var(--gold-dim);color:var(--gold-light);font-size:10px;font-weight:700;letter-spacing:.3px}
+    /* Botão de data + calendário (mesmo visual do site público) */
+    .adm-date-btn{width:100%;padding:11px 14px;border-radius:9px;background:var(--bg2);border:1px solid rgba(255,255,255,0.1);color:var(--text-muted);font-size:14px;font-family:"DM Sans",sans-serif;cursor:pointer;text-align:left;display:flex;align-items:center;justify-content:space-between;gap:8px;transition:border-color .2s,color .2s}
+    .adm-date-btn:hover{border-color:var(--gold);color:var(--text)}
+    .adm-date-btn.has-value{color:var(--text);border-color:var(--gold)}
+    .adm-date-btn span{flex:1}
+    .adm-date-btn svg{flex-shrink:0;opacity:.5}
+    .custom-cal-overlay{display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.6);backdrop-filter:blur(2px);align-items:center;justify-content:center}
+    .custom-cal-overlay.open{display:flex!important}
+    .custom-cal{background:var(--bg2);border:1px solid var(--gold-border);border-radius:16px;padding:20px;width:320px;max-width:calc(100vw - 32px);box-shadow:0 24px 80px rgba(0,0,0,.8);animation:slideUp .25s ease-out}
+    .custom-cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+    .custom-cal-title{font-family:"DM Sans",sans-serif;font-size:15px;font-weight:700;color:var(--text)}
+    .custom-cal-nav{background:none;border:1px solid rgba(255,255,255,0.1);border-radius:7px;color:var(--text-muted);width:30px;height:30px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+    .custom-cal-nav:hover{border-color:var(--gold);color:var(--gold)}
+    .custom-cal-weekdays{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:6px}
+    .custom-cal-weekday{text-align:center;font-size:11px;font-weight:700;color:var(--text-dim);padding:4px 0;text-transform:uppercase}
+    .custom-cal-days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px}
+    .custom-cal-day{aspect-ratio:1;width:100%;min-width:0;padding:0;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500;cursor:pointer;border:none;background:none;color:var(--text);transition:all .15s;font-family:"DM Sans",sans-serif}
+    .custom-cal-day:hover:not(.disabled):not(.empty):not(.past){background:var(--gold-dim);color:var(--gold)}
+    .custom-cal-day.today{border:1px solid rgba(201,168,76,0.4);color:var(--gold)}
+    .custom-cal-day.selected{background:var(--gold);color:#111;font-weight:700}
+    .custom-cal-day.disabled{color:rgba(255,255,255,0.15);cursor:not-allowed;text-decoration:line-through}
+    .custom-cal-day.past{color:rgba(255,255,255,0.2);cursor:not-allowed}
+    .custom-cal-day.empty{cursor:default}
+    .custom-cal-footer{display:flex;justify-content:space-between;margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.06)}
+    .custom-cal-footer button{background:none;border:none;font-size:13px;font-weight:600;cursor:pointer;font-family:"DM Sans",sans-serif;padding:6px 12px;border-radius:7px}
+    .custom-cal-footer .cal-clear{color:var(--text-dim)}
+    .custom-cal-footer .cal-clear:hover{color:var(--text-muted)}
+    .custom-cal-footer .cal-today{color:var(--gold)}
+    .custom-cal-footer .cal-today:hover{background:var(--gold-dim)}
     table{width:100%;border-collapse:collapse}
     thead{background:var(--bg2)}
     th{padding:12px 16px;text-align:left;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);white-space:nowrap;cursor:pointer;user-select:none;border-bottom:1px solid rgba(255,255,255,0.06)}
@@ -622,7 +651,7 @@
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;" id="adm-book-grid">
         <div>
           <label class="adm-field-label" for="adm-book-name">Nome do cliente</label>
-          <input class="plan-admin-input" id="adm-book-name" type="text" placeholder="Nome e sobrenome" autocomplete="off">
+          <input class="plan-admin-input" id="adm-book-name" type="text" onblur="this.value=formatName(this.value)" placeholder="Nome e sobrenome" autocomplete="off">
         </div>
         <div>
           <label class="adm-field-label" for="adm-book-phone">Telefone <span style="text-transform:none;letter-spacing:0;font-weight:500;color:var(--text-dim);">(opcional)</span></label>
@@ -633,9 +662,13 @@
         <span class="adm-field-label">Serviço(s)</span>
         <div id="adm-book-services" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
       </div>
-      <div style="margin-bottom:14px;max-width:260px;">
-        <label class="adm-field-label" for="adm-book-date">Data</label>
-        <input class="plan-admin-input" id="adm-book-date" type="date" onchange="admRenderSlots()">
+      <div style="margin-bottom:14px;max-width:380px;">
+        <span class="adm-field-label">Data</span>
+        <button type="button" class="adm-date-btn" id="adm-book-date-btn" onclick="admOpenCal()">
+          <span id="adm-book-date-label">📅 Clique aqui para selecionar a data</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11zM7 11h2v2H7zm4 0h2v2h-2zm4 0h2v2h-2z"/></svg>
+        </button>
+        <input type="hidden" id="adm-book-date">
       </div>
       <div style="margin-bottom:16px;">
         <span class="adm-field-label">Horário</span>
@@ -979,34 +1012,6 @@
 
   <div id="tab-sessions" style="display:none;">
 
-    <!-- CADASTRAR CLIENTE -->
-    <div style="margin-bottom:24px;">
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;background:linear-gradient(135deg,#c9a84c,#f0d78c,#c9a84c);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:14px;">➕ Cadastrar Cliente</div>
-      <div style="background:var(--bg2);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:16px;margin-bottom:12px;">
-        <div style="display:grid;grid-template-columns:1.4fr 1fr auto;gap:12px;align-items:end;" id="adm-client-form">
-          <div>
-            <label class="adm-field-label" for="adm-client-name">Nome e sobrenome</label>
-            <input class="plan-admin-input" id="adm-client-name" type="text" placeholder="Ex: João Silva" autocomplete="off" onkeydown="if(event.key==='Enter') document.getElementById('adm-client-phone').focus()">
-          </div>
-          <div>
-            <label class="adm-field-label" for="adm-client-phone">Telefone</label>
-            <input class="plan-admin-input" id="adm-client-phone" type="tel" placeholder="(22) 99999-9999" inputmode="numeric" oninput="admMaskPhone(this)" onkeydown="if(event.key==='Enter') admRegisterClient()">
-          </div>
-          <button class="export-btn" id="adm-client-btn" onclick="admRegisterClient()" style="padding:10px 18px;font-size:13px;">Cadastrar</button>
-        </div>
-      </div>
-      <details class="coll" style="margin-bottom:0;" ontoggle="if(this.open) renderAdminClientsList()">
-        <summary>
-          <span class="coll-title">📋 Clientes cadastrados por você <span id="adm-clients-count" style="color:var(--text-dim);font-size:14px;"></span></span>
-          <span class="coll-hint">Clique aqui para ver a lista</span>
-          <span class="coll-arrow">▾</span>
-        </summary>
-        <div id="adm-clients-list" style="overflow-x:auto;">
-          <div style="padding:20px;text-align:center;color:var(--text-dim);font-size:13px;">Nenhum cliente cadastrado por você ainda.</div>
-        </div>
-      </details>
-    </div>
-
     <!-- TOP 3 EM DESTAQUE -->
     <div style="margin-bottom:24px;">
       <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;background:linear-gradient(135deg,#c9a84c,#f0d78c,#c9a84c);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:14px;">🏆 Top 3 em Destaque</div>
@@ -1030,6 +1035,34 @@
           <div id="top3-phone" style="font-size:11px;color:var(--text-dim);margin-top:2px;">—</div>
         </div>
       </div>
+    </div>
+
+    <!-- CADASTRAR CLIENTE -->
+    <div style="margin-bottom:24px;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;background:linear-gradient(135deg,#c9a84c,#f0d78c,#c9a84c);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:14px;">➕ Cadastrar Cliente</div>
+      <div style="background:var(--bg2);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:16px;margin-bottom:12px;">
+        <div style="display:grid;grid-template-columns:1.4fr 1fr auto;gap:12px;align-items:end;" id="adm-client-form">
+          <div>
+            <label class="adm-field-label" for="adm-client-name">Nome e sobrenome</label>
+            <input class="plan-admin-input" id="adm-client-name" type="text" onblur="this.value=formatName(this.value)" placeholder="Ex: João Silva" autocomplete="off" onkeydown="if(event.key==='Enter') document.getElementById('adm-client-phone').focus()">
+          </div>
+          <div>
+            <label class="adm-field-label" for="adm-client-phone">Telefone</label>
+            <input class="plan-admin-input" id="adm-client-phone" type="tel" placeholder="(22) 99999-9999" inputmode="numeric" oninput="admMaskPhone(this)" onkeydown="if(event.key==='Enter') admRegisterClient()">
+          </div>
+          <button class="export-btn" id="adm-client-btn" onclick="admRegisterClient()" style="padding:10px 18px;font-size:13px;">Cadastrar</button>
+        </div>
+      </div>
+      <details class="coll" style="margin-bottom:0;" ontoggle="if(this.open) renderAdminClientsList()">
+        <summary>
+          <span class="coll-title">📋 Clientes cadastrados por você <span id="adm-clients-count" style="color:var(--text-dim);font-size:14px;"></span></span>
+          <span class="coll-hint">Clique aqui para ver a lista</span>
+          <span class="coll-arrow">▾</span>
+        </summary>
+        <div id="adm-clients-list" style="overflow-x:auto;">
+          <div style="padding:20px;text-align:center;color:var(--text-dim);font-size:13px;">Nenhum cliente cadastrado por você ainda.</div>
+        </div>
+      </details>
     </div>
 
     <!-- TOP 30 LISTA COMPLETA (recolhida) -->
@@ -1239,6 +1272,25 @@
 
 </main>
 
+<!-- Calendário (reserva do administrador) -->
+<div class="custom-cal-overlay" id="adm-cal-overlay" onclick="if(event.target===this)admCloseCal()">
+  <div class="custom-cal">
+    <div class="custom-cal-header">
+      <button type="button" class="custom-cal-nav" onclick="admCalNav(-1)">‹</button>
+      <div class="custom-cal-title" id="adm-cal-title"></div>
+      <button type="button" class="custom-cal-nav" onclick="admCalNav(1)">›</button>
+    </div>
+    <div class="custom-cal-weekdays">
+      <div class="custom-cal-weekday">D</div><div class="custom-cal-weekday">S</div><div class="custom-cal-weekday">T</div><div class="custom-cal-weekday">Q</div><div class="custom-cal-weekday">Q</div><div class="custom-cal-weekday">S</div><div class="custom-cal-weekday">S</div>
+    </div>
+    <div class="custom-cal-days" id="adm-cal-days"></div>
+    <div class="custom-cal-footer">
+      <button type="button" class="cal-clear" onclick="admClearCal()">Limpar</button>
+      <button type="button" class="cal-today" onclick="admCalToday()">Hoje</button>
+    </div>
+  </div>
+</div>
+
 <div id="toast"><div class="toast-box" id="toast-box"></div></div>
 
 <script type="module">
@@ -1261,6 +1313,56 @@
   const COL = "appointments";
 
   let currentAdmin = null;
+  // ═══ Correção automática de nomes (Maiúsculas, acentos, conectivos) ═══
+// ═══ Correção automática de nomes ═══
+  // Primeira letra de cada nome em maiúscula, "de/da/do/das/dos/e" em minúscula,
+  // espaços sobrando removidos e acentos corrigidos nos nomes mais comuns.
+  // Nomes escritos com maiúsculas no meio (ex.: McDonald) são preservados.
+  const NAME_CONNECTORS = new Set(['de','da','do','das','dos','e']);
+  const NAME_ACCENTS = {
+    andre:'andré', joao:'joão', jose:'josé', antonio:'antônio', sergio:'sérgio', julio:'júlio', marcio:'márcio',
+    claudio:'cláudio', fabio:'fábio', flavio:'flávio', otavio:'otávio', octavio:'octávio', tulio:'túlio',
+    vinicius:'vinícius', lucio:'lúcio', mario:'mário', rogerio:'rogério', cesar:'césar', hercules:'hércules',
+    valerio:'valério', caue:'cauê', caua:'cauã', kaue:'kauê', kaua:'kauã', lazaro:'lázaro', mauricio:'maurício',
+    lourenco:'lourenço', goncalo:'gonçalo', venancio:'venâncio', emilio:'emílio', italo:'ítalo', icaro:'ícaro',
+    isaias:'isaías', benicio:'benício', patricio:'patrício', tercio:'tércio', candido:'cândido', ezequias:'ezequias',
+    jessica:'jéssica', monica:'mônica', patricia:'patrícia', vitoria:'vitória', ines:'inês', julia:'júlia',
+    livia:'lívia', claudia:'cláudia', gloria:'glória', barbara:'bárbara', debora:'débora', elisangela:'elisângela',
+    fabiola:'fabíola', flavia:'flávia', leticia:'letícia', lidia:'lídia', marcia:'márcia', natalia:'natália',
+    nathalia:'nathália', rosangela:'rosângela', sonia:'sônia', tais:'taís', thais:'thaís', valeria:'valéria',
+    veronica:'verônica', angela:'ângela', cecilia:'cecília', cintia:'cíntia', erica:'érica', fatima:'fátima',
+    lais:'laís', marilia:'marília', nubia:'núbia', olivia:'olívia', silvia:'sílvia', eloisa:'eloísa', heloisa:'heloísa',
+    goncalves:'gonçalves', conceicao:'conceição', araujo:'araújo', magalhaes:'magalhães', guimaraes:'guimarães',
+    simoes:'simões', mendonca:'mendonça', braganca:'bragança', franca:'frança', assuncao:'assunção',
+    estevao:'estevão', nobrega:'nóbrega', brandao:'brandão', valadao:'valadão', galvao:'galvão', paixao:'paixão',
+    serrao:'serrão', camara:'câmara', correa:'corrêa', goes:'góes', simao:'simão', leao:'leão', baiao:'baião',
+    ze:'zé'
+  };
+  const NAME_STRIP = s => s.normalize('NFD').replace(/[̀-ͯ]/g,'');
+  function formatNameSeg(seg, forceCap){
+    const lower = seg.toLowerCase();
+    if(!forceCap && NAME_CONNECTORS.has(lower)) return lower;
+    const tail = seg.slice(1);
+    // mistura de maiúsculas e minúsculas (McDonald, DeSouza): mantém como o cliente escreveu
+    if(/[A-ZÀ-ÖØ-Þ]/.test(tail) && /[a-zß-öø-ÿ]/.test(seg)) return seg.charAt(0).toUpperCase()+tail;
+    let w = lower;
+    // só mexe em acentos se a palavra veio sem nenhum acento
+    if(NAME_STRIP(w) === w){
+      if(NAME_ACCENTS[w]) w = NAME_ACCENTS[w];
+      else if(w.length > 4) w = w.replace(/cao$/,'ção').replace(/coes$/,'ções');
+    }
+    return w.charAt(0).toUpperCase()+w.slice(1);
+  }
+  function formatName(raw){
+    const s = String(raw == null ? '' : raw).replace(/\s+/g,' ').trim();
+    if(!s) return '';
+    return s.split(' ').map((word, i)=>{
+      let first = (i === 0);
+      return word.replace(/[^\-'’]+/g, seg=>{ const r = formatNameSeg(seg, first); first = false; return r; });
+    }).join(' ');
+  }
+
+  window.formatName = formatName;
   let allData = [];
   let sortKey = "date";
   let sortDir = 1;
@@ -1313,7 +1415,7 @@
 
   function subscribeData(){
     onSnapshot(collection(db,COL),snap=>{
-      allData=snap.docs.map(d=>({id:d.id,...d.data()}));
+      allData=snap.docs.map(d=>{const x={id:d.id,...d.data()}; if(x.name) x.name=formatName(x.name); return x;});
       updateStats(); renderTable(); updateRevenueCards(); drawRevenueChart('year');
     });
     // Listener em tempo real para wallets — atualiza ranking GB$ automaticamente
@@ -2648,9 +2750,83 @@
   }
 
   window.admInitBookForm = function(){
-    const dateEl = document.getElementById('adm-book-date');
-    if(dateEl) dateEl.min = getTodayStr();
     admRenderChips();
+    admUpdateDateLabel();
+  };
+
+  // — calendário clicável (mesmo visual/regra do site público: dias fechados e passados ficam desabilitados) —
+  let admCalDate = new Date();
+
+  function admIsDayOpen(date){
+    const cfg = admCfg();
+    const day = cfg.days && cfg.days[ADM_DOW[date.getDay()]];
+    return !!(day && day.open === true);
+  }
+
+  function admUpdateDateLabel(){
+    const val   = (document.getElementById('adm-book-date')||{}).value;
+    const label = document.getElementById('adm-book-date-label');
+    const btn   = document.getElementById('adm-book-date-btn');
+    if(!label) return;
+    if(val){
+      const fmt = new Date(val+'T12:00:00').toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+      label.textContent = fmt.charAt(0).toUpperCase()+fmt.slice(1);
+      if(btn) btn.classList.add('has-value');
+    } else {
+      label.textContent = '📅 Clique aqui para selecionar a data';
+      if(btn) btn.classList.remove('has-value');
+    }
+  }
+
+  function admRenderCal(){
+    const today = new Date(); today.setHours(0,0,0,0);
+    const yr = admCalDate.getFullYear(), mo = admCalDate.getMonth();
+    const months = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+    document.getElementById('adm-cal-title').textContent = months[mo]+' de '+yr;
+    const firstDay = new Date(yr,mo,1).getDay();
+    const daysInMonth = new Date(yr,mo+1,0).getDate();
+    const selVal = (document.getElementById('adm-book-date')||{}).value;
+    let html = '';
+    for(let i=0;i<firstDay;i++) html += '<div class="custom-cal-day empty"></div>';
+    for(let d=1; d<=daysInMonth; d++){
+      const date = new Date(yr,mo,d); date.setHours(0,0,0,0);
+      const dateStr = yr+'-'+pad(mo+1)+'-'+pad(d);
+      const isPast  = date < today;
+      const isToday = date.getTime() === today.getTime();
+      const isOpen  = admIsDayOpen(date);
+      let cls = 'custom-cal-day';
+      if(isPast) cls += ' past'; else if(!isOpen) cls += ' disabled';
+      if(isToday) cls += ' today';
+      if(dateStr === selVal) cls += ' selected';
+      const clickable = !isPast && isOpen;
+      html += '<button type="button" class="'+cls+'" '+(clickable?'onclick="admSelectCalDay(\''+dateStr+'\')"':'disabled')+' tabindex="-1">'+d+'</button>';
+    }
+    document.getElementById('adm-cal-days').innerHTML = html;
+  }
+
+  window.admOpenCal = function(){
+    const val = (document.getElementById('adm-book-date')||{}).value;
+    admCalDate = val ? new Date(val+'T12:00:00') : new Date();
+    admRenderCal();
+    document.getElementById('adm-cal-overlay').classList.add('open');
+  };
+  window.admCloseCal = function(){ document.getElementById('adm-cal-overlay').classList.remove('open'); };
+  window.admCalNav = function(dir){
+    admCalDate = new Date(admCalDate.getFullYear(), admCalDate.getMonth()+dir, 1);
+    admRenderCal();
+  };
+  window.admCalToday = function(){ admCalDate = new Date(); admRenderCal(); };
+  window.admSelectCalDay = function(dateStr){
+    document.getElementById('adm-book-date').value = dateStr;
+    admUpdateDateLabel();
+    admRenderSlots();
+    admCloseCal();
+  };
+  window.admClearCal = function(){
+    document.getElementById('adm-book-date').value = '';
+    admUpdateDateLabel();
+    admRenderSlots();
+    admCloseCal();
   };
 
   function admRenderChips(){
@@ -2722,7 +2898,7 @@
   }
 
   window.admSubmitBooking = async function(){
-    const name   = document.getElementById('adm-book-name').value.trim().replace(/\s+/g,' ');
+    const name   = formatName(document.getElementById('adm-book-name').value);
     const digits = document.getElementById('adm-book-phone').value.replace(/\D/g,'');
     const date   = document.getElementById('adm-book-date').value;
     const time   = admSelectedTime;
@@ -2760,6 +2936,7 @@
       document.getElementById('adm-book-name').value = '';
       document.getElementById('adm-book-phone').value = '';
       document.getElementById('adm-book-date').value = '';
+      admUpdateDateLabel();
       admSelectedSvcs = [];
       admRenderChips();
       admRenderSlots();
@@ -2777,7 +2954,7 @@
   window.admRegisterClient = async function(){
     const nameEl  = document.getElementById('adm-client-name');
     const phoneEl = document.getElementById('adm-client-phone');
-    const name    = nameEl.value.trim().replace(/\s+/g,' ');
+    const name    = formatName(nameEl.value);
     const digits  = phoneEl.value.replace(/\D/g,'');
     if(name.split(' ').filter(Boolean).length < 2){ showToast('Informe nome e sobrenome','red'); nameEl.focus(); return; }
     if(digits.length<10 || digits.length>11){ showToast('Informe um telefone válido com DDD','red'); phoneEl.focus(); return; }
@@ -2839,7 +3016,7 @@
     if(!el) return;
     // Escutar coleção clients em tempo real
     onSnapshot(collection(db,'clients'), snap=>{
-      allClients = snap.docs.map(d=>({id:d.id,...d.data()}))
+      allClients = snap.docs.map(d=>{const x={id:d.id,...d.data()}; if(x.name) x.name=formatName(x.name); return x;})
         .sort((a,b)=>(a.name||'').localeCompare(b.name||'','pt-BR'));
       renderSessionsList(allClients);
       renderAdminClientsList();
@@ -3294,7 +3471,7 @@
     cancelledUnsubscribe = onSnapshot(
       collection(db,'cancelled_appointments'),
       snap => {
-        allCancelled = snap.docs.map(d=>({id:d.id,...d.data()}));
+        allCancelled = snap.docs.map(d=>{const x={id:d.id,...d.data()}; if(x.name) x.name=formatName(x.name); return x;});
         allCancelled.sort((a,b)=>(b.cancelledAt||'').localeCompare(a.cancelledAt||''));
         updateCancelledBadge();
         renderCancelledList(allCancelled);
@@ -3546,7 +3723,7 @@
       const denyInfo = isDenied && r.denyReason ? '<div style="font-size:11px;color:#f87171;margin-top:4px;">Motivo: '+esc(r.denyReason)+'</div>' : '';
       const cost = r.productCost||r.itemCost||0;
       const phone = r.clientPhone||'';
-      return '<div style="padding:14px 16px;border-bottom:1px solid rgba(255,255,255,0.05);">'        +'<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap;margin-bottom:8px;">'          +'<div>'            +'<div style="font-weight:700;font-size:13px;color:var(--text);">'+esc(r.clientName||'—')+'</div>'            +'<div style="font-size:11px;color:var(--text-dim);">'+esc(phone)+'</div>'          +'</div>'+statusBadge        +'</div>'        +'<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">'          +'<div>'            +'<span style="font-size:13px;color:var(--text-muted);">'+esc(r.productName||r.itemName||'—')+'</span>'            +' <span style="font-family:Bebas Neue,sans-serif;font-size:16px;color:var(--gold);">'+cost+' GB$</span>'            +'<div style="font-size:11px;color:var(--text-dim);margin-top:2px;">'+dateStr+'</div>'            +denyInfo          +'</div>'          +'<div style="display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap;">'            +(isPending?'<button data-rid="'+r.id+'" onclick="markRedemptionDelivered(this.dataset.rid)" style="padding:7px 12px;border-radius:7px;border:1px solid rgba(22,163,74,.35);background:rgba(22,163,74,0.08);color:#4ade80;font-size:12px;font-weight:700;cursor:pointer;">✓ Entregar</button>':'')            +(isPending?'<button data-rid="'+r.id+'" data-phone="'+phone+'" data-cost="'+cost+'" onclick="denyRedemption(this)" style="padding:7px 12px;border-radius:7px;border:1px solid rgba(220,38,38,.3);background:rgba(220,38,38,0.08);color:#f87171;font-size:12px;font-weight:600;cursor:pointer;">❌ Negar</button>':'')            +(!isPending?'<button data-rid="'+r.id+'" onclick="deleteRedemption(this.dataset.rid)" style="padding:7px 10px;border-radius:7px;border:1px solid rgba(220,38,38,.25);background:none;color:#f87171;font-size:12px;cursor:pointer;">🗑️</button>':'')          +'</div>'        +'</div></div>';
+      return '<div style="padding:14px 16px;border-bottom:1px solid rgba(255,255,255,0.05);">'        +'<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap;margin-bottom:8px;">'          +'<div>'            +'<div style="font-weight:700;font-size:13px;color:var(--text);">'+esc(formatName(r.clientName)||'—')+'</div>'            +'<div style="font-size:11px;color:var(--text-dim);">'+esc(phone)+'</div>'          +'</div>'+statusBadge        +'</div>'        +'<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">'          +'<div>'            +'<span style="font-size:13px;color:var(--text-muted);">'+esc(r.productName||r.itemName||'—')+'</span>'            +' <span style="font-family:Bebas Neue,sans-serif;font-size:16px;color:var(--gold);">'+cost+' GB$</span>'            +'<div style="font-size:11px;color:var(--text-dim);margin-top:2px;">'+dateStr+'</div>'            +denyInfo          +'</div>'          +'<div style="display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap;">'            +(isPending?'<button data-rid="'+r.id+'" onclick="markRedemptionDelivered(this.dataset.rid)" style="padding:7px 12px;border-radius:7px;border:1px solid rgba(22,163,74,.35);background:rgba(22,163,74,0.08);color:#4ade80;font-size:12px;font-weight:700;cursor:pointer;">✓ Entregar</button>':'')            +(isPending?'<button data-rid="'+r.id+'" data-phone="'+phone+'" data-cost="'+cost+'" onclick="denyRedemption(this)" style="padding:7px 12px;border-radius:7px;border:1px solid rgba(220,38,38,.3);background:rgba(220,38,38,0.08);color:#f87171;font-size:12px;font-weight:600;cursor:pointer;">❌ Negar</button>':'')            +(!isPending?'<button data-rid="'+r.id+'" onclick="deleteRedemption(this.dataset.rid)" style="padding:7px 10px;border-radius:7px;border:1px solid rgba(220,38,38,.25);background:none;color:#f87171;font-size:12px;cursor:pointer;">🗑️</button>':'')          +'</div>'        +'</div></div>';
     }).join('');
   }
 
@@ -4200,7 +4377,7 @@
       return `<div style="padding:14px 16px;border-bottom:1px solid rgba(255,255,255,0.05);">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
           <div>
-            <div style="font-weight:700;font-size:13px;">${esc(p.clientName||'—')}</div>
+            <div style="font-weight:700;font-size:13px;">${esc(formatName(p.clientName)||'—')}</div>
             <div style="font-size:11px;color:var(--text-dim);">${esc(p.email||'—')} • ${esc(p.phone||'—')}</div>
           </div>
           ${statusBadge}
@@ -4506,7 +4683,7 @@
     modal.innerHTML = `
       <div style="background:var(--bg2);border:1px solid var(--gold-border);border-radius:18px;padding:28px 24px;width:90%;max-width:360px;animation:slideUp .25s ease-out;">
         <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;background:linear-gradient(135deg,#c9a84c,#f0d78c);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px;">🪙 Gerenciar GB$</div>
-        <div style="font-size:13px;color:var(--text-muted);margin-bottom:6px;">Cliente: <strong style="color:var(--text);">${esc(clientName||digits)}</strong></div>
+        <div style="font-size:13px;color:var(--text-muted);margin-bottom:6px;">Cliente: <strong style="color:var(--text);">${esc(formatName(clientName)||digits)}</strong></div>
         <div style="font-size:13px;color:var(--text-muted);margin-bottom:18px;">Saldo atual: <strong style="color:var(--gold);">${bal} GB$</strong></div>
 
         <!-- Tipo de operação -->
@@ -4552,7 +4729,7 @@
         (isAdd
           ? 'Deseja creditar <strong style="color:var(--gold);">+'+amount+' GB$</strong>'
           : 'Deseja remover <strong style="color:#f87171;">−'+amount+' GB$</strong>')+
-          ' da conta de <strong>'+esc(clientName||digits)+'</strong>?',
+          ' da conta de <strong>'+esc(formatName(clientName)||digits)+'</strong>?',
         'Sim, confirmar', 'Cancelar',
         isAdd ? 'gold' : 'red'
       );
@@ -4567,7 +4744,7 @@
           await sendPersonalNotification(digits,'🪙 +'+amount+' GB$ creditados!','Gabriel adicionou '+amount+' GB$ à sua carteira. Aproveite!');
         }
         document.body.removeChild(modal);
-        showToast(label+' '+(isAdd?'creditados':'removidos')+' para '+esc(clientName||digits)+'!', isAdd?'green':'red');
+        showToast(label+' '+(isAdd?'creditados':'removidos')+' para '+esc(formatName(clientName)||digits)+'!', isAdd?'green':'red');
       } catch(e){ showToast('Erro: '+e.message,'red'); }
     };
     modal.onclick = e=>{ if(e.target===modal) document.body.removeChild(modal); };
@@ -4583,7 +4760,7 @@
     modal.innerHTML = `
       <div style="background:var(--bg2);border:1px solid rgba(74,222,128,0.35);border-radius:18px;padding:28px 24px;width:90%;max-width:360px;animation:slideUp .25s ease-out;">
         <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:#4ade80;margin-bottom:4px;">💰 Gerenciar Saldo R$</div>
-        <div style="font-size:13px;color:var(--text-muted);margin-bottom:6px;">Cliente: <strong style="color:var(--text);">${esc(clientName||digits)}</strong></div>
+        <div style="font-size:13px;color:var(--text-muted);margin-bottom:6px;">Cliente: <strong style="color:var(--text);">${esc(formatName(clientName)||digits)}</strong></div>
         <div style="font-size:13px;color:var(--text-muted);margin-bottom:18px;">Saldo atual: <strong style="color:#4ade80;">R$ ${bal.toFixed(2).replace('.',',')}</strong></div>
 
         <!-- Tipo de operação -->
@@ -4631,7 +4808,7 @@
         (isAdd
           ? 'Deseja creditar <strong style="color:#4ade80;">+'+amountFmt+'</strong>'
           : 'Deseja remover <strong style="color:#f87171;">−'+amountFmt+'</strong>')+
-          ' do saldo R$ de <strong>'+esc(clientName||digits)+'</strong>?',
+          ' do saldo R$ de <strong>'+esc(formatName(clientName)||digits)+'</strong>?',
         'Sim, confirmar', 'Cancelar',
         isAdd ? 'green' : 'red'
       );
@@ -4646,7 +4823,7 @@
           await sendPersonalNotification(digits,'💰 '+amountFmt+' creditados!','Gabriel adicionou '+amountFmt+' ao seu saldo. Aproveite na loja!');
         }
         document.body.removeChild(modal);
-        showToast(amountFmt+' '+(isAdd?'creditados':'removidos')+' para '+esc(clientName||digits)+'!', isAdd?'green':'red');
+        showToast(amountFmt+' '+(isAdd?'creditados':'removidos')+' para '+esc(formatName(clientName)||digits)+'!', isAdd?'green':'red');
       } catch(e){ showToast('Erro: '+e.message,'red'); }
     };
     modal.onclick = e=>{ if(e.target===modal) document.body.removeChild(modal); };
@@ -4755,7 +4932,7 @@
     doneUnsubscribe = onSnapshot(
       query(collection(db, COL), where('done','==',true)),
       snap => {
-        allDone = snap.docs.map(d=>({id:d.id,...d.data()}))
+        allDone = snap.docs.map(d=>{const x={id:d.id,...d.data()}; if(x.name) x.name=formatName(x.name); return x;})
           .sort((a,b)=>(b.date+b.time||'').localeCompare(a.date+a.time||''));
         // Update badge
         const badge = document.getElementById('done-badge');
