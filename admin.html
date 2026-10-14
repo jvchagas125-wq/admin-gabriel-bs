@@ -768,9 +768,14 @@
     </div>
 
     <!-- Resgates pendentes -->
-    <div id="redemptions-section" style="margin-bottom:28px;">
+  <details class="coll" id="redemptions-section">
+    <summary>
+      <span class="coll-title" style="color:#f87171">🔔 Resgates de Clientes</span>
+      <span class="coll-hint">Clique aqui para ver a lista</span>
+      <span class="coll-arrow">▾</span>
+    </summary>
+    <div class="coll-body">
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:12px;">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#f87171;">🔔 Resgates de Clientes</div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;">
           <button onclick="filterRedemptions('all')" id="rdm-filter-all" style="padding:5px 12px;border-radius:20px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.1);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">Todos</button>
           <button onclick="filterRedemptions('pending')" id="rdm-filter-pending" style="padding:5px 12px;border-radius:20px;border:1px solid rgba(234,179,8,0.3);background:rgba(234,179,8,0.08);color:#fde047;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;">⏳ Pendentes</button>
@@ -782,12 +787,17 @@
         <div style="padding:20px;text-align:center;color:var(--text-dim);font-size:13px;">Nenhum resgate ainda.</div>
       </div>
     </div>
+  </details>
 
     <!-- Pedidos de compra GB$ -->
-    <div class="cfg-card" style="margin-bottom:24px;">
-      <div class="cfg-title" style="margin-bottom:14px;">🧾 Pedidos de Compra GB$
-        <span id="gb-purchases-badge-inline" style="display:none;background:#dc2626;color:#fff;border-radius:10px;font-size:12px;padding:2px 8px;margin-left:8px;font-weight:700;vertical-align:middle;"></span>
-      </div>
+    <details class="coll">
+    <summary>
+      <span class="coll-title">🧾 Pedidos de Compra GB$
+        <span id="gb-purchases-badge-inline" style="display:none;background:#dc2626;color:#fff;border-radius:10px;font-size:12px;padding:2px 8px;margin-left:8px;font-weight:700;vertical-align:middle;"></span></span>
+      <span class="coll-hint">Clique aqui para ver a lista</span>
+      <span class="coll-arrow">▾</span>
+    </summary>
+    <div class="coll-body">
       <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;">
         <button onclick="filterGBPurchases('all')" id="gbp-filter-all" style="padding:5px 12px;border-radius:20px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.1);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">Todos</button>
         <button onclick="filterGBPurchases('pending')" id="gbp-filter-pending" style="padding:5px 12px;border-radius:20px;border:1px solid rgba(234,179,8,0.3);background:rgba(234,179,8,0.08);color:#fde047;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;">⏳ Pendentes</button>
@@ -798,12 +808,18 @@
         <div style="text-align:center;padding:32px;color:var(--text-dim);">Carregando...</div>
       </div>
     </div>
+  </details>
 
     <!-- Pacotes de compra GB$ -->
-    <div class="cfg-card" style="margin-bottom:24px;">
+    <details class="coll">
+    <summary>
+      <span class="coll-title">💳 Pacotes de Compra GB$</span>
+      <span class="coll-hint">Clique aqui para ver a lista</span>
+      <span class="coll-arrow">▾</span>
+    </summary>
+    <div class="coll-body">
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:6px;">
         <div>
-          <div class="cfg-title" style="margin-bottom:2px;">💳 Pacotes de Compra GB$</div>
           <div class="cfg-hint" style="margin:0;">Clientes podem comprar GB$ via Mercado Pago. Edite os pacotes abaixo.</div>
         </div>
         <button class="export-btn" onclick="addGBPackage()">+ Adicionar pacote</button>
@@ -815,14 +831,21 @@
       <div id="gb-packages-list" style="display:flex;flex-direction:column;gap:10px;"></div>
       <button class="cfg-save-btn" onclick="saveGBPackages()" style="margin-top:14px;max-width:240px;">💾 Salvar Pacotes</button>
     </div>
+  </details>
 
     <!-- Produtos cadastrados -->
-    <div>
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--gold);margin-bottom:14px;">📦 Produtos Cadastrados</div>
+  <details class="coll">
+    <summary>
+      <span class="coll-title">📦 Produtos Cadastrados</span>
+      <span class="coll-hint">Clique aqui para ver a lista</span>
+      <span class="coll-arrow">▾</span>
+    </summary>
+    <div class="coll-body">
       <div id="store-products-admin" style="display:flex;flex-direction:column;gap:12px;">
         <div style="text-align:center;padding:32px;color:var(--text-dim);">Carregando...</div>
       </div>
     </div>
+  </details>
   </div>
 
 
@@ -835,12 +858,18 @@
   <!-- ABA SERVIÇOS -->
   <div id="tab-svcadmin" style="display:none;">
     <div style="max-width:720px;">
-      <div class="cfg-card">
-        <div class="cfg-title">✂️ Serviços</div>
+      <details class="coll">
+    <summary>
+      <span class="coll-title">✂️ Serviços</span>
+      <span class="coll-hint">Clique aqui para ver a lista</span>
+      <span class="coll-arrow">▾</span>
+    </summary>
+    <div class="coll-body">
         <div class="cfg-hint">Adicione, edite ou remova os serviços. Nome, valor e duração são atualizados no site e no agendamento automaticamente.</div>
         <div id="svcadmin-list"></div>
         <button class="cfg-add-btn" onclick="addService()" style="margin-top:8px;">+ Adicionar serviço</button>
-      </div>
+    </div>
+  </details>
 
       <div class="cfg-card">
         <div class="cfg-title">⏱️ Intervalo entre Atendimentos</div>
@@ -982,32 +1011,57 @@
       <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;background:linear-gradient(135deg,#c9a84c,#f0d78c,#c9a84c);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">&#128081; Assinaturas VIP</div>
       <button onclick="loadSubscriptions()" style="padding:8px 16px;border-radius:8px;border:1px solid var(--gold-border);background:var(--gold-dim);color:var(--gold);font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">&#8635; Atualizar</button>
     </div>
-    <div class="cfg-card" style="margin-bottom:20px;">
-      <div class="cfg-title">&#9203; Pagamentos Pendentes</div>
+    <details class="coll">
+    <summary>
+      <span class="coll-title">&#9203; Pagamentos Pendentes</span>
+      <span class="coll-hint">Clique aqui para ver a lista</span>
+      <span class="coll-arrow">▾</span>
+    </summary>
+    <div class="coll-body">
       <div class="cfg-hint">Clientes que iniciaram o processo de assinatura. Apos confirmar o pagamento no Mercado Pago, clique em "Ativar VIP".</div>
       <div id="pending-subs-list"><div style="text-align:center;padding:32px 0;"><div class="spinner" style="margin:0 auto;"></div></div></div>
     </div>
+  </details>
     <!-- Solicitações de Cancelamento -->
-    <div class="cfg-card" style="margin-bottom:20px;border-color:rgba(220,38,38,0.3);">
-      <div class="cfg-title" style="color:#f87171;">⚠️ Solicitações de Cancelamento</div>
+    <details class="coll" style="border-color:rgba(220,38,38,0.3);">
+    <summary>
+      <span class="coll-title" style="color:#f87171">⚠️ Solicitações de Cancelamento</span>
+      <span class="coll-hint">Clique aqui para ver a lista</span>
+      <span class="coll-arrow">▾</span>
+    </summary>
+    <div class="coll-body">
       <div class="cfg-hint">Clientes que solicitaram o cancelamento da assinatura. Cancele o plano no Mercado Pago e clique em "Revogar VIP" para confirmar.</div>
       <div id="cancel-requests-list"><div style="text-align:center;padding:24px 0;"><div class="spinner" style="margin:0 auto;"></div></div></div>
     </div>
+  </details>
 
-    <div class="cfg-card">
-      <div class="cfg-title">&#9989; Assinantes Ativos</div>
+    <details class="coll">
+    <summary>
+      <span class="coll-title">&#9989; Assinantes Ativos</span>
+      <span class="coll-hint">Clique aqui para ver a lista</span>
+      <span class="coll-arrow">▾</span>
+    </summary>
+    <div class="coll-body">
       <div class="cfg-hint">Clientes com acesso VIP ativo. Clique em "Revogar" para cancelar o acesso.</div>
       <div id="active-subs-list"><div style="text-align:center;padding:32px 0;"><div class="spinner" style="margin:0 auto;"></div></div></div>
     </div>
+  </details>
 
     <!-- Planos de Assinatura -->
-    <div class="cfg-card" style="margin-top:20px;">
-      <div class="cfg-title">💎 Planos de Assinatura</div>
+    <details class="coll">
+    <summary>
+      <span class="coll-title">💎 Planos de Assinatura</span>
+      <span class="coll-hint">Clique aqui para ver a lista</span>
+      <span class="coll-arrow">▾</span>
+    </summary>
+    <div class="coll-body">
       <div class="cfg-hint">Adicione, edite ou remova os planos exibidos no site. As alterações são refletidas imediatamente para os clientes.</div>
       <div id="plans-admin-list"></div>
       <button class="cfg-add-btn" onclick="addPlan()" style="margin-top:12px;">+ Adicionar plano</button>
+    <button class="cfg-save-btn" onclick="savePlans()" style="background:#1a6634;margin-top:14px;">💾 Salvar Planos</button>
+
     </div>
-    <button class="cfg-save-btn" onclick="savePlans()" style="background:#1a6634;margin-top:8px;">💾 Salvar Planos</button>
+  </details>
   </div>
 
   <div id="tab-sessions" style="display:none;">
@@ -1121,8 +1175,13 @@
 
 
       <!-- ÍCONE DOS APPS (PWA) -->
-      <div class="cfg-card" style="margin-bottom:18px;">
-        <div class="cfg-title">📱 Ícone dos Apps</div>
+      <details class="coll">
+    <summary>
+      <span class="coll-title">📱 Ícone dos Apps</span>
+      <span class="coll-hint">Clique aqui para ver a lista</span>
+      <span class="coll-arrow">▾</span>
+    </summary>
+    <div class="coll-body">
         <div class="cfg-hint" style="margin-bottom:14px;">Ícone exibido quando os apps são instalados no celular. Use imagens quadradas <strong style="color:var(--gold);">512×512px</strong> em PNG com fundo sólido (sem transparência).</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:4px;">
 
@@ -1169,10 +1228,17 @@
 
         </div><!-- end grid -->
       </div>
+    </div>
+  </details><!-- fecha card Ícone dos Apps -->
 
       <!-- CONFIGURAÇÕES DO SITE -->
-      <div class="cfg-card">
-        <div class="cfg-title">🌐 Informações do Site</div>
+      <details class="coll">
+    <summary>
+      <span class="coll-title">🌐 Informações do Site</span>
+      <span class="coll-hint">Clique aqui para ver a lista</span>
+      <span class="coll-arrow">▾</span>
+    </summary>
+    <div class="coll-body">
         <div class="cfg-hint">Edite o logo, contatos e endereço exibidos no site dos clientes.</div>
 
         <!-- Logo hero -->
@@ -1220,7 +1286,8 @@
         </div>
 
         <button class="cfg-save-btn" onclick="saveSiteConfig()">💾 Salvar Informações do Site</button>
-      </div>
+    </div>
+  </details>
 
       <!-- PLANO DE FUNDO -->
       <div class="cfg-card">
@@ -1239,8 +1306,13 @@
         <button class="cfg-save-btn" onclick="saveBgImage()" style="margin-top:14px;">💾 Salvar Plano de Fundo</button>
       </div>
 
-      <div class="cfg-card">
-        <div class="cfg-title">📅 Dias e Horários de Funcionamento</div>
+      <details class="coll">
+    <summary>
+      <span class="coll-title">📅 Dias e Horários de Funcionamento</span>
+      <span class="coll-hint">Clique aqui para ver a lista</span>
+      <span class="coll-arrow">▾</span>
+    </summary>
+    <div class="coll-body">
         <div class="cfg-hint">Defina quais dias funcionam e os horários de cada um.</div>
         <div id="days-config"></div>
         <div style="margin-top:20px;">
@@ -1256,7 +1328,8 @@
           <div id="specific-breaks-config" style="display:flex;flex-direction:column;gap:10px;"></div>
           <button class="cfg-add-btn" onclick="addSpecificBreak()" style="margin-top:8px;">+ Adicionar fechamento de agenda</button>
         </div>
-      </div>
+    </div>
+  </details>
 
       <!-- SERVIÇOS -->
       <button class="cfg-save-btn" onclick="saveSettings()">💾 Salvar Configurações</button>
