@@ -681,6 +681,23 @@
     </div>
   </details>
 
+  <!-- FECHAR AGENDA -->
+  <details class="coll" id="fechar-agenda-card">
+    <summary>
+      <span class="coll-title">📅 Fechar Agenda</span>
+      <span class="coll-hint">Clique aqui para ver a lista</span>
+      <span class="coll-arrow">▾</span>
+    </summary>
+    <div class="coll-body">
+      <div class="cfg-hint" style="margin-bottom:12px;">Bloqueie horários em dias específicos (ex: palestra, compromisso). O cliente verá a justificativa ao tentar agendar nesse horário.</div>
+      <div id="specific-breaks-config" style="display:flex;flex-direction:column;gap:10px;"></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;align-items:center;">
+        <button class="cfg-add-btn" onclick="addSpecificBreak()">+ Adicionar fechamento de agenda</button>
+        <button class="cfg-save-btn" id="save-specific-breaks-btn" onclick="saveSpecificBreaksOnly()" style="width:auto;margin:0;padding:10px 20px;">💾 Salvar Fechamentos</button>
+      </div>
+    </div>
+  </details>
+
   <div class="toolbar">
     <div class="toolbar-title">Agendamentos</div>
     <input class="search-input" type="search" id="search" placeholder="Buscar nome ou telefone..." oninput="renderTable()">
@@ -1321,13 +1338,6 @@
           <button class="cfg-add-btn" onclick="addBreak()">+ Adicionar intervalo</button>
         </div>
 
-        <!-- Intervalos em datas específicas -->
-        <div style="margin-top:24px;">
-          <div class="cfg-subtitle">📅 Fechar Agenda</div>
-          <div class="cfg-hint" style="margin-bottom:12px;">Bloqueie horários em dias específicos (ex: palestra, compromisso). O cliente verá a justificativa ao tentar agendar nesse horário.</div>
-          <div id="specific-breaks-config" style="display:flex;flex-direction:column;gap:10px;"></div>
-          <button class="cfg-add-btn" onclick="addSpecificBreak()" style="margin-top:8px;">+ Adicionar fechamento de agenda</button>
-        </div>
     </div>
   </details>
 
@@ -5134,6 +5144,33 @@
       if(r) specificBreaks[i].reason = r.value.trim();
     }
   }
+
+  window.saveSpecificBreaksOnly = async function(){
+    const btn = document.getElementById('save-specific-breaks-btn');
+    if(btn) btn.disabled = true;
+    try {
+      syncSpecificBreaksFromDOM();
+      const list = collectSpecificBreaks();
+      const incomplete = specificBreaks.length - list.length;
+      if(incomplete > 0){
+        showToast('Selecione a data de todos os fechamentos (ou remova os vazios)','red');
+        return;
+      }
+      for(const b of list){
+        if(b.start && b.end && b.end <= b.start){ showToast('O horário final deve ser depois do inicial','red'); return; }
+      }
+      await setDoc(doc(db,'config','schedule'), { specificBreaks: list }, { merge:true });
+      specificBreaks = list;
+      if(currentSettings) currentSettings.specificBreaks = list;
+      renderSpecificBreaks();
+      showToast('Fechamentos de agenda salvos!','green');
+    } catch(e){
+      console.error('saveSpecificBreaksOnly', e);
+      showToast('Erro ao salvar fechamentos: '+(e.code||e.message),'red');
+    } finally {
+      if(btn) btn.disabled = false;
+    }
+  };
 
   window.removeSpecificBreak = async function(i){
     if(!(await showGBConfirm('🗑️ Remover fechamento de agenda','Deseja remover este fechamento de agenda?','Sim, remover','Cancelar','red'))) return;
