@@ -1306,23 +1306,6 @@
     </div>
   </details>
 
-      <!-- PLANO DE FUNDO -->
-      <div class="cfg-card">
-        <div class="cfg-title">🖼️ Plano de Fundo do Site</div>
-        <div class="cfg-hint">Envie uma imagem para usar como plano de fundo. Recomendado: 1080x1920px.</div>
-        <div class="img-dropzone" id="dz-bg-image" onclick="document.getElementById('fi-bg-image').click()" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="dzDrop(event,'fi-bg-image','prev-bg-image','up-bg-image','cfg-bg-image',null)">
-          <input type="file" id="fi-bg-image" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="dzChange(this,'prev-bg-image','up-bg-image','cfg-bg-image',null)">
-          <div class="img-dropzone-label">📷 Clique ou <strong>arraste o plano de fundo</strong> aqui<br><span style="font-size:10px;color:var(--text-dim);">JPG, PNG ou WEBP · máx 10MB · <strong style="color:var(--gold);">Recomendado: 1080x1920px</strong></span></div>
-        </div>
-        <div style="display:flex;align-items:flex-start;gap:10px;margin-top:6px;">
-          <img id="prev-bg-image" class="img-upload-preview" src="" alt="bg" style="width:72px;height:72px;border-radius:8px;object-fit:cover;background:var(--bg3);border:1px solid var(--gold-border);flex-shrink:0;">
-          <div id="up-bg-image" class="img-uploading" style="margin-top:0;">⏳ Enviando...</div>
-        </div>
-        <button type="button" id="rm-cfg-bg-image" onclick="removeImgUpload('prev-bg-image','cfg-bg-image','dz-bg-image')" style="display:none;margin-top:6px;padding:4px 10px;border-radius:6px;border:1px solid rgba(220,38,38,0.35);background:none;color:#f87171;font-size:11px;font-weight:600;cursor:pointer;">🗑️ Remover imagem</button>
-        <input type="hidden" id="cfg-bg-image" value="">
-        <button class="cfg-save-btn" onclick="saveBgImage()" style="margin-top:14px;">💾 Salvar Plano de Fundo</button>
-      </div>
-
       <details class="coll">
     <summary>
       <span class="coll-title">📅 Dias e Horários de Funcionamento</span>
@@ -1341,8 +1324,24 @@
     </div>
   </details>
 
-      <!-- SERVIÇOS -->
-      <button class="cfg-save-btn" onclick="saveSettings()">💾 Salvar Configurações</button>
+      <button class="cfg-save-btn" onclick="saveSettings()" style="margin-bottom:22px;">💾 Salvar Configurações</button>
+
+      <!-- PLANO DE FUNDO -->
+      <div class="cfg-card">
+        <div class="cfg-title">🖼️ Plano de Fundo do Site</div>
+        <div class="cfg-hint">Envie uma imagem para usar como plano de fundo. Recomendado: 1080x1920px.</div>
+        <div class="img-dropzone" id="dz-bg-image" onclick="document.getElementById('fi-bg-image').click()" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="dzDrop(event,'fi-bg-image','prev-bg-image','up-bg-image','cfg-bg-image',null)">
+          <input type="file" id="fi-bg-image" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="dzChange(this,'prev-bg-image','up-bg-image','cfg-bg-image',null)">
+          <div class="img-dropzone-label">📷 Clique ou <strong>arraste o plano de fundo</strong> aqui<br><span style="font-size:10px;color:var(--text-dim);">JPG, PNG ou WEBP · máx 10MB · <strong style="color:var(--gold);">Recomendado: 1080x1920px</strong></span></div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:10px;margin-top:6px;">
+          <img id="prev-bg-image" class="img-upload-preview" src="" alt="bg" style="width:72px;height:72px;border-radius:8px;object-fit:cover;background:var(--bg3);border:1px solid var(--gold-border);flex-shrink:0;">
+          <div id="up-bg-image" class="img-uploading" style="margin-top:0;">⏳ Enviando...</div>
+        </div>
+        <button type="button" id="rm-cfg-bg-image" onclick="removeImgUpload('prev-bg-image','cfg-bg-image','dz-bg-image')" style="display:none;margin-top:6px;padding:4px 10px;border-radius:6px;border:1px solid rgba(220,38,38,0.35);background:none;color:#f87171;font-size:11px;font-weight:600;cursor:pointer;">🗑️ Remover imagem</button>
+        <input type="hidden" id="cfg-bg-image" value="">
+        <button class="cfg-save-btn" onclick="saveBgImage()" style="margin-top:14px;">💾 Salvar Plano de Fundo</button>
+      </div>
 
     </div>
   </div>
