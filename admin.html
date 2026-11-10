@@ -2509,7 +2509,7 @@
     }
     // Sincroniza o contador usado pelo site (só para cima, para nunca liberar vaga a mais)
     Object.keys(real).forEach(code=>{
-      const cur = (couponStats[code] && Number(couponStats[code].count)) || 0;
+      const cur = Math.max((couponStats[code] && Number(couponStats[code].count)) || 0, Object.keys((couponStats[code]||{}).claimers||{}).length);
       if(real[code] > cur){
         couponStats[code] = { ...(couponStats[code]||{}), count: real[code] };
         setDoc(doc(db,'coupon_stats',code), { code, count: real[code], syncedAt: new Date().toISOString() }, { merge:true })
@@ -2544,7 +2544,8 @@
 
   // ── Status do cupom ──
   function couponCount(code){
-    const st = (couponStats[code] && Number(couponStats[code].count)) || 0;
+    const S = couponStats[code] || {};
+    const st = Math.max(Number(S.count)||0, Object.keys(S.claimers||{}).length);
     const real = couponClaimsReal ? (couponClaimsReal[code] || 0) : 0;
     return Math.max(st, real);
   }
@@ -2743,7 +2744,7 @@
     const code = (document.getElementById('cp-code-'+i)?.value||c.code||'').trim();
     if(!code){ showToast('Defina o código do cupom primeiro','red'); return; }
     if(!(await showGBConfirm('↺ Zerar resgates','Zerar o contador de resgates do cupom <strong>'+esc(code)+'</strong>? Novas pessoas poderão resgatar até o limite de novo. Quem já resgatou continua com o cupom.','Sim, zerar','Cancelar','red'))) return;
-    try{ await setDoc(doc(db,'coupon_stats',code), { count:0, resetAt:new Date().toISOString() }, { merge:true }); showToast('Contador zerado!','green'); }
+    try{ await setDoc(doc(db,'coupon_stats',code), { code, count:0, claimers:{}, resetAt:new Date().toISOString() }); showToast('Contador zerado!','green'); }
     catch(e){ showToast('Erro ao zerar: '+e.message,'red'); }
   };
 
