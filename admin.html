@@ -2433,7 +2433,9 @@
   let couponSvcNames = [];
   let couponProducts = [];        // só produtos ATIVOS da Loja (os que aparecem para marcar)
   let couponAllProductIds = new Set(); // todos os produtos existentes (ativos ou não)
-  let couponStats = {};           // coupon_stats/{CODIGO} → { count }
+  let couponStats = {};           // coupon_stats/{CODIGO} → { count, resetAt }
+  let couponClaimsReal = null;    // contagem real lida dos clientes: { CODIGO: n } (null = ainda não carregou)
+  let couponClientsData = [];
   let couponsAdminReady = false;
   let couponsDocLoaded = false, couponSvcLoaded = false, couponProdLoaded = false;
   let couponLiveStarted = false;
@@ -2476,8 +2478,37 @@
     onSnapshot(collection(db,'coupon_stats'), snap=>{
       const s = {}; snap.docs.forEach(d=>{ s[d.id] = d.data(); });
       couponStats = s;
-      if(couponsAdminReady) adminCoupons.forEach((c,i)=>refreshCouponHeader(i));
+      recalcCouponClaims();
     }, e=>console.warn('coupon_stats:', e));
+
+    // Contagem real: quantos clientes têm o cupom resgatado (inclui resgates feitos antes do contador existir)
+    onSnapshot(collection(db,'clients'), snap=>{
+      couponClientsData = snap.docs.map(d=>d.data().coupons || {});
+      recalcCouponClaims();
+    }, e=>console.warn('coupons/clients:', e));
+  }
+
+  function recalcCouponClaims(){
+    const real = {};
+    couponClientsData.forEach(cps=>{
+      Object.keys(cps).forEach(code=>{
+        const at = (cps[code] && cps[code].claimedAt) || '';
+        const resetAt = (couponStats[code] && couponStats[code].resetAt) || '';
+        if(resetAt && at && at <= resetAt) return;   // resgates antes do "Zerar contador" não contam
+        real[code] = (real[code]||0) + 1;
+      });
+    });
+    couponClaimsReal = real;
+    // Sincroniza o contador usado pelo site (só para cima, para nunca liberar vaga a mais)
+    Object.keys(real).forEach(code=>{
+      const cur = (couponStats[code] && Number(couponStats[code].count)) || 0;
+      if(real[code] > cur){
+        couponStats[code] = { ...(couponStats[code]||{}), count: real[code] };
+        setDoc(doc(db,'coupon_stats',code), { code, count: real[code], syncedAt: new Date().toISOString() }, { merge:true })
+          .catch(e=>console.warn('coupon_stats sync:', e));
+      }
+    });
+    if(couponsAdminReady) adminCoupons.forEach((c,i)=>refreshCouponHeader(i));
   }
 
   function finishCouponLoad(){
@@ -2504,7 +2535,11 @@
   }
 
   // ── Status do cupom ──
-  function couponCount(code){ return (couponStats[code] && Number(couponStats[code].count)) || 0; }
+  function couponCount(code){
+    const st = (couponStats[code] && Number(couponStats[code].count)) || 0;
+    const real = couponClaimsReal ? (couponClaimsReal[code] || 0) : 0;
+    return Math.max(st, real);
+  }
   function couponStatusOf(c){
     const today = getTodayStr();
     const lim = parseInt(c.maxRedemptions)||0;
@@ -2924,6 +2959,7 @@
         loadCancelledTab();
         applyAdminIconOnLoad();
         loadDoneTab(); // Carrega concluídos
+        startCouponLiveData(); // mantém o contador de resgates dos cupons sincronizado
         // Inicializa a aba padrão corretamente
         setTimeout(()=>{ switchTab('appointments'); restoreListVisibility(); }, 100);
       } else {
