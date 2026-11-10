@@ -2436,6 +2436,7 @@
   let couponStats = {};           // coupon_stats/{CODIGO} → { count, resetAt }
   let couponClaimsReal = null;    // contagem real lida dos clientes: { CODIGO: n } (null = ainda não carregou)
   let couponClientsData = [];
+  let lastClaimsJson = null;
   let couponsAdminReady = false;
   let couponsDocLoaded = false, couponSvcLoaded = false, couponProdLoaded = false;
   let couponLiveStarted = false;
@@ -2499,6 +2500,13 @@
       });
     });
     couponClaimsReal = real;
+    // Também publica a contagem em config/coupons (o site sempre consegue ler esse documento)
+    const realJson = JSON.stringify(Object.keys(real).sort().map(k=>[k,real[k]]));
+    if(realJson !== lastClaimsJson){
+      lastClaimsJson = realJson;
+      setDoc(doc(db,'config','coupons'), { claims: real, claimsUpdatedAt: new Date().toISOString() }, { merge:true })
+        .catch(e=>{ lastClaimsJson = null; console.warn('coupons claims sync:', e); });
+    }
     // Sincroniza o contador usado pelo site (só para cima, para nunca liberar vaga a mais)
     Object.keys(real).forEach(code=>{
       const cur = (couponStats[code] && Number(couponStats[code].count)) || 0;
@@ -2882,7 +2890,7 @@
       if(!c.allServices && !c.serviceNames.length && !c.allProducts && !c.productIds.length) return fail(i, lb+' ('+c.code+'): escolha pelo menos um serviço ou produto');
     }
     try{
-      await setDoc(doc(db,'config','coupons'), { list, updatedAt: new Date().toISOString() });
+      await setDoc(doc(db,'config','coupons'), { list, claims: couponClaimsReal || {}, updatedAt: new Date().toISOString() });
       adminCoupons = list;
       renderCouponsAdmin();
       showToast('Cupons salvos!','green');
