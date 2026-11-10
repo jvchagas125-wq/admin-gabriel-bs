@@ -660,6 +660,16 @@
     .cpa-rm{padding:8px 14px;border-radius:8px;border:1px solid rgba(220,38,38,.3);background:none;color:#f87171;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif}
     .cpa-rm:hover{background:var(--red-dim)}
     .cpa-close{padding:8px 14px;border-radius:8px;border:1px solid rgba(255,255,255,.12);background:none;color:var(--text-muted);font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif}
+    .cpa-claimers{display:flex;flex-direction:column;gap:6px;max-height:320px;overflow-y:auto}
+    .cpa-claimer{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:9px;background:var(--bg3);border:1px solid rgba(255,255,255,.05)}
+    .cpa-claimer.old{opacity:.55}
+    .cpa-claimer-av{width:32px;height:32px;border-radius:50%;background:var(--gold-dim);border:1px solid var(--gold-border);color:var(--gold);font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;text-transform:uppercase}
+    .cpa-claimer-main{flex:1;min-width:0;display:flex;flex-direction:column}
+    .cpa-claimer-main b{font-size:13px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .cpa-claimer-main span{font-size:12px;color:var(--text-muted)}
+    .cpa-claimer-meta{display:flex;flex-direction:column;align-items:flex-end;gap:2px;font-size:11px;color:var(--text-dim);text-align:right}
+    .cpa-claimer-wa{flex-shrink:0;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.3);text-decoration:none;font-size:14px}
+    @media (max-width:640px){.cpa-claimer{flex-wrap:wrap}.cpa-claimer-meta{width:100%;flex-direction:row;justify-content:space-between;padding-left:42px}}
     @media (max-width:640px){
       .cpa-grid2,.cpa-grid3,.cpa-aud{grid-template-columns:1fr}
       .cpa-head{gap:10px;padding:12px}
@@ -2484,14 +2494,15 @@
 
     // Contagem real: quantos clientes têm o cupom resgatado (inclui resgates feitos antes do contador existir)
     onSnapshot(collection(db,'clients'), snap=>{
-      couponClientsData = snap.docs.map(d=>d.data().coupons || {});
+      couponClientsData = snap.docs.map(d=>{ const x = d.data(); return { digits:d.id, name:x.name||'', phone:x.phone||'', coupons:x.coupons||{} }; });
       recalcCouponClaims();
     }, e=>console.warn('coupons/clients:', e));
   }
 
   function recalcCouponClaims(){
     const real = {};
-    couponClientsData.forEach(cps=>{
+    couponClientsData.forEach(cl=>{
+      const cps = cl.coupons || {};
       Object.keys(cps).forEach(code=>{
         const at = (cps[code] && cps[code].claimedAt) || '';
         const resetAt = (couponStats[code] && couponStats[code].resetAt) || '';
@@ -2562,6 +2573,30 @@
     if(c.audience === 'old') return 'Clientes antigos (conta com '+(c.audienceOldDays||30)+'+ dias)';
     return 'Todos os clientes';
   }
+  // Clientes que resgataram o cupom (mais recentes primeiro)
+  function couponClaimers(code){
+    if(!code) return [];
+    const resetAt = (couponStats[code] && couponStats[code].resetAt) || '';
+    return couponClientsData
+      .filter(cl=>cl.coupons && cl.coupons[code])
+      .map(cl=>{ const e = cl.coupons[code]||{}; return { name: formatName(cl.name||'')||'—', phone: cl.phone||cl.digits, claimedAt: e.claimedAt||'', uses: Number(e.uses)||0, beforeReset: !!(resetAt && e.claimedAt && e.claimedAt <= resetAt) }; })
+      .sort((a,b)=>(b.claimedAt||'').localeCompare(a.claimedAt||''));
+  }
+  function couponClaimersHtml(c){
+    const list = couponClaimers(c.code);
+    if(!list.length) return '<div class="cpa-none" style="padding:6px 0;">Ninguém resgatou este cupom ainda.</div>';
+    return list.map(x=>{
+      const dt = x.claimedAt ? new Date(x.claimedAt).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—';
+      const wa = String(x.phone||'').replace(/\D/g,'');
+      return '<div class="cpa-claimer'+(x.beforeReset?' old':'')+'">'
+        +'<div class="cpa-claimer-av">'+esc((x.name||'?').charAt(0))+'</div>'
+        +'<div class="cpa-claimer-main"><b>'+esc(x.name)+'</b><span>'+esc(x.phone||'—')+'</span></div>'
+        +'<div class="cpa-claimer-meta"><span>📅 '+dt+'</span><span>'+(x.uses>0?'✅ Usado '+x.uses+'x':'⏳ Ainda não usou')+(x.beforeReset?' · antes de zerar':'')+'</span></div>'
+        +(wa?'<a class="cpa-claimer-wa" href="https://wa.me/55'+wa+'" target="_blank" rel="noopener" title="Chamar no WhatsApp">💬</a>':'')
+      +'</div>';
+    }).join('');
+  }
+
   function couponRedeemText(c){
     const lim = parseInt(c.maxRedemptions)||0, n = couponCount(c.code);
     return lim > 0 ? n+'/'+lim+' resgates' : n+' resgate'+(n===1?'':'s')+' · sem limite';
@@ -2624,6 +2659,10 @@
               +'<div class="cpa-progress"><div id="cpa-pbar-'+i+'"></div></div>'
               +'<button type="button" class="cpa-mini-btn" onclick="resetCouponCount('+i+')">↺ Zerar contador</button>'
             +'</div>'
+          +'</div>'
+
+          +'<div class="cpa-sec"><div class="cpa-sec-t">👥 Quem resgatou <small id="cpa-clcount-'+i+'"></small></div>'
+            +'<div class="cpa-claimers" id="cpa-claimers-'+i+'"></div>'
           +'</div>'
 
           +'<div class="cpa-sec"><div class="cpa-sec-t">✂️ Onde o desconto vale</div>'
@@ -2730,6 +2769,12 @@
     const bar = document.getElementById('cpa-pbar-'+i);
     if(bar){ bar.style.width = lim > 0 ? Math.min(100, Math.round(n*100/lim))+'%' : '0%'; bar.className = (lim > 0 && n >= lim) ? 'full' : ''; }
     document.getElementById('cpa-item-'+i)?.setAttribute('data-st', st.key);
+    const clBox = document.getElementById('cpa-claimers-'+i);
+    if(clBox){
+      clBox.innerHTML = couponClaimersHtml(c);
+      const nCl = couponClaimers(c.code).length;
+      set('cpa-clcount-'+i, nCl ? '('+nCl+' pessoa'+(nCl>1?'s':'')+')' : '');
+    }
   };
 
   window.toggleCouponOpen = function(i){
