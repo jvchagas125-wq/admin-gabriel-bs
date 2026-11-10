@@ -563,6 +563,110 @@
     .adm-cal-footer .clear:hover{color:var(--text-muted);}
     .adm-cal-footer .today{color:var(--gold);}
     .adm-cal-footer .today:hover{background:var(--gold-dim);}
+    /* ── Cupons (admin) ── */
+    .cpa-help{background:rgba(201,168,76,0.06);border:1px solid var(--gold-border);border-radius:12px;margin-bottom:16px;overflow:hidden}
+    .cpa-help summary{cursor:pointer;padding:12px 16px;font-size:13px;font-weight:700;color:var(--gold);list-style:none;display:flex;align-items:center;justify-content:space-between}
+    .cpa-help summary::-webkit-details-marker{display:none}
+    .cpa-help summary::after{content:'▾';transition:transform .2s}
+    .cpa-help[open] summary::after{transform:rotate(180deg)}
+    .cpa-help ul{margin:0;padding:0 18px 14px 34px;display:flex;flex-direction:column;gap:7px;font-size:12.5px;line-height:1.55;color:var(--text-muted)}
+    .cpa-help b{color:var(--text)}
+    .cpa-empty{text-align:center;padding:30px 0;color:var(--text-dim);font-size:28px}
+    .cpa-empty div{font-size:14px;font-weight:700;color:var(--text-muted);margin-top:6px}
+    .cpa-empty span{font-size:12px}
+    .cpa-item{background:var(--bg3);border:1px solid rgba(255,255,255,0.07);border-left:4px solid #4ade80;border-radius:12px;margin-bottom:12px;overflow:hidden;transition:border-color .2s,box-shadow .2s}
+    .cpa-item[data-st="expired"]{border-left-color:#f87171}
+    .cpa-item[data-st="soldout"]{border-left-color:#fb923c}
+    .cpa-item[data-st="paused"]{border-left-color:#847e6f}
+    .cpa-item.open{box-shadow:0 6px 24px rgba(0,0,0,.25);border-top-color:var(--gold-border);border-right-color:var(--gold-border);border-bottom-color:var(--gold-border)}
+    .cpa-head{display:flex;align-items:center;gap:14px;padding:14px 16px;cursor:pointer;user-select:none}
+    .cpa-head:hover{background:rgba(255,255,255,0.02)}
+    .cpa-hpct{flex-shrink:0;width:58px;height:58px;border-radius:12px;background:linear-gradient(135deg,#c9a84c,#f0d78c);color:#1a1712;font-family:'Bebas Neue',sans-serif;font-size:26px;display:flex;align-items:center;justify-content:center;line-height:1}
+    .cpa-hpct small{font-size:15px;margin-left:1px}
+    .cpa-item[data-st="expired"] .cpa-hpct,.cpa-item[data-st="paused"] .cpa-hpct{filter:grayscale(.85);opacity:.6}
+    .cpa-hmain{flex:1;min-width:0}
+    .cpa-hcode{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;color:var(--gold);line-height:1.1}
+    .cpa-htitle{font-size:13px;color:var(--text);margin:2px 0 5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .cpa-hmeta{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:11px;color:var(--text-dim)}
+    .cpa-status{font-family:'DM Sans',sans-serif;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;border-radius:20px;padding:3px 9px;border:1px solid}
+    .cpa-status::before{content:'● '}
+    .cpa-status.st-active{background:rgba(22,163,74,.13);color:#4ade80;border-color:rgba(74,222,128,.35)}
+    .cpa-status.st-expired{background:rgba(220,38,38,.13);color:#f87171;border-color:rgba(248,113,113,.35)}
+    .cpa-status.st-soldout{background:rgba(234,88,12,.13);color:#fb923c;border-color:rgba(251,146,60,.35)}
+    .cpa-status.st-paused{background:rgba(255,255,255,.05);color:var(--text-muted);border-color:rgba(255,255,255,.15)}
+    .cpa-chev{flex-shrink:0;width:30px;height:30px;border-radius:50%;background:var(--bg2);color:var(--gold);display:flex;align-items:center;justify-content:center;font-size:14px;transition:transform .25s}
+    .cpa-item.open .cpa-chev{transform:rotate(180deg)}
+    .cpa-body{display:none;padding:4px 16px 16px;border-top:1px solid rgba(255,255,255,0.06)}
+    .cpa-item.open .cpa-body{display:block}
+    .cpa-sec{background:var(--bg2);border:1px solid rgba(255,255,255,0.05);border-radius:10px;padding:14px;margin-top:12px}
+    .cpa-sec-t{font-size:12px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px}
+    .cpa-sec-t small{text-transform:none;letter-spacing:0;color:var(--text-dim);font-weight:500}
+    .cpa-sec .plan-admin-input,.cpa-sec .adm-date-btn{background:var(--bg3)}
+    .cpa-sec .plan-admin-label small{text-transform:none;letter-spacing:0;font-weight:500}
+    .cpa-grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .cpa-grid3{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:12px}
+    .cpa-code-input{font-family:'Bebas Neue',sans-serif;font-size:18px!important;letter-spacing:1.5px;color:var(--gold)!important}
+    .cpa-suffix{position:relative}
+    .cpa-suffix b{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--gold);font-size:13px;pointer-events:none}
+    .cpa-progress-wrap{margin-top:12px;display:grid;grid-template-columns:1fr auto;gap:6px 12px;align-items:center}
+    .cpa-progress-top{display:flex;justify-content:space-between;font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px;font-weight:700}
+    .cpa-progress-top strong{font-family:'Bebas Neue',sans-serif;font-size:17px;color:var(--gold);letter-spacing:1px}
+    .cpa-progress{grid-column:1;height:8px;border-radius:8px;background:var(--bg3);overflow:hidden}
+    .cpa-progress div{height:100%;background:linear-gradient(90deg,#c9a84c,#f0d78c);border-radius:8px;transition:width .4s}
+    .cpa-progress div.full{background:linear-gradient(90deg,#ea580c,#fb923c)}
+    .cpa-mini-btn{grid-column:2;grid-row:1/3;padding:7px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.12);background:none;color:var(--text-muted);font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap}
+    .cpa-mini-btn:hover{border-color:var(--gold);color:var(--gold)}
+    .cpa-chips{display:flex;flex-wrap:wrap;gap:7px;transition:opacity .2s}
+    .cpa-chips.disabled{opacity:.3;pointer-events:none}
+    .cpa-chip{display:inline-flex;cursor:pointer}
+    .cpa-chip input{position:absolute;opacity:0;pointer-events:none}
+    .cpa-chip span{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:20px;border:1px solid rgba(255,255,255,.12);background:var(--bg3);color:var(--text-muted);font-size:12px;font-weight:600;transition:all .15s;line-height:1.2}
+    .cpa-chip span::before{content:'';width:14px;height:14px;border-radius:4px;border:1.5px solid rgba(255,255,255,.25);flex-shrink:0;transition:all .15s;background-position:center;background-repeat:no-repeat}
+    .cpa-chip:hover span{border-color:var(--gold-border);color:var(--text)}
+    .cpa-chip input:checked + span{background:var(--gold-dim);border-color:var(--gold);color:var(--gold)}
+    .cpa-chip input:checked + span::before{background-color:var(--gold);border-color:var(--gold);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231a1712' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E");background-size:10px}
+    .cpa-chip input:focus-visible + span{outline:2px solid var(--gold);outline-offset:2px}
+    .cpa-chip em{font-style:normal;font-size:9px;font-weight:800;padding:1px 5px;border-radius:5px;background:rgba(74,222,128,.15);color:#4ade80}
+    .cpa-chip-all{margin:4px 0 10px}
+    .cpa-chip-all span{font-weight:700;color:var(--gold);border-style:dashed;border-color:var(--gold-border)}
+    .cpa-none{font-size:12px;color:var(--text-dim)}
+    .cpa-note{font-size:11px;color:var(--text-dim);margin-top:8px}
+    .cpa-note em{font-style:normal;font-size:9px;font-weight:800;padding:1px 5px;border-radius:5px;background:rgba(74,222,128,.15);color:#4ade80}
+    .cpa-live{color:#4ade80!important;font-size:10px!important;animation:cpaPulse 2s infinite}
+    @keyframes cpaPulse{50%{opacity:.4}}
+    .cpa-aud{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+    .cpa-aud-opt{position:relative;display:flex;gap:10px;align-items:flex-start;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:var(--bg3);cursor:pointer;transition:all .15s}
+    .cpa-aud-opt:hover{border-color:var(--gold-border)}
+    .cpa-aud-opt input[type=radio]{appearance:none;-webkit-appearance:none;margin:2px 0 0;width:16px;height:16px;border-radius:50%;border:2px solid rgba(255,255,255,.3);flex-shrink:0;cursor:pointer;transition:all .15s}
+    .cpa-aud-opt input[type=radio]:checked{border-color:var(--gold);background:radial-gradient(circle,var(--gold) 45%,transparent 50%)}
+    .cpa-aud-opt:has(input[type=radio]:checked){border-color:var(--gold);background:var(--gold-dim)}
+    .cpa-aud-opt b{display:block;font-size:13px;color:var(--text);margin-bottom:4px}
+    .cpa-aud-opt span{font-size:11.5px;color:var(--text-muted);line-height:1.6}
+    .cpa-days{width:54px;padding:3px 6px;margin:0 3px;border-radius:6px;border:1px solid var(--gold-border);background:var(--bg2);color:var(--gold);font-weight:700;font-size:13px;text-align:center;font-family:'DM Sans',sans-serif}
+    .cpa-days:focus{outline:none;border-color:var(--gold)}
+    .cpa-toggles{display:flex;flex-wrap:wrap;gap:12px 26px}
+    .cpa-switch{display:inline-flex;align-items:center;gap:10px;cursor:pointer;font-size:13px;font-weight:600;color:var(--text)}
+    .cpa-switch input{position:absolute;opacity:0;pointer-events:none}
+    .cpa-switch i{position:relative;width:40px;height:22px;border-radius:22px;background:rgba(255,255,255,.12);transition:background .2s;flex-shrink:0}
+    .cpa-switch i::after{content:'';position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#bbb;transition:transform .2s,background .2s}
+    .cpa-switch input:checked + i{background:var(--gold)}
+    .cpa-switch input:checked + i::after{transform:translateX(18px);background:#1a1712}
+    .cpa-switch input:focus-visible + i{outline:2px solid var(--gold);outline-offset:2px}
+    .cpa-link{display:flex;gap:8px}
+    .cpa-link input{flex:1;color:var(--text-muted)!important;font-size:12px!important}
+    .cpa-link button{padding:8px 16px;border-radius:8px;border:1px solid var(--gold-border);background:var(--gold-dim);color:var(--gold);font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:'DM Sans',sans-serif}
+    .cpa-link button:hover{background:var(--gold);color:#111}
+    .cpa-foot{display:flex;justify-content:space-between;gap:10px;margin-top:14px}
+    .cpa-rm{padding:8px 14px;border-radius:8px;border:1px solid rgba(220,38,38,.3);background:none;color:#f87171;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif}
+    .cpa-rm:hover{background:var(--red-dim)}
+    .cpa-close{padding:8px 14px;border-radius:8px;border:1px solid rgba(255,255,255,.12);background:none;color:var(--text-muted);font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif}
+    @media (max-width:640px){
+      .cpa-grid2,.cpa-grid3,.cpa-aud{grid-template-columns:1fr}
+      .cpa-head{gap:10px;padding:12px}
+      .cpa-hpct{width:48px;height:48px;font-size:21px}
+      .cpa-body{padding:2px 10px 12px}
+      .cpa-link{flex-direction:column}
+    }
   </style>
 </head>
 <body>
@@ -912,7 +1016,20 @@
     <div style="max-width:820px;">
       <div class="cfg-card">
         <div class="cfg-title">🎟️ Cupons de Desconto</div>
-        <div class="cfg-hint" style="margin-bottom:16px;">Crie cupons de desconto para serviços e produtos da loja. Cada cupom gera um <strong>link</strong> para você publicar (Instagram, WhatsApp…): quem abrir o link resgata o cupom e o desconto é aplicado automaticamente. Os cupons marcados com <strong>"Mostrar na página Cupons"</strong> também aparecem no site para o cliente resgatar. Quando a validade termina, o cupom some sozinho.</div>
+        <div class="cfg-hint" style="margin-bottom:12px;">Crie cupons de desconto para serviços e produtos da loja. Clique em um cupom para abrir e editar.</div>
+        <details class="cpa-help">
+          <summary>ℹ️ Como funcionam os cupons</summary>
+          <ul>
+            <li><b>Link do cupom:</b> cada cupom gera um link para publicar (Instagram, WhatsApp…). Quem abrir o link e estiver logado resgata o cupom e o desconto é aplicado sozinho.</li>
+            <li><b>Mostrar na página Cupons:</b> o cupom também aparece no site para o cliente resgatar. Desmarcado, ele só funciona pelo link.</li>
+            <li><b>Validade:</b> no dia seguinte à data escolhida o cupom fica <b>Expirado</b> e some do site. Para reaproveitar, é só escolher uma nova data e salvar — ele volta a ficar <b>Ativo</b>.</li>
+            <li><b>Usos por cliente:</b> quantas vezes a mesma pessoa pode usar o desconto depois de resgatar (0 = ilimitado).</li>
+            <li><b>Limite de pessoas:</b> quantas pessoas podem resgatar o cupom no total (ex.: 10 → mostra 0/10, 1/10…). Ao chegar no limite o cupom fica <b>Esgotado</b> e aparece como indisponível no site e no link. Use "Zerar contador" para liberar novos resgates. 0 = sem limite.</li>
+            <li><b>Para quem aparece:</b> <b>Só clientes novos</b> = só quem criou a conta há no máximo X dias (ex.: 7 → contas de até 7 dias). <b>Só clientes antigos</b> = só quem tem a conta há pelo menos X dias. Isso vale para a página Cupons e para o link.</li>
+            <li><b>Produtos da loja:</b> a lista acompanha a aba Loja em tempo real — produto novo ativado aparece aqui; produto desativado some da lista (e volta marcado se for reativado).</li>
+            <li><b>Cupom ativo:</b> desligue para pausar o cupom sem apagar. Lembre de clicar em <b>💾 Salvar Cupons</b> depois de editar.</li>
+          </ul>
+        </details>
         <div id="coupons-admin-list"></div>
         <button class="cfg-add-btn" onclick="addCouponAdmin()">+ Novo cupom</button>
       </div>
@@ -2314,8 +2431,13 @@
   const CLIENT_SITE_URL = 'https://gabriel-barber-studio.vercel.app';
   let adminCoupons = [];
   let couponSvcNames = [];
-  let couponProducts = [];
+  let couponProducts = [];        // só produtos ATIVOS da Loja (os que aparecem para marcar)
+  let couponAllProductIds = new Set(); // todos os produtos existentes (ativos ou não)
+  let couponStats = {};           // coupon_stats/{CODIGO} → { count }
   let couponsAdminReady = false;
+  let couponsDocLoaded = false, couponSvcLoaded = false, couponProdLoaded = false;
+  let couponLiveStarted = false;
+  const couponOpen = new Set();   // ids dos cupons abertos (expandido)
 
   function couponLink(code){ return CLIENT_SITE_URL + '/?cupom=' + encodeURIComponent(code||''); }
 
@@ -2326,23 +2448,79 @@
     return '<div style="font-size:10px;font-weight:700;color:#4ade80;margin-top:3px;">🎟️ '+esc(a.couponCode)+pf+'</div>';
   }
 
+  function couponsTabVisible(){ const t = document.getElementById('tab-coupons'); return t && t.style.display !== 'none'; }
+
+  // Escutas em tempo real: produtos da Loja, serviços e contador de resgates
+  function startCouponLiveData(){
+    if(couponLiveStarted) return;
+    couponLiveStarted = true;
+    onSnapshot(collection(db,'store_products'), snap=>{
+      // coleta as edições ANTES de trocar a lista de produtos (os índices dos checkboxes mudam)
+      if(couponsAdminReady && document.getElementById('cp-code-0')) adminCoupons = collectCouponsAdmin();
+      const all = snap.docs.map(d=>({ id:d.id, ...d.data() }));
+      couponAllProductIds = new Set(all.map(p=>p.id));
+      couponProducts = all.filter(p=>p.active !== false)
+        .sort((a,b)=>(a.name||'').localeCompare(b.name||'','pt-BR'))
+        .map(p=>({ id:p.id, name:p.name||'Produto', brl: p.costType === 'brl' }));
+      couponProdLoaded = true;
+      finishCouponLoad();
+    }, e=>{ console.warn('coupons/products:', e); couponProdLoaded = true; finishCouponLoad(); });
+
+    onSnapshot(doc(db,'config','services'), snap=>{
+      if(couponsAdminReady && document.getElementById('cp-code-0')) adminCoupons = collectCouponsAdmin();
+      couponSvcNames = (snap.exists() && Array.isArray(snap.data().list)) ? snap.data().list.map(x=>x.name).filter(Boolean) : [];
+      couponSvcLoaded = true;
+      finishCouponLoad();
+    }, e=>{ console.warn('coupons/services:', e); couponSvcLoaded = true; finishCouponLoad(); });
+
+    onSnapshot(collection(db,'coupon_stats'), snap=>{
+      const s = {}; snap.docs.forEach(d=>{ s[d.id] = d.data(); });
+      couponStats = s;
+      if(couponsAdminReady) adminCoupons.forEach((c,i)=>refreshCouponHeader(i));
+    }, e=>console.warn('coupon_stats:', e));
+  }
+
+  function finishCouponLoad(){
+    if(!(couponsDocLoaded && couponSvcLoaded && couponProdLoaded)) return;
+    couponsAdminReady = true;
+    if(couponsTabVisible()) renderCouponsAdmin();
+  }
+
   async function loadCouponsAdmin(){
-    couponsAdminReady = false;
+    startCouponLiveData();
+    couponsAdminReady = false; couponsDocLoaded = false;
+    const box = document.getElementById('coupons-admin-list');
+    if(box) box.innerHTML = '<div style="text-align:center;padding:24px 0;"><div class="spinner" style="margin:0 auto;width:24px;height:24px;"></div></div>';
     try{
-      const [cs, ss, ps] = await Promise.all([
-        getDoc(doc(db,'config','coupons')),
-        getDoc(doc(db,'config','services')),
-        getDocs(collection(db,'store_products')),
-      ]);
+      const cs = await getDoc(doc(db,'config','coupons'));
       adminCoupons = (cs.exists() && Array.isArray(cs.data().list)) ? cs.data().list.map(c=>({...c})) : [];
-      couponSvcNames = (ss.exists() && Array.isArray(ss.data().list)) ? ss.data().list.map(x=>x.name).filter(Boolean) : [];
-      couponProducts = ps.docs.map(d=>({ id:d.id, name:d.data().name||'Produto', brl: d.data().costType === 'brl' }));
-      couponsAdminReady = true;
+      couponsDocLoaded = true;
+      finishCouponLoad();
     }catch(e){
       console.error('loadCouponsAdmin', e);
       showToast('Erro ao carregar cupons: '+e.message,'red');
+      renderCouponsAdmin();
     }
-    renderCouponsAdmin();
+  }
+
+  // ── Status do cupom ──
+  function couponCount(code){ return (couponStats[code] && Number(couponStats[code].count)) || 0; }
+  function couponStatusOf(c){
+    const today = getTodayStr();
+    const lim = parseInt(c.maxRedemptions)||0;
+    if(c.active === false) return { key:'paused',  label:'Pausado' };
+    if(c.expiresAt && c.expiresAt < today) return { key:'expired', label:'Expirado' };
+    if(lim > 0 && couponCount(c.code) >= lim) return { key:'soldout', label:'Esgotado' };
+    return { key:'active', label:'Ativo' };
+  }
+  function couponAudienceText(c){
+    if(c.audience === 'new') return 'Novos clientes (conta com até '+(c.audienceNewDays||7)+' dia'+((c.audienceNewDays||7)>1?'s':'')+')';
+    if(c.audience === 'old') return 'Clientes antigos (conta com '+(c.audienceOldDays||30)+'+ dias)';
+    return 'Todos os clientes';
+  }
+  function couponRedeemText(c){
+    const lim = parseInt(c.maxRedemptions)||0, n = couponCount(c.code);
+    return lim > 0 ? n+'/'+lim+' resgates' : n+' resgate'+(n===1?'':'s')+' · sem limite';
   }
 
   function renderCouponsAdmin(){
@@ -2353,84 +2531,178 @@
       return;
     }
     if(!adminCoupons.length){
-      box.innerHTML = '<div style="text-align:center;padding:24px 0;color:var(--text-dim);font-size:13px;">Nenhum cupom criado ainda. Clique em "+ Novo cupom".</div>';
+      box.innerHTML = '<div class="cpa-empty">🎟️<div>Nenhum cupom criado ainda.</div><span>Clique em "+ Novo cupom" para começar.</span></div>';
       return;
     }
-    const today = getTodayStr();
-    const chk = 'accent-color:var(--gold);width:15px;height:15px;';
     box.innerHTML = adminCoupons.map((c,i)=>{
-      const expired = c.expiresAt && c.expiresAt < today;
-      const svcChecks = couponSvcNames.length
-        ? couponSvcNames.map((n,j)=>'<label style="display:flex;align-items:center;gap:7px;font-size:12px;color:var(--text);cursor:pointer;"><input type="checkbox" style="'+chk+'" id="cp-svc-'+i+'-'+j+'" '+((c.serviceNames||[]).includes(n)?'checked':'')+'> '+esc(n)+'</label>').join('')
-        : '<span style="font-size:12px;color:var(--text-dim);">Nenhum serviço cadastrado.</span>';
-      const prodChecks = couponProducts.length
-        ? couponProducts.map((pr,j)=>'<label style="display:flex;align-items:center;gap:7px;font-size:12px;color:var(--text);cursor:pointer;"><input type="checkbox" style="'+chk+'" id="cp-prod-'+i+'-'+j+'" '+((c.productIds||[]).includes(pr.id)?'checked':'')+'> '+esc(pr.name)+(pr.brl?' <span style="color:var(--text-dim);font-size:11px;">(vendido em R$ — sem desconto por enquanto)</span>':'')+'</label>').join('')
-        : '<span style="font-size:12px;color:var(--text-dim);">Nenhum produto cadastrado.</span>';
-      return '<div class="plan-admin-card" style="margin-bottom:14px;">'
-        +'<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;">'
-          +'<div style="font-family:Bebas Neue,sans-serif;font-size:18px;color:var(--gold);">Cupom '+(i+1)
-            +(expired?' <span style="font-family:DM Sans,sans-serif;font-size:10px;font-weight:700;background:rgba(220,38,38,.15);color:#f87171;border:1px solid rgba(220,38,38,.35);border-radius:20px;padding:2px 8px;margin-left:6px;">Expirado</span>':'')
+      const isOpen = couponOpen.has(c.id);
+      const svcChips = couponSvcNames.length
+        ? couponSvcNames.map((n,j)=>'<label class="cpa-chip"><input type="checkbox" id="cp-svc-'+i+'-'+j+'" '+((c.serviceNames||[]).includes(n)?'checked':'')+'><span>'+esc(n)+'</span></label>').join('')
+        : '<span class="cpa-none">Nenhum serviço cadastrado.</span>';
+      const prodChips = couponProducts.length
+        ? couponProducts.map((pr,j)=>'<label class="cpa-chip"'+(pr.brl?' title="Vendido em R$ — o desconto ainda não é aplicado nesses produtos"':'')+'><input type="checkbox" id="cp-prod-'+i+'-'+j+'" '+((c.productIds||[]).includes(pr.id)?'checked':'')+'><span>'+esc(pr.name)+(pr.brl?' <em>R$</em>':'')+'</span></label>').join('')
+        : '<span class="cpa-none">Nenhum produto ativo na Loja.</span>';
+      const aud = c.audience || 'all';
+      const lim = parseInt(c.maxRedemptions)||0;
+      return '<div class="cpa-item'+(isOpen?' open':'')+'" id="cpa-item-'+i+'">'
+        // ── Cabeçalho (lista fechada) ──
+        +'<div class="cpa-head" onclick="toggleCouponOpen('+i+')">'
+          +'<div class="cpa-hpct" id="cpa-hpct-'+i+'"></div>'
+          +'<div class="cpa-hmain">'
+            +'<div class="cpa-hcode"><span id="cpa-hcode-'+i+'"></span><span class="cpa-status" id="cpa-hst-'+i+'"></span></div>'
+            +'<div class="cpa-htitle" id="cpa-htitle-'+i+'"></div>'
+            +'<div class="cpa-hmeta" id="cpa-hmeta-'+i+'"></div>'
           +'</div>'
-          +'<button onclick="removeCouponAdmin('+i+')" style="padding:5px 12px;border-radius:7px;border:1px solid rgba(220,38,38,.3);background:none;color:#f87171;font-size:12px;font-weight:600;cursor:pointer;">Remover</button>'
+          +'<div class="cpa-chev">▾</div>'
         +'</div>'
-        +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">'
-          +'<div><span class="plan-admin-label">Código do cupom</span><input class="plan-admin-input" id="cp-code-'+i+'" value="'+esc(c.code||'')+'" placeholder="Ex: BEMVINDO10" maxlength="24" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9_-]/g,\'\');updateCouponLink('+i+')"></div>'
-          +'<div><span class="plan-admin-label">Desconto (%)</span><input type="number" class="plan-admin-input" id="cp-pct-'+i+'" value="'+(c.discountPct||10)+'" min="1" max="100" step="1"></div>'
-        +'</div>'
-        +'<div style="margin-bottom:12px;"><span class="plan-admin-label">Título (aparece para o cliente)</span><input class="plan-admin-input" id="cp-title-'+i+'" value="'+esc(c.title||'')+'" placeholder="Ex: 10% OFF no corte"></div>'
-        +'<div style="margin-bottom:12px;"><span class="plan-admin-label">Descrição (opcional)</span><input class="plan-admin-input" id="cp-desc-'+i+'" value="'+esc(c.description||'')+'" placeholder="Ex: Válido para o primeiro corte do mês"></div>'
-        +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">'
-          +'<div><span class="plan-admin-label">Validade (sem data = sem prazo)</span>'
-            +'<input type="hidden" id="cp-exp-'+i+'" value="'+esc(c.expiresAt||'')+'">'
-            +'<button type="button" class="adm-date-btn'+(c.expiresAt?' has-value':'')+'" onclick="openAdminDatePicker(\'cp-exp-'+i+'\',\'cp-explbl-'+i+'\')"><span id="cp-explbl-'+i+'">'+(c.expiresAt?('📅 '+c.expiresAt.split('-').reverse().join('/')):'📅 Sem prazo — clique para escolher')+'</span>'
-            +'<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 4h-1V2h-2v2H8V2H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 16H5V10h14v10z"/></svg></button></div>'
-          +'<div><span class="plan-admin-label">Usos por cliente (0 = ilimitado)</span><input type="number" class="plan-admin-input" id="cp-max-'+i+'" value="'+(c.maxUsesPerClient===undefined?1:c.maxUsesPerClient)+'" min="0" step="1"></div>'
-        +'</div>'
-        +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">'
-          +'<div><span class="plan-admin-label">Serviços com desconto</span>'
-            +'<label style="display:flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:var(--gold);cursor:pointer;margin:6px 0;"><input type="checkbox" style="'+chk+'" id="cp-allsvc-'+i+'" '+(c.allServices?'checked':'')+' onchange="toggleCouponAll('+i+',\'svc\')"> Todos os serviços</label>'
-            +'<div id="cp-svcbox-'+i+'" style="display:flex;flex-direction:column;gap:6px;'+(c.allServices?'opacity:.35;pointer-events:none;':'')+'">'+svcChecks+'</div></div>'
-          +'<div><span class="plan-admin-label">Produtos da loja com desconto</span>'
-            +'<label style="display:flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:var(--gold);cursor:pointer;margin:6px 0;"><input type="checkbox" style="'+chk+'" id="cp-allprod-'+i+'" '+(c.allProducts?'checked':'')+' onchange="toggleCouponAll('+i+',\'prod\')"> Todos os produtos</label>'
-            +'<div id="cp-prodbox-'+i+'" style="display:flex;flex-direction:column;gap:6px;'+(c.allProducts?'opacity:.35;pointer-events:none;':'')+'">'+prodChecks+'</div></div>'
-        +'</div>'
-        +'<div style="display:flex;flex-wrap:wrap;gap:18px;margin-bottom:14px;">'
-          +'<label style="display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:var(--text);cursor:pointer;"><input type="checkbox" style="'+chk+'" id="cp-active-'+i+'" '+(c.active!==false?'checked':'')+'> Cupom ativo</label>'
-          +'<label style="display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:var(--text);cursor:pointer;"><input type="checkbox" style="'+chk+'" id="cp-public-'+i+'" '+(c.showPublic!==false?'checked':'')+'> Mostrar na página Cupons do site</label>'
-        +'</div>'
-        +'<div><span class="plan-admin-label">Link do cupom (publique no Instagram, WhatsApp…)</span>'
-          +'<div style="display:flex;gap:8px;"><input class="plan-admin-input" id="cp-link-'+i+'" readonly value="'+esc(c.code?couponLink(c.code):'Defina o código para gerar o link')+'" style="flex:1;color:var(--text-muted);">'
-          +'<button onclick="copyCouponLink('+i+')" style="padding:8px 14px;border-radius:8px;border:1px solid var(--gold-border);background:var(--gold-dim);color:var(--gold);font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">📋 Copiar</button></div>'
+        // ── Corpo (formulário) ──
+        +'<div class="cpa-body">'
+          +'<div class="cpa-sec"><div class="cpa-sec-t">📝 Informações</div>'
+            +'<div class="cpa-grid2">'
+              +'<div><span class="plan-admin-label">Código do cupom</span><input class="plan-admin-input cpa-code-input" id="cp-code-'+i+'" value="'+esc(c.code||'')+'" placeholder="Ex: BEMVINDO10" maxlength="24" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9_-]/g,\'\');updateCouponLink('+i+');refreshCouponHeader('+i+')"></div>'
+              +'<div><span class="plan-admin-label">Desconto (%)</span><div class="cpa-suffix"><input type="number" class="plan-admin-input" id="cp-pct-'+i+'" value="'+(c.discountPct||10)+'" min="1" max="100" step="1" oninput="refreshCouponHeader('+i+')"><b>%</b></div></div>'
+            +'</div>'
+            +'<div style="margin-top:12px;"><span class="plan-admin-label">Título (aparece para o cliente)</span><input class="plan-admin-input" id="cp-title-'+i+'" value="'+esc(c.title||'')+'" placeholder="Ex: 10% OFF no corte" oninput="refreshCouponHeader('+i+')"></div>'
+            +'<div style="margin-top:12px;"><span class="plan-admin-label">Descrição (opcional)</span><input class="plan-admin-input" id="cp-desc-'+i+'" value="'+esc(c.description||'')+'" placeholder="Ex: Válido para o primeiro corte do mês"></div>'
+          +'</div>'
+
+          +'<div class="cpa-sec"><div class="cpa-sec-t">⏳ Validade e limites</div>'
+            +'<div class="cpa-grid3">'
+              +'<div><span class="plan-admin-label">Validade (sem data = sem prazo)</span>'
+                +'<input type="hidden" id="cp-exp-'+i+'" value="'+esc(c.expiresAt||'')+'">'
+                +'<button type="button" class="adm-date-btn'+(c.expiresAt?' has-value':'')+'" onclick="openAdminDatePicker(\'cp-exp-'+i+'\',\'cp-explbl-'+i+'\')"><span id="cp-explbl-'+i+'">'+(c.expiresAt?('📅 '+c.expiresAt.split('-').reverse().join('/')):'📅 Sem prazo — clique para escolher')+'</span>'
+                +'<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 4h-1V2h-2v2H8V2H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 16H5V10h14v10z"/></svg></button></div>'
+              +'<div><span class="plan-admin-label">Usos por cliente <small>(0 = ilimitado)</small></span><input type="number" class="plan-admin-input" id="cp-max-'+i+'" value="'+(c.maxUsesPerClient===undefined?1:c.maxUsesPerClient)+'" min="0" step="1"></div>'
+              +'<div><span class="plan-admin-label">Limite de pessoas <small>(0 = sem limite)</small></span><input type="number" class="plan-admin-input" id="cp-lim-'+i+'" value="'+lim+'" min="0" step="1" oninput="refreshCouponHeader('+i+')"></div>'
+            +'</div>'
+            +'<div class="cpa-progress-wrap">'
+              +'<div class="cpa-progress-top"><span>Resgates</span><strong id="cpa-pcount-'+i+'"></strong></div>'
+              +'<div class="cpa-progress"><div id="cpa-pbar-'+i+'"></div></div>'
+              +'<button type="button" class="cpa-mini-btn" onclick="resetCouponCount('+i+')">↺ Zerar contador</button>'
+            +'</div>'
+          +'</div>'
+
+          +'<div class="cpa-sec"><div class="cpa-sec-t">✂️ Onde o desconto vale</div>'
+            +'<div class="cpa-grid2">'
+              +'<div><span class="plan-admin-label">Serviços com desconto</span>'
+                +'<label class="cpa-chip cpa-chip-all"><input type="checkbox" id="cp-allsvc-'+i+'" '+(c.allServices?'checked':'')+' onchange="toggleCouponAll('+i+',\'svc\')"><span>★ Todos os serviços</span></label>'
+                +'<div class="cpa-chips'+(c.allServices?' disabled':'')+'" id="cp-svcbox-'+i+'">'+svcChips+'</div></div>'
+              +'<div><span class="plan-admin-label">Produtos da loja com desconto <small class="cpa-live">● ao vivo</small></span>'
+                +'<label class="cpa-chip cpa-chip-all"><input type="checkbox" id="cp-allprod-'+i+'" '+(c.allProducts?'checked':'')+' onchange="toggleCouponAll('+i+',\'prod\')"><span>★ Todos os produtos</span></label>'
+                +'<div class="cpa-chips'+(c.allProducts?' disabled':'')+'" id="cp-prodbox-'+i+'">'+prodChips+'</div>'
+                +(couponProducts.some(p=>p.brl)?'<div class="cpa-note"><em>R$</em> = produto vendido em reais — o desconto ainda não é aplicado nesses itens.</div>':'')
+              +'</div>'
+            +'</div>'
+          +'</div>'
+
+          +'<div class="cpa-sec"><div class="cpa-sec-t">🎯 Para quem o cupom aparece</div>'
+            +'<div class="cpa-aud">'
+              +'<label class="cpa-aud-opt"><input type="radio" name="cp-aud-'+i+'" id="cp-aud-all-'+i+'" value="all" '+(aud==='all'?'checked':'')+' onchange="refreshCouponHeader('+i+')"><div><b>Todos os clientes</b><span>Qualquer cliente pode ver e resgatar.</span></div></label>'
+              +'<label class="cpa-aud-opt"><input type="radio" name="cp-aud-'+i+'" id="cp-aud-new-'+i+'" value="new" '+(aud==='new'?'checked':'')+' onchange="refreshCouponHeader('+i+')"><div><b>Só clientes novos</b><span>Conta criada há no máximo <input type="number" class="cpa-days" id="cp-newdays-'+i+'" value="'+(c.audienceNewDays||7)+'" min="1" step="1" onclick="event.stopPropagation()" onfocus="document.getElementById(\'cp-aud-new-'+i+'\').checked=true;refreshCouponHeader('+i+')" oninput="refreshCouponHeader('+i+')"> dias</span></div></label>'
+              +'<label class="cpa-aud-opt"><input type="radio" name="cp-aud-'+i+'" id="cp-aud-old-'+i+'" value="old" '+(aud==='old'?'checked':'')+' onchange="refreshCouponHeader('+i+')"><div><b>Só clientes antigos</b><span>Conta criada há pelo menos <input type="number" class="cpa-days" id="cp-olddays-'+i+'" value="'+(c.audienceOldDays||30)+'" min="1" step="1" onclick="event.stopPropagation()" onfocus="document.getElementById(\'cp-aud-old-'+i+'\').checked=true;refreshCouponHeader('+i+')" oninput="refreshCouponHeader('+i+')"> dias</span></div></label>'
+            +'</div>'
+          +'</div>'
+
+          +'<div class="cpa-sec"><div class="cpa-sec-t">👁️ Visibilidade</div>'
+            +'<div class="cpa-toggles">'
+              +'<label class="cpa-switch"><input type="checkbox" id="cp-active-'+i+'" '+(c.active!==false?'checked':'')+' onchange="refreshCouponHeader('+i+')"><i></i><span>Cupom ativo</span></label>'
+              +'<label class="cpa-switch"><input type="checkbox" id="cp-public-'+i+'" '+(c.showPublic!==false?'checked':'')+' onchange="refreshCouponHeader('+i+')"><i></i><span>Mostrar na página Cupons do site</span></label>'
+            +'</div>'
+          +'</div>'
+
+          +'<div class="cpa-sec"><div class="cpa-sec-t">🔗 Link do cupom <small>(publique no Instagram, WhatsApp…)</small></div>'
+            +'<div class="cpa-link"><input class="plan-admin-input" id="cp-link-'+i+'" readonly value="'+esc(c.code?couponLink(c.code):'Defina o código para gerar o link')+'">'
+            +'<button type="button" onclick="copyCouponLink('+i+')">📋 Copiar</button></div>'
+          +'</div>'
+
+          +'<div class="cpa-foot"><button type="button" class="cpa-rm" onclick="removeCouponAdmin('+i+')">🗑️ Remover cupom</button>'
+          +'<button type="button" class="cpa-close" onclick="toggleCouponOpen('+i+')">Fechar ▴</button></div>'
         +'</div>'
       +'</div>';
     }).join('');
+    adminCoupons.forEach((c,i)=>refreshCouponHeader(i));
+  }
+
+  // Lê UM cupom da tela
+  function collectCouponAt(i, c){
+    const val = id => document.getElementById(id);
+    if(!val('cp-code-'+i)) return { ...c };
+    const allServices = !!val('cp-allsvc-'+i)?.checked;
+    const allProducts = !!val('cp-allprod-'+i)?.checked;
+    const serviceNames = allServices ? [] : couponSvcNames.filter((n,j)=>val('cp-svc-'+i+'-'+j)?.checked);
+    const chosen = allProducts ? [] : couponProducts.filter((pr,j)=>val('cp-prod-'+i+'-'+j)?.checked);
+    // Mantém produtos marcados que estão DESATIVADOS na Loja (voltam marcados se o Gabriel reativar)
+    const visible = new Set(couponProducts.map(p=>p.id));
+    const keptIds = [], keptNames = [];
+    if(!allProducts) (c.productIds||[]).forEach((id,k)=>{ if(!visible.has(id) && couponAllProductIds.has(id)){ keptIds.push(id); keptNames.push((c.productNames||[])[k]||''); } });
+    const pct = parseInt(val('cp-pct-'+i)?.value);
+    const aud = val('cp-aud-new-'+i)?.checked ? 'new' : (val('cp-aud-old-'+i)?.checked ? 'old' : 'all');
+    return {
+      id: c.id,
+      code: (val('cp-code-'+i)?.value||'').trim().toUpperCase().replace(/[^A-Z0-9_-]/g,''),
+      title: (val('cp-title-'+i)?.value||'').trim(),
+      description: (val('cp-desc-'+i)?.value||'').trim(),
+      discountPct: isNaN(pct) ? 0 : pct,
+      allServices, serviceNames,
+      allProducts,
+      productIds: chosen.map(x=>x.id).concat(keptIds),
+      productNames: chosen.map(x=>x.name).concat(keptNames),
+      expiresAt: val('cp-exp-'+i)?.value || '',
+      maxUsesPerClient: Math.max(0, parseInt(val('cp-max-'+i)?.value)||0),
+      maxRedemptions: Math.max(0, parseInt(val('cp-lim-'+i)?.value)||0),
+      audience: aud,
+      audienceNewDays: Math.max(1, parseInt(val('cp-newdays-'+i)?.value)||7),
+      audienceOldDays: Math.max(1, parseInt(val('cp-olddays-'+i)?.value)||30),
+      showPublic: !!val('cp-public-'+i)?.checked,
+      active: !!val('cp-active-'+i)?.checked,
+      createdAt: c.createdAt || new Date().toISOString(),
+    };
   }
 
   // Lê os campos da tela de volta para o array (sem validar)
   function collectCouponsAdmin(){
-    const val = id => document.getElementById(id);
-    return adminCoupons.map((c,i)=>{
-      const allServices = !!val('cp-allsvc-'+i)?.checked;
-      const allProducts = !!val('cp-allprod-'+i)?.checked;
-      const serviceNames = allServices ? [] : couponSvcNames.filter((n,j)=>val('cp-svc-'+i+'-'+j)?.checked);
-      const chosen = allProducts ? [] : couponProducts.filter((pr,j)=>val('cp-prod-'+i+'-'+j)?.checked);
-      const pct = parseInt(val('cp-pct-'+i)?.value);
-      return {
-        id: c.id,
-        code: (val('cp-code-'+i)?.value||'').trim().toUpperCase().replace(/[^A-Z0-9_-]/g,''),
-        title: (val('cp-title-'+i)?.value||'').trim(),
-        description: (val('cp-desc-'+i)?.value||'').trim(),
-        discountPct: isNaN(pct) ? 0 : pct,
-        allServices, serviceNames,
-        allProducts, productIds: chosen.map(x=>x.id), productNames: chosen.map(x=>x.name),
-        expiresAt: val('cp-exp-'+i)?.value || '',
-        maxUsesPerClient: Math.max(0, parseInt(val('cp-max-'+i)?.value)||0),
-        showPublic: !!val('cp-public-'+i)?.checked,
-        active: !!val('cp-active-'+i)?.checked,
-        createdAt: c.createdAt || new Date().toISOString(),
-      };
-    });
+    return adminCoupons.map((c,i)=>collectCouponAt(i, c));
   }
+
+  // Atualiza o cabeçalho (status, resgates, validade…) enquanto o Gabriel edita
+  window.refreshCouponHeader = function(i){
+    const base = adminCoupons[i]; if(!base) return;
+    const c = collectCouponAt(i, base);
+    const set = (id, h) => { const el = document.getElementById(id); if(el) el.innerHTML = h; };
+    const st = couponStatusOf(c);
+    set('cpa-hpct-'+i, (c.discountPct||0)+'<small>%</small>');
+    set('cpa-hcode-'+i, esc(c.code || 'SEM CÓDIGO'));
+    set('cpa-htitle-'+i, esc(c.title || 'Sem título'));
+    const stEl = document.getElementById('cpa-hst-'+i);
+    if(stEl){ stEl.className = 'cpa-status st-'+st.key; stEl.textContent = st.label; }
+    const exp = c.expiresAt ? 'até '+c.expiresAt.split('-').reverse().join('/') : 'sem prazo';
+    set('cpa-hmeta-'+i,
+      '<span>📅 '+exp+'</span>'
+      +'<span>👥 '+esc(couponRedeemText(c))+'</span>'
+      +'<span>🎯 '+esc(couponAudienceText(c))+'</span>'
+      +(c.showPublic?'<span>🌐 No site</span>':'<span>🔗 Só pelo link</span>'));
+    const lim = c.maxRedemptions, n = couponCount(c.code);
+    set('cpa-pcount-'+i, lim > 0 ? n+'/'+lim : n+' (sem limite)');
+    const bar = document.getElementById('cpa-pbar-'+i);
+    if(bar){ bar.style.width = lim > 0 ? Math.min(100, Math.round(n*100/lim))+'%' : '0%'; bar.className = (lim > 0 && n >= lim) ? 'full' : ''; }
+    document.getElementById('cpa-item-'+i)?.setAttribute('data-st', st.key);
+  };
+
+  window.toggleCouponOpen = function(i){
+    const c = adminCoupons[i]; if(!c) return;
+    const el = document.getElementById('cpa-item-'+i);
+    if(couponOpen.has(c.id)){ couponOpen.delete(c.id); el?.classList.remove('open'); }
+    else { couponOpen.add(c.id); el?.classList.add('open'); }
+  };
+
+  window.resetCouponCount = async function(i){
+    const c = adminCoupons[i]; if(!c) return;
+    const code = (document.getElementById('cp-code-'+i)?.value||c.code||'').trim();
+    if(!code){ showToast('Defina o código do cupom primeiro','red'); return; }
+    if(!(await showGBConfirm('↺ Zerar resgates','Zerar o contador de resgates do cupom <strong>'+esc(code)+'</strong>? Novas pessoas poderão resgatar até o limite de novo. Quem já resgatou continua com o cupom.','Sim, zerar','Cancelar','red'))) return;
+    try{ await setDoc(doc(db,'coupon_stats',code), { count:0, resetAt:new Date().toISOString() }, { merge:true }); showToast('Contador zerado!','green'); }
+    catch(e){ showToast('Erro ao zerar: '+e.message,'red'); }
+  };
 
   // ── Calendário personalizado (escolhe a data e grava no <input type="hidden"> informado) ──
   let admCal = { inputId:null, labelId:null, y:0, m:0 };
@@ -2476,6 +2748,7 @@
       lbl.textContent = iso ? '📅 '+iso.split('-').reverse().join('/') : '📅 Sem prazo — clique para escolher';
       lbl.closest('.adm-date-btn')?.classList.toggle('has-value', !!iso);
     }
+    const mCp = /^cp-exp-(\d+)$/.exec(admCal.inputId||''); if(mCp) refreshCouponHeader(+mCp[1]);
     closeDpCal();
   }
 
@@ -2534,13 +2807,20 @@
   window.addCouponAdmin = function(){
     if(!couponsAdminReady){ showToast('Aguarde o carregamento dos cupons','red'); return; }
     adminCoupons = collectCouponsAdmin();
+    const id = 'cp_'+Date.now();
     adminCoupons.push({
-      id:'cp_'+Date.now(), code:'', title:'', description:'', discountPct:10,
+      id, code:'', title:'', description:'', discountPct:10,
       allServices:false, serviceNames:[], allProducts:false, productIds:[], productNames:[],
-      expiresAt:'', maxUsesPerClient:1, showPublic:true, active:true, createdAt:new Date().toISOString(),
+      expiresAt:'', maxUsesPerClient:1, maxRedemptions:0,
+      audience:'all', audienceNewDays:7, audienceOldDays:30,
+      showPublic:true, active:true, createdAt:new Date().toISOString(),
     });
+    couponOpen.add(id);
     renderCouponsAdmin();
-    setTimeout(()=>{ document.getElementById('cp-code-'+(adminCoupons.length-1))?.focus(); },60);
+    setTimeout(()=>{
+      const el = document.getElementById('cp-code-'+(adminCoupons.length-1));
+      if(el){ el.focus(); el.scrollIntoView({behavior:'smooth', block:'center'}); }
+    },60);
   };
 
   window.removeCouponAdmin = async function(i){
@@ -2549,6 +2829,7 @@
     if(!(await showGBConfirm('🗑️ Remover Cupom','Deseja remover o cupom <strong>'+esc(label)+'</strong>? Clientes que já o resgataram perdem o desconto. Clique em "Salvar Cupons" para confirmar.','Sim, remover','Cancelar','red'))) return;
     adminCoupons = collectCouponsAdmin();
     adminCoupons.splice(i,1);
+    couponOpen.delete(c.id);
     renderCouponsAdmin();
   };
 
@@ -2556,15 +2837,14 @@
     if(!couponsAdminReady){ showToast('Os cupons não carregaram. Abra a aba novamente antes de salvar.','red'); return; }
     const list = collectCouponsAdmin();
     const seen = new Set();
+    const fail = (i, msg) => { couponOpen.add(list[i].id); adminCoupons = list; renderCouponsAdmin(); showToast(msg,'red'); };
     for(let i=0;i<list.length;i++){
       const c = list[i]; const lb = 'Cupom '+(i+1);
-      if(!c.code){ showToast(lb+': informe o código do cupom','red'); return; }
-      if(seen.has(c.code)){ showToast('Código repetido: '+c.code,'red'); return; }
+      if(!c.code) return fail(i, lb+': informe o código do cupom');
+      if(seen.has(c.code)) return fail(i, 'Código repetido: '+c.code);
       seen.add(c.code);
-      if(!(c.discountPct>=1 && c.discountPct<=100)){ showToast(lb+' ('+c.code+'): o desconto deve ficar entre 1% e 100%','red'); return; }
-      if(!c.allServices && !c.serviceNames.length && !c.allProducts && !c.productIds.length){
-        showToast(lb+' ('+c.code+'): escolha pelo menos um serviço ou produto','red'); return;
-      }
+      if(!(c.discountPct>=1 && c.discountPct<=100)) return fail(i, lb+' ('+c.code+'): o desconto deve ficar entre 1% e 100%');
+      if(!c.allServices && !c.serviceNames.length && !c.allProducts && !c.productIds.length) return fail(i, lb+' ('+c.code+'): escolha pelo menos um serviço ou produto');
     }
     try{
       await setDoc(doc(db,'config','coupons'), { list, updatedAt: new Date().toISOString() });
@@ -3640,6 +3920,23 @@
       } catch(e){}
     }
 
+    // Data de criação da conta (clientes antigos sem o campo: estimada pelo 1º agendamento)
+    let clientCreated = '', clientCreatedEst = false;
+    try {
+      let iso = clientData && clientData.createdAt;
+      if(!iso){
+        const firsts = apts.map(a=>a.createdAt || (a.date ? a.date+'T12:00:00' : '')).filter(Boolean).sort();
+        if(firsts.length){ iso = firsts[0]; clientCreatedEst = true; }
+      }
+      if(iso){
+        const d = new Date(iso);
+        if(!isNaN(d)){
+          const days = Math.max(0, Math.floor((new Date(getTodayStr()+'T12:00:00') - new Date(d.getFullYear(),d.getMonth(),d.getDate(),12))/86400000));
+          clientCreated = d.toLocaleDateString('pt-BR') + ' <span style="color:var(--text-dim);font-weight:500;">('+(days===0?'hoje':'há '+days+' dia'+(days>1?'s':''))+(clientCreatedEst?' · estimada pelo 1º agendamento':'')+')</span>';
+        }
+      }
+    } catch(e){}
+
     // Buscar saldo GB$, saldo R$ e valor da moeda
     let gbBalance = 0;
     let gbBalanceBrl = 0;
@@ -3683,6 +3980,7 @@
       +'<div style="background:var(--bg3);border-radius:10px;padding:14px;margin-bottom:12px;">'
       +'<div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:6px;">Informações</div>'
       +'<div style="font-size:13px;margin-bottom:4px;"><span style="color:var(--text-muted);">Telefone:</span> <strong>'+esc(phone||'—')+'</strong></div>'
+      +'<div style="font-size:13px;margin-bottom:4px;"><span style="color:var(--text-muted);">Conta criada em:</span> <strong>'+(clientCreated||'—')+'</strong></div>'
       +(clientBirth?'<div style="font-size:13px;margin-bottom:4px;"><span style="color:var(--text-muted);">Nascimento:</span> <strong>'+clientBirth+'</strong></div>':'')
       +(favSvc?'<div style="font-size:13px;"><span style="color:var(--text-muted);">Serviço favorito:</span> <strong>'+esc(favSvc[0])+'</strong> ('+favSvc[1]+'x)</div>':'')
       +'</div>'
