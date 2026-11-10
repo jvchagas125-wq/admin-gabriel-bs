@@ -660,6 +660,13 @@
     .cpa-rm{padding:8px 14px;border-radius:8px;border:1px solid rgba(220,38,38,.3);background:none;color:#f87171;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif}
     .cpa-rm:hover{background:var(--red-dim)}
     .cpa-close{padding:8px 14px;border-radius:8px;border:1px solid rgba(255,255,255,.12);background:none;color:var(--text-muted);font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif}
+    .cpa-cl-det > summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:6px;margin-bottom:0;user-select:none}
+    .cpa-cl-det > summary::-webkit-details-marker{display:none}
+    .cpa-cl-det > summary .cpa-cl-hint{margin-left:auto;display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.3px;text-transform:none;color:var(--text-muted);padding:4px 10px;border-radius:20px;border:1px solid rgba(255,255,255,.12)}
+    .cpa-cl-det > summary .cpa-cl-hint::after{content:'▾';transition:transform .2s}
+    .cpa-cl-det[open] > summary .cpa-cl-hint::after{transform:rotate(180deg)}
+    .cpa-cl-det > summary:hover .cpa-cl-hint{border-color:var(--gold);color:var(--gold)}
+    .cpa-cl-det[open] > summary{margin-bottom:12px}
     .cpa-claimers{display:flex;flex-direction:column;gap:6px;max-height:320px;overflow-y:auto}
     .cpa-claimer{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:9px;background:var(--bg3);border:1px solid rgba(255,255,255,.05)}
     .cpa-claimer.old{opacity:.55}
@@ -2451,6 +2458,7 @@
   let couponsDocLoaded = false, couponSvcLoaded = false, couponProdLoaded = false;
   let couponLiveStarted = false;
   const couponOpen = new Set();   // ids dos cupons abertos (expandido)
+  const couponClaimOpen = new Set(); // ids dos cupons com a lista "Quem resgatou" aberta
 
   function couponLink(code){ return CLIENT_SITE_URL + '/?cupom=' + encodeURIComponent(code||''); }
 
@@ -2661,9 +2669,10 @@
             +'</div>'
           +'</div>'
 
-          +'<div class="cpa-sec"><div class="cpa-sec-t">👥 Quem resgatou <small id="cpa-clcount-'+i+'"></small></div>'
+          +'<details class="cpa-sec cpa-cl-det" id="cpa-cldet-'+i+'"'+(couponClaimOpen.has(c.id)?' open':'')+' ontoggle="toggleCouponClaimers('+i+',this.open)">'
+            +'<summary class="cpa-sec-t">👥 Quem resgatou <small id="cpa-clcount-'+i+'"></small><span class="cpa-cl-hint">'+(couponClaimOpen.has(c.id)?'Fechar':'Ver lista')+'</span></summary>'
             +'<div class="cpa-claimers" id="cpa-claimers-'+i+'"></div>'
-          +'</div>'
+          +'</details>'
 
           +'<div class="cpa-sec"><div class="cpa-sec-t">✂️ Onde o desconto vale</div>'
             +'<div class="cpa-grid2">'
@@ -2775,6 +2784,12 @@
       const nCl = couponClaimers(c.code).length;
       set('cpa-clcount-'+i, nCl ? '('+nCl+' pessoa'+(nCl>1?'s':'')+')' : '');
     }
+  };
+
+  window.toggleCouponClaimers = function(i, open){
+    const c = adminCoupons[i]; if(!c) return;
+    if(open) couponClaimOpen.add(c.id); else couponClaimOpen.delete(c.id);
+    const h = document.querySelector('#cpa-cldet-'+i+' .cpa-cl-hint'); if(h) h.textContent = open ? 'Fechar' : 'Ver lista';
   };
 
   window.toggleCouponOpen = function(i){
